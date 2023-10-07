@@ -6,7 +6,7 @@
   Description = 'Convert a registry path to a series of reg commands.'
   GUID = '57c33a4f-3d66-422b-8e2b-596231011201'
   HelpInfoURI = 'https://github.com/Tatsh/winprefs'
-  ModuleVersion = '0.0.2'
+  ModuleVersion = '0.1.0'
   PowerShellVersion = '5.1'
   RequiredAssemblies = @()
   RequiredModules = @()
