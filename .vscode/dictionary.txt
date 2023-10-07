@@ -1,4 +1,5 @@
 analyzer
+appdata
 cmder
 codeql
 dword

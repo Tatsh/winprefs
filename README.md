@@ -3,19 +3,29 @@
 [![QA](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml)
 [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/WinPrefs)](https://www.powershellgallery.com/packages/WinPrefs)
 [![PowerShell Gallery Platform Support](https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported)](https://www.powershellgallery.com/packages/WinPrefs)
+![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/winprefs)
+![GitHub](https://img.shields.io/github/license/Tatsh/winprefs)
+![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.1.1/master)
 
 macOS users: please see [macprefs](https://github.com/Tatsh/macprefs) for an equivalent tool.
 
-This tool converts a registry path to a series of reg commands for copying into a script. By
-default only `HKCU:` and `HKLM:` are mounted in PowerShell. Others need to be mounted and must be
-under the appropriate name such as `HKU` for `HKEY_USERS`.
+This package dumps a registry path to equivalent `reg` commands. It contains two commands.
+`Save-Preferences` creates a batch script composed of `reg` commands for copying into a script.
+`Write-RegCommands` is effectively the same but requires a path argument and only writes to standard
+output.
+
+By default both commands default to a maximum depth of 20. `Save-Preferences` defaults to path
+`HKCU:`.
+
+Note that by default only `HKCU:` and `HKLM:` are mounted in PowerShell. Others need to be mounted
+and must be under the appropriate name such as `HKU` for `HKEY_USERS`.
 
 Keys/values are skipped under these conditions:
 
-- Recursion limit (100)
-- Value contains newlines
+- Depth limit (default: 20); this can be changed by passing `-MaxDepth LIMIT` or `-m LIMIT`
 - Key that cannot be read for any reason such as permissions
-- Values of type `REG_UNKNOWN`
+- Value contains newlines
+- Value has type `REG_UNKNOWN`
 
 An example of an always skipped key under normal circumstances is `HKLM\SECURITY`, even if this is
 run as administrator.
@@ -34,21 +44,51 @@ Install-Module -Name WinPrefs
 ## Usage
 
 ```powershell
-Write-RegCommands HKCU:
+Save-Preferences
 # or the alias:
-prefs-export HKCU:
+prefs-export
 ```
 
-The output is escaped for Batch file only. No variables will be present in the output.
+`Save-Preferences` generates an `exec-reg.bat` file and saves to `${env:APPDATA}\prefs-export` by
+default. This can be changed by passing `-OutputDirectory DIR` (or `-o DIR`).
 
-If you want to use a `reg` command in PowerShell you need to replace `%%` with `%`.
+It accepts switch `-Commit`/`-c` to initialise and commit to a Git repository in the output
+directory. It also accepts a `-DeployKey PATH` parameter and will push if this is specified. Any
+other Git management such as the branch name, etc must be managed in the output directory manually.
+
+```powershell
+Write-RegCommands HKCU:
+# or the alias
+path2reg HKCU:
+```
+
+`Write-RegCommands` prints out equivalent reg commands to reproduce the keys/values at the given
+path. `reg` command output is escaped for Batch file only. No variables will be present in the
+output. If you want to use a `reg` command in PowerShell you need to replace `%%` with `%`.
 
 ### Examples
+
+#### Save `HKEY_LOCAL_MACHINE\Control Panel` with a depth of 1
+
+```powershell
+prefs-export -o . -m 1 -Path 'HKCU:\Control Panel\Desktop'
+cat exec-reg.bat
+```
+
+Output:
+
+```batch
+reg add "HKCU\Control Panel\Desktop\Colors" /v "ActiveBorder" /t REG_SZ /d "212 208 200" /f
+reg add "HKCU\Control Panel\Desktop\Colors" /v "ActiveTitle" /t REG_SZ /d "10 36 106" /f
+REM ...
+```
+
+### Export, commit with Git and push with a key
 
 #### Dump the local environment variables
 
 ```powershell
-prefs-export HKCU:\Environment
+Write-RegCommands HKCU:\Environment
 ```
 
 Output:
@@ -56,15 +96,13 @@ Output:
 ```batch
 reg add "HKCU\Environment" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\OneDrive" /f
 reg add "HKCU\Environment" /v "Path" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\AppData\Local\Microsoft\WindowsApps;C:\msys64\mingw64\bin;C:\tools\Cmder;" /f
-reg add "HKCU\Environment" /v "TEMP" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\AppData\Local\Temp" /f
-reg add "HKCU\Environment" /v "TMP" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\AppData\Local\Temp" /f
-reg add "HKCU\Environment" /v "ChocolateyToolsLocation" /t REG_SZ /d "C:\tools" /f
+REM ...
 ```
 
 #### Dump a single value
 
 ```powershell
-prefs-export HKCU:\Environment\OneDrive
+Write-RegCommands HKCU:\Environment\OneDrive
 ```
 
 Output:
@@ -76,7 +114,7 @@ reg add "HKCU\Environment\OneDrive" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPRO
 #### Dump a binary value
 
 ```powershell
-prefs-export 'HKCU:\Control Panel\Desktop\WindowMetrics\StatusFont'
+Write-RegCommands 'HKCU:\Control Panel\Desktop\WindowMetrics\StatusFont'
 ```
 
 Output:

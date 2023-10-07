@@ -1,16 +1,16 @@
 function ReplaceFullHiveNameWithShortName {
-  param (
+  param(
     [Parameter(Mandatory, HelpMessage = "Registry path with long name and no drive syntax.")]
-    [string] $Path)
+    [string]$Path)
   $_unused, $HkeyParts = $Path.ToUpper().Split('\')[0].Split('_')
-  $Path -Replace '^HKEY_[^\\]+\\', "HK$($(foreach ($Item in $HkeyParts) { $Item[0] }) -Join ''):"
+  $Path -replace '^HKEY_[^\\]+\\', "HK$($(foreach ($Item in $HkeyParts) { $Item[0] }) -Join ''):"
 }
 
 function GetFullHiveName {
-  param (
+  param(
     [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^HK(LM|CU|CR|U|CC|PD):')]
-    [string] $Path
+    [string]$Path
   )
   switch -Wildcard ($Path) {
     'HKCC:*' { 'HKEY_CURRENT_CONFIG' }
@@ -22,8 +22,8 @@ function GetFullHiveName {
   }
 }
 
-function GetRegType() {
-  param (
+function GetRegType () {
+  param(
     [Parameter(Mandatory)]
     [AllowNull()]
     [ValidatePattern('^(Binary|(D|Q)Word|(Multi|Expand)String|String|None)')]
@@ -45,9 +45,9 @@ function GetRegType() {
 }
 
 function FixVParameter {
-  param (
+  param(
     [Parameter(Mandatory)]
-    [string] $Prop
+    [string]$Prop
   )
   if ($Prop -eq '(default)') {
     '/ve '
@@ -58,7 +58,7 @@ function FixVParameter {
 }
 
 function Escape {
-  param (
+  param(
     [Parameter(Mandatory)]
     [AllowNull()]
     [AllowEmptyString()]
@@ -67,14 +67,14 @@ function Escape {
   if ($null -eq $Value) {
     return ""
   }
-  $Value -Replace '"', '""' -Replace '%', '%%' # -Replace "(`r)?`n", "!LF!"
+  $Value -replace '"', '""' -replace '%', '%%' # -Replace "(`r)?`n", "!LF!"
 }
 
 function ConvertValueForReg {
-  param (
+  param(
     [Parameter(Mandatory)]
     [ValidatePattern('^REG_(BINARY|(?:Q|D)WORD|(?:(?:EXPAND|MULTI)_)?SZ|NONE)')]
-    [string] $RegType,
+    [string]$RegType,
 
     [Parameter(Mandatory)]
     [AllowNull()]
@@ -87,7 +87,7 @@ function ConvertValueForReg {
     '^REG_BINARY$' {
       " /d $($(for ($i = 0; $i -lt $Value.Length; $i++) { "{0:x2}" -f $i}) -Join '') "
     }
-    '^REG_MULTI_SZ$' { " /d ""$(Escape $($Value -Join '\0'))"" " }
+    '^REG_MULTI_SZ$' { " /d ""$(Escape $($Value -Join "\0"))"" " }
     '^REG_(?:EXPAND_)?SZ$' { " /d ""$(Escape $Value)"" " }
     '^REG_(?:Q|D)WORD$' { " /d $Value " }
     '^REG_NONE$' { " " }
@@ -96,7 +96,7 @@ function ConvertValueForReg {
 }
 
 function DoWriteRegCommand {
-  param (
+  param(
     [Parameter(Mandatory)]
     [Microsoft.Win32.RegistryKey]$RegKeyObj,
 
@@ -137,7 +137,7 @@ function DoWriteRegCommand {
 }
 
 function DoWriteRegCommands {
-  param (
+  param(
     [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^HK(LM|CU|CR|U|CC):')]
     [string]$Path
@@ -151,79 +151,11 @@ function DoWriteRegCommands {
     'HKU:*' { [Microsoft.Win32.Registry]::Users }
     default { throw }
   }
-  $PathWithoutPrefix = $Path -Replace '^HK(LM|CU|CR|U|CC):', ''
-  $RegKey = $Path -Replace ':', '\' -Replace '\\\\', '\'
+  $PathWithoutPrefix = $Path -replace '^HK(LM|CU|CR|U|CC):', ''
+  $RegKey = $Path -replace ':', '\' -replace '\\\\', '\'
   $RegKeyObj = $Hive.OpenSubKey($PathWithoutPrefix.TrimStart('\'))
   foreach ($Prop in $(Get-Item -ErrorAction SilentlyContinue $Path | Select-Object -ExpandProperty Property)) {
     DoWriteRegCommand $RegKeyObj $Prop $RegKey
-  }
-}
-
-$LIMIT = 100
-$SKIP_RE = '(^HK..:.*\\CurrentVersion\\Explorer\\.*MRU.*)|(\\\*$)|(.*\\Shell\\Bags\\[0-9]+\\Shell\\\{.*)'
-
-function DoWriteRegCommandsRecursive {
-  param (
-    [Parameter(Mandatory, HelpMessage = "Registry path.")]
-    [ValidatePattern('^^HK(LM|CU|CR|U|CC):')]
-    [string]$Path,
-
-    [Parameter(HelpMessage = "Current depth level. Used internally.")]
-    [int]$Depth)
-  if ($Depth -ge $LIMIT) {
-    Write-Debug "Skipping $Path due to depth limit."
-    return
-  }
-  if ($Path -match $SKIP_RE) {
-    Write-Debug "Skipping $Path because it matched the skip RE."
-    continue
-  }
-  try {
-    # SilentlyContinue is needed to skip HKLM\SECURITY
-    $Items = Get-ChildItem -ErrorAction SilentlyContinue -Path $Path
-  }
-  catch {
-    Write-Debug "Skipping $Path. Does the location exist?"
-    return
-  }
-  if (!$Items) {
-    $out = DoWriteRegCommands $(ReplaceFullHiveNameWithShortName $Path)
-    if (!$out) {
-      # Assume it is a full path to a value
-      $Hive = switch -Wildcard ($Path) {
-        'HKCC:*' { [Microsoft.Win32.Registry]::CurrentConfig }
-        'HKCR:*' { [Microsoft.Win32.Registry]::ClassesRoot }
-        'HKCU:*' { [Microsoft.Win32.Registry]::CurrentUser }
-        'HKLM:*' { [Microsoft.Win32.Registry]::LocalMachine }
-        'HKPD:*' { [Microsoft.Win32.Registry]::PerformanceData }
-        'HKU:*' { [Microsoft.Win32.Registry]::Users }
-        default { throw }
-      }
-      $Components = $($Path -Replace '^HK(LM|CU|CR|U|CC):', '').TrimStart('\').Split('\')
-      $RegKeyObj = $Hive.OpenSubKey($($Components[0..($Components.Length - 2)] -Join '\'))
-      DoWriteRegCommand $RegKeyObj $($Path.Split('\')[-1]) $($Path -Replace ':', '')
-    }
-    else {
-      Write-Output $out
-    }
-    return
-  }
-  foreach ($Item in $Items) {
-    $ItemStr = $Item.ToString()
-    $PathShort = ReplaceFullHiveNameWithShortName $ItemStr
-    try {
-      $Children = Get-ChildItem -Path $PathShort -ErrorAction SilentlyContinue
-    }
-    catch {
-      Write-Debug "Skipping $Path because Get-ChildItem failed."
-      continue
-    }
-    if ($Children) {
-      DoWriteRegCommandsRecursive -Path $PathShort -Depth $($Depth + 1)
-    }
-    else {
-      DoWriteRegCommands -Path $PathShort
-    }
   }
 }
 
@@ -234,9 +166,10 @@ function DoWriteRegCommandsRecursive {
   appropriate name such as HKU for HKEY_USERS.
 
   Keys are skipped under these conditions:
-  - Recursion limit (100)
-  - Value contains newlines
+
+  - Depth limit (20); this can be changed by passing -MaxDepth or -m
   - Key that cannot be read for any reason such as permissions.
+  - Value contains newlines
 
   An example of an always skipped key under normal circumstances is HKLM\SECURITY, even if this is
   run as administrator.
@@ -257,16 +190,131 @@ function DoWriteRegCommandsRecursive {
     prefs-export HKLM: > hklm.bat
 #>
 function Write-RegCommands {
-  param (
+  param(
     [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^^HK(LM|CU|CR|U|CC):')]
-    [string]$Path
-  )
-  # Write-Output "setlocal EnableDelayedExpansion"
-  # Write-Output "(set LF=^"
-  # Write-Output "%=EMPTY=%"
-  # Write-Output ")"
-  DoWriteRegCommandsRecursive $Path
+    [string]$Path,
+
+    [Parameter(HelpMessage = "Depth limit.")]
+    [Alias("m")]
+    [int]$MaxDepth = 20,
+
+    [Parameter(HelpMessage = "Current depth level. Used internally.")]
+    [int]$Depth)
+  begin {
+    $SkipRe = '(^HK..:.*\\CurrentVersion\\Explorer\\.*MRU.*)|(\\\*$)|' + `
+      '(.*\\Shell\\Bags\\[0-9]+\\Shell\\\{.*)'
+  }
+  process {
+    if ($Depth -ge $MaxDepth) {
+      Write-Debug "Skipping $Path due to depth limit of $MaxDepth."
+      return
+    }
+    if ($Path -match $SkipRe) {
+      Write-Debug "Skipping $Path because it matched the skip RE."
+      continue
+    }
+    try {
+      # SilentlyContinue is needed to skip HKLM\SECURITY
+      $Items = Get-ChildItem -ErrorAction SilentlyContinue -Path $Path
+    }
+    catch {
+      Write-Debug "Skipping $Path. Does the location exist?"
+      return
+    }
+    if (!$Items) {
+      $out = DoWriteRegCommands $(ReplaceFullHiveNameWithShortName $Path)
+      if (!$out) {
+        # Assume it is a full path to a value
+        $Hive = switch -Wildcard ($Path) {
+          'HKCC:*' { [Microsoft.Win32.Registry]::CurrentConfig }
+          'HKCR:*' { [Microsoft.Win32.Registry]::ClassesRoot }
+          'HKCU:*' { [Microsoft.Win32.Registry]::CurrentUser }
+          'HKLM:*' { [Microsoft.Win32.Registry]::LocalMachine }
+          'HKPD:*' { [Microsoft.Win32.Registry]::PerformanceData }
+          'HKU:*' { [Microsoft.Win32.Registry]::Users }
+          default { throw }
+        }
+        $Components = $($Path -replace '^HK(LM|CU|CR|U|CC):', '').TrimStart('\').Split('\')
+        $RegKeyObj = $Hive.OpenSubKey($($Components[0..($Components.Length - 2)] -join '\'))
+        DoWriteRegCommand $RegKeyObj $($Path.Split('\')[-1]) $($Path -replace ':', '')
+      }
+      else {
+        Write-Output $out
+      }
+      return
+    }
+    foreach ($Item in $Items) {
+      $ItemStr = $Item.ToString()
+      $PathShort = ReplaceFullHiveNameWithShortName $ItemStr
+      try {
+        $Children = Get-ChildItem -Path $PathShort -ErrorAction SilentlyContinue
+      }
+      catch {
+        Write-Debug "Skipping $Path because Get-ChildItem failed."
+        continue
+      }
+      if ($Children) {
+        Write-RegCommands -Path $PathShort -Depth $($Depth + 1) -MaxDepth $MaxDepth
+      }
+      else {
+        DoWriteRegCommands -Path $PathShort
+      }
+    }
+  }
 }
-Set-Alias -Name prefs-export -Value Write-RegCommands
-Export-ModuleMember -Function Write-RegCommands -Alias prefs-export
+
+function Save-Preferences {
+  param(
+    [Parameter(HelpMessage = "Key for pushing to Git repository.")]
+    [Alias("K")]
+    [string]$DeployKey,
+
+    [Parameter(HelpMessage = "Commit the changes with Git.")]
+    [Alias("c")]
+    [switch]$Commit = $false,
+
+    [Parameter(HelpMessage = "Where to store the exported data.")]
+    [Alias("o")]
+    [string]$OutputDirectory = "${env:APPDATA}\prefs-export",
+
+    [Parameter(HelpMessage = "Depth limit.")]
+    [Alias("m")]
+    [int]$MaxDepth = 20,
+
+    [Parameter(HelpMessage = "Registry path.")]
+    [ValidatePattern('^^HK(LM|CU|CR|U|CC):')]
+    [string]$Path = 'HKCU:'
+  )
+  if ($DeployKey) {
+    $DeployKey = Resolve-Path -Path $DeployKey -ErrorAction SilentlyContinue
+  }
+  New-Item -Force -ItemType directory -Path "$OutputDirectory" | Out-Null
+  Write-RegCommands -MaxDepth $MaxDepth -Path $Path | `
+    Sort-Object -CaseSensitive -Unique > "$OutputDirectory\exec-reg.bat"
+  $Git = (Get-Command git).Path
+  if ($Commit -and $Git) {
+    if (-not (Test-Path -PathType Container -Path ".git")) {
+      Write-Debug "Init"
+      $OriginalLocation = Get-Location
+      Set-Location $OutputDirectory
+      git init
+      Set-Location -Path $OriginalLocation
+    }
+    Write-Debug "Committing changes"
+    git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" add .
+    git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" commit --no-gpg-sign `
+      --quiet --no-verify "--author=winprefs <winprefs@tat.sh>" `
+      -m "Automatic commit @ $(Get-Date -UFormat %c)"
+    if (Test-Path -PathType Leaf -Path $DeployKey) {
+      git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" config core.sshCommand `
+        "ssh -i ${DeployKey} -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no"
+      git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" push -u --porcelain `
+        --no-signed origin origin $(git branch --show-current)
+    }
+  }
+}
+
+Set-Alias -Name path2reg -Value Write-RegCommands
+Set-Alias -Name prefs-export -Value Save-Preferences
+Export-ModuleMember -Alias path2reg, prefs-export -Function Save-Preferences, Write-RegCommands
