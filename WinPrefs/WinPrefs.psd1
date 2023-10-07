@@ -23,7 +23,7 @@
       LicenseUri   = 'https://github.com/Tatsh/winprefs/blob/master/LICENSE.txt'
       ProjectUri   = 'https://github.com/Tatsh/winprefs'
       ReleaseNotes = 'https://github.com/Tatsh/winprefs/blob/master/CHANGELOG.md'
-      Tags         = @('admin', 'administrator', 'backup', 'batch', 'registry')
+      Tags         = @('admin', 'administrator', 'backup', 'batch', 'registry', 'windows')
     }
   }
 }
