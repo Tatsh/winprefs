@@ -87,7 +87,7 @@ function ConvertValueForReg {
     '^REG_BINARY$' {
       " /d $($(for ($i = 0; $i -lt $Value.Length; $i++) { "{0:x2}" -f $i}) -Join '') "
     }
-    '^REG_MULTI_SZ$' { " /d ""$(Escape $($Value -Join "`0"))"" " }
+    '^REG_MULTI_SZ$' { " /d ""$(Escape $($Value -Join '\0'))"" " }
     '^REG_(?:EXPAND_)?SZ$' { " /d ""$(Escape $Value)"" " }
     '^REG_(?:Q|D)WORD$' { " /d $Value " }
     '^REG_NONE$' { " " }
