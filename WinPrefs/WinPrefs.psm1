@@ -239,7 +239,7 @@ function DoWriteRegCommandsRecursive {
   - Key that cannot be read for any reason such as permissions.
 
   An example of an always skipped key under normal circumstances is HKLM\SECURITY, even if this is
-  run as adminstrator.
+  run as administrator.
 
   WARNING: If you save an entire tree such as HKLM to a file and attempt to run said script, you
   probably will break your OS. The output of this tool is meant for getting a single command at

@@ -1,0 +1,37 @@
+{
+  "author": "Andrew Udvare <audvare@gmail.com>",
+  "description": "Convert a registry path to a series of reg commands.",
+  "devDependencies": {
+    "@prettier/plugin-xml": "^3.2.0",
+    "cspell": "^7.3.7",
+    "markdownlint-cli2": "^0.10.0",
+    "prettier": "^3.0.3",
+    "prettier-plugin-ini": "^1.1.0",
+    "prettier-plugin-sort-json": "^3.1.0",
+    "prettier-plugin-toml": "^1.0.0"
+  },
+  "prettier": {
+    "endOfLine": "lf",
+    "iniSpaceAroundEquals": true,
+    "jsonRecursiveSort": true,
+    "plugins": [
+      "@prettier/plugin-xml",
+      "prettier-plugin-ini",
+      "prettier-plugin-sort-json",
+      "prettier-plugin-toml"
+    ],
+    "printWidth": 100,
+    "singleQuote": true
+  },
+  "license": "MIT",
+  "name": "winprefs",
+  "repository": "git@github.com:Tatsh/winprefs.git",
+  "scripts": {
+    "check-formatting": "prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
+    "check-spelling": "cspell --no-progress .",
+    "clean-dict": "r=(); while IFS=$\\n read -r w; do ! rg --no-config -qi. -g '!.vscode/dictionary.txt' -m 1 \"$w\" . && r+=(\"$w\"); done < ./.vscode/dictionary.txt; j=$(printf \"|%s\" \"${r[@]}\"); j=\"^(${j:1})$\"; grep -Ev \"${j}\" ./.vscode/dictionary.txt > new && mv new ./.vscode/dictionary.txt",
+    "format": "yarn prettier -w .",
+    "qa": "yarn check-spelling && yarn check-formatting"
+  },
+  "version": "0.0.1"
+}
