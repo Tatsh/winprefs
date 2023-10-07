@@ -70,7 +70,7 @@ prefs-export HKCU:\Environment\OneDrive
 Output:
 
 ```batch
-reg add "HKCU\Environment\OneDrive" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\tatsh\OneDrive" /f
+reg add "HKCU\Environment\OneDrive" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\OneDrive" /f
 ```
 
 #### Dump a binary value
