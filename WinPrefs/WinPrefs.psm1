@@ -1,163 +1,6 @@
-function ReplaceFullHiveNameWithShortName {
-  param(
-    [Parameter(Mandatory, HelpMessage = "Registry path with long name and no drive syntax.")]
-    [string]$Path)
-  $_unused, $HkeyParts = $Path.ToUpper().Split('\')[0].Split('_')
-  $Path -replace '^HKEY_[^\\]+\\', "HK$($(foreach ($Item in $HkeyParts) { $Item[0] }) -Join ''):"
-}
-
-function GetFullHiveName {
-  param(
-    [Parameter(Mandatory, HelpMessage = "Registry path.")]
-    [ValidatePattern('^HK(LM|CU|CR|U|CC|PD):')]
-    [string]$Path
-  )
-  switch -Wildcard ($Path) {
-    'HKCC:*' { 'HKEY_CURRENT_CONFIG' }
-    'HKCR:*' { 'HKEY_CLASSES_ROOT' }
-    'HKCU:*' { 'HKEY_CURRENT_USER' }
-    'HKLM:*' { 'HKEY_LOCAL_MACHINE' }
-    'HKU:*' { 'HKEY_USERS' }
-    default { throw }
-  }
-}
-
-function GetRegType () {
-  param(
-    [Parameter(Mandatory)]
-    [AllowNull()]
-    [ValidatePattern('^(Binary|(D|Q)Word|(Multi|Expand)String|String|None)')]
-    $Value
-  )
-  if ($null -eq $Value) {
-    return 'REG_NONE'
-  }
-  switch ($Value) {
-    'Binary' { 'REG_BINARY' }
-    'DWord' { 'REG_DWORD' }
-    'ExpandString' { 'REG_EXPAND_SZ' }
-    'MultiString' { 'REG_MULTI_SZ' }
-    'None' { 'REG_NONE' }
-    'QWord' { 'REG_QWORD' }
-    'String' { 'REG_SZ' }
-    default { throw "$Value" }
-  }
-}
-
-function FixVParameter {
-  param(
-    [Parameter(Mandatory)]
-    [string]$Prop
-  )
-  if ($Prop -eq '(default)') {
-    '/ve '
-  }
-  else {
-    "/v ""$(Escape $Prop)"" "
-  }
-}
-
-function Escape {
-  param(
-    [Parameter(Mandatory)]
-    [AllowNull()]
-    [AllowEmptyString()]
-    [string]$Value
-  )
-  if ($null -eq $Value) {
-    return ""
-  }
-  $Value -replace '"', '""' -replace '%', '%%'
-}
-
-function ConvertValueForReg {
-  param(
-    [Parameter(Mandatory)]
-    [ValidatePattern('^REG_(BINARY|(?:Q|D)WORD|(?:(?:EXPAND|MULTI)_)?SZ|NONE)')]
-    [string]$RegType,
-
-    [Parameter(Mandatory)]
-    [AllowNull()]
-    $Value
-  )
-  if ($null -eq $RegType) {
-    return " "
-  }
-  switch -Regex ($RegType) {
-    '^REG_BINARY$' {
-      " /d $($(for ($i = 0; $i -lt $Value.Length; $i++) { "{0:x2}" -f $i}) -Join '') "
-    }
-    '^REG_MULTI_SZ$' { " /d ""$(Escape $($Value -Join "\0"))"" " }
-    '^REG_(?:EXPAND_)?SZ$' { " /d ""$(Escape $Value)"" " }
-    '^REG_(?:Q|D)WORD$' { " /d $Value " }
-    '^REG_NONE$' { " " }
-    default { throw "$RegType" }
-  }
-}
-
-function DoWriteRegCommand {
-  param(
-    [Parameter(Mandatory)]
-    [Microsoft.Win32.RegistryKey]$RegKeyObj,
-
-    [Parameter(Mandatory)]
-    [string]$Prop,
-
-    [Parameter(Mandatory)]
-    [string]$RegKey
-  )
-  $GetValuePropArg = if ($Prop -eq '(default)') { $null } else { $Prop }
-  $Value = $RegKeyObj.GetValue($GetValuePropArg, $null,
-    [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
-  $RegProp = FixVParameter $Prop
-  try {
-    $ValueKind = $RegKeyObj.GetValueKind($GetValuePropArg).ToString()
-  }
-  catch {
-    Write-Debug "Skipping $RegKey\$Prop. GetValueKind() failed."
-    return
-  }
-  if ($ValueKind -eq 'Unknown') {
-    Write-Debug "Skipping $RegKey\$Prop of unknown type."
-    return
-  }
-  try {
-    $RegType = GetRegType $ValueKind
-  }
-  catch {
-    Write-Debug "Unable to determine registry type: RegKeyObj = $RegKeyObj, Prop = $Prop"
-    return
-  }
-  if ($Value -match "(`r)?`n") {
-    Write-Debug "Skipping $RegKeyObj $Prop because it contains newlines."
-    return
-  }
-  $RegValue = ConvertValueForReg -RegType $RegType -Value $Value
-  "reg add ""$(Escape $RegKey)"" $RegProp/t $RegType$RegValue/f"
-}
-
-function DoWriteRegCommands {
-  param(
-    [Parameter(Mandatory, HelpMessage = "Registry path.")]
-    [ValidatePattern('^HK(LM|CU|CR|U|CC):')]
-    [string]$Path
-  )
-  $Hive = switch -Wildcard ($Path) {
-    'HKCC:*' { [Microsoft.Win32.Registry]::CurrentConfig }
-    'HKCR:*' { [Microsoft.Win32.Registry]::ClassesRoot }
-    'HKCU:*' { [Microsoft.Win32.Registry]::CurrentUser }
-    'HKLM:*' { [Microsoft.Win32.Registry]::LocalMachine }
-    'HKPD:*' { [Microsoft.Win32.Registry]::PerformanceData }
-    'HKU:*' { [Microsoft.Win32.Registry]::Users }
-    default { throw }
-  }
-  $PathWithoutPrefix = $Path -replace '^HK(LM|CU|CR|U|CC):', ''
-  $RegKey = $Path -replace ':', '\' -replace '\\\\', '\'
-  $RegKeyObj = $Hive.OpenSubKey($PathWithoutPrefix.TrimStart('\'))
-  foreach ($Prop in $(Get-Item -ErrorAction SilentlyContinue $Path | Select-Object -ExpandProperty Property)) {
-    DoWriteRegCommand $RegKeyObj $Prop $RegKey
-  }
-}
+. "$PSScriptRoot\Utils\RegCommand.ps1"
+. "$PSScriptRoot\Utils\Registry.ps1"
+. "$PSScriptRoot\Utils\Shell.ps1"
 
 <#
 .SYNOPSIS
@@ -209,6 +52,7 @@ function Write-RegCommands {
       '(.*\\Shell\\Bags\\[0-9]+\\Shell\\\{.*)'
   }
   process {
+    Write-Output "$Depth $MaxDepth"
     if ($Depth -ge $MaxDepth) {
       Write-Debug "Skipping $Path due to depth limit of $MaxDepth."
       return
@@ -333,14 +177,6 @@ function Save-Preferences {
         --no-signed origin origin $(git branch --show-current)
     }
   }
-}
-
-function GetSafePathName {
-  param(
-    [Parameter(Mandatory)]
-    [string]$Path
-  )
-  $Path -replace ':', '-' -replace '\\', '-' -replace '-+$', ''
 }
 
 <#
