@@ -266,13 +266,13 @@ function Write-RegCommands {
 
 function Save-Preferences {
   param(
-    [Parameter(HelpMessage = "Key for pushing to Git repository.")]
-    [Alias("K")]
-    [string]$DeployKey,
-
     [Parameter(HelpMessage = "Commit the changes with Git.")]
     [Alias("c")]
     [switch]$Commit = $false,
+
+    [Parameter(HelpMessage = "Key for pushing to Git repository.")]
+    [Alias("K")]
+    [string]$DeployKey,
 
     [Parameter(HelpMessage = "Where to store the exported data.")]
     [Alias("o")]
@@ -313,6 +313,53 @@ function Save-Preferences {
         --no-signed origin origin $(git branch --show-current)
     }
   }
+}
+
+function New-SavePreferencesScheduledTask {
+  param(
+    [Parameter(HelpMessage = "Key for pushing to Git repository.")]
+    [Alias("K")]
+    [string]$DeployKey,
+
+    [Parameter(HelpMessage = "Depth limit.")]
+    [Alias("m")]
+    [int]$MaxDepth = 20,
+
+    [Parameter(HelpMessage = "Where to store the exported data.")]
+    [Alias("o")]
+    [string]$OutputDirectory = "${env:APPDATA}\prefs-export",
+
+    [Parameter(HelpMessage = "Registry path.")]
+    [ValidatePattern('^^HK(LM|CU|CR|U|CC):')]
+    [string]$Path = 'HKCU:',
+
+    [Parameter(
+      HelpMessage = "Arguments to Register-ScheduledTask.",
+      ValueFromRemainingArguments = $true
+    )]
+    [string[]]$RegisterArgs
+  )
+  $TasksDir = "${env:APPDATA}\WinPrefs\tasks"
+  New-Item -Force -ItemType directory -Path $TasksDir | Out-Null
+  $TaskFile = "$TasksDir\export-${Path -replace ':','-' -replace '\','-'}.ps1"
+  if (Test-Path -PathType leaf $TaskFile) {
+    Write-Warning 'Task file for this path already exists. Overwriting.'
+  }
+  $DeployKeyArg = if ($DeployKey -and (Test-Path -PathType leaf $DeployKey)) {
+    " -DeployKey ""$DeployKey"""
+  }
+  else { '' }
+  Write-Output "Import-Module WinPrefs" > $TaskFile
+  Write-Output "Save-Preferences -Commit$DeployKeyArg -MaxDepth $MaxDepth -OutputDirectory ""$OutputDirectory"" -Path ""$Path""" >> $TaskFile
+  $Action = New-ScheduledTaskAction -Argument $TaskFile -Execute 'powershell.exe' -WorkingDirectory $HOME
+  Register-ScheduledTask `
+    -Action $Action `
+    -Description "Run prefs-export at midnight daily (path $Path)." `
+    -Force `
+    -TaskName "SavePreferences-$Path" `
+    -TaskPath WinPrefs `
+    -Trigger $(New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Hours 12)) `
+    @RegisterArgs
 }
 
 Set-Alias -Name path2reg -Value Write-RegCommands
