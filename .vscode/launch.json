@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "attachDotnetDebugger": true,
+      "createTemporaryIntegratedConsole": true,
+      "name": "PowerShell Run Pester Tests",
+      "request": "launch",
+      "script": "Invoke-Pester",
+      "type": "PowerShell"
+    }
+  ],
+  "version": "0.2.0"
+}
