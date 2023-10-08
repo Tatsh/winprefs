@@ -14,6 +14,7 @@ hklm
 hkpd
 macprefs
 psscriptanalyzer
+pwsh
 qword
 sarif
 securestring
