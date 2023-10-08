@@ -66,6 +66,24 @@ path2reg HKCU:
 path. `reg` command output is escaped for Batch file only. No variables will be present in the
 output. If you want to use a `reg` command in PowerShell you need to replace `%%` with `%`.
 
+## Automated Usage
+
+You can create a scheduled task that will run every 12 hours to backup a registry path.
+`Register-SavePreferencesScheduledTask` (`winprefs-install-job`) can be called multiple times with
+different `-Path` arguments. Like `Save-Preferences` it can automatically commit to a repository and
+push. Because it uses a PowerShell script, `Execution-Policy` must be changed to `Bypass`:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
+```
+
+Calling `Register-SavePreferencesScheduledTask` multiple times with the same `-Path` argument will
+not break anything. If a task with the same name already exists, it must be unregistered before its
+replacement can be made.
+
+Any task can be uninstalled with `Unregister-SavePreferencesScheduledTask` (`winprefs-uninstall-job`)
+with the same `-Path` argument.
+
 ### Examples
 
 #### Save `HKEY_LOCAL_MACHINE\Control Panel` with a depth of 1
