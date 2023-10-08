@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-10-08
+
 ### Added
 
 - Add `Register-SavePreferencesScheduledTask` and `Unregister-SavePreferencesScheduledTask` to
@@ -27,5 +29,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[Unreleased]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Tatsh/winprefs/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0
