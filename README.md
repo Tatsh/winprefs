@@ -71,11 +71,7 @@ output. If you want to use a `reg` command in PowerShell you need to replace `%%
 You can create a scheduled task that will run every 12 hours to backup a registry path.
 `Register-SavePreferencesScheduledTask` (`winprefs-install-job`) can be called multiple times with
 different `-Path` arguments. Like `Save-Preferences` it can automatically commit to a repository and
-push. Because it uses a PowerShell script, `Execution-Policy` must be changed to `Bypass`:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope CurrentUser
-```
+push.
 
 Calling `Register-SavePreferencesScheduledTask` multiple times with the same `-Path` argument will
 not break anything. If a task with the same name already exists, it must be unregistered before its
