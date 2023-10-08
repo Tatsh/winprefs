@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2023-10-08
+
 ### Fixed
 
 - Use `pwsh.exe` not `powershell.exe` for the scheduled task.
@@ -40,5 +42,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Format code
 
 [Unreleased]: https://github.com/Tatsh/winprefs/compare/v0.2.0...HEAD
+[0.2.1]: https://github.com/Tatsh/winprefs/compare/v0.2.1...HEAD
 [0.2.0]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0
