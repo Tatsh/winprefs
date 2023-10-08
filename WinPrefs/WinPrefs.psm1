@@ -1,14 +1,14 @@
 function ReplaceFullHiveNameWithShortName {
   param(
-    [Parameter(Mandatory,HelpMessage = "Registry path with long name and no drive syntax.")]
+    [Parameter(Mandatory, HelpMessage = "Registry path with long name and no drive syntax.")]
     [string]$Path)
-  $_unused,$HkeyParts = $Path.ToUpper().Split('\')[0].Split('_')
-  $Path -replace '^HKEY_[^\\]+\\',"HK$($(foreach ($Item in $HkeyParts) { $Item[0] }) -Join ''):"
+  $_unused, $HkeyParts = $Path.ToUpper().Split('\')[0].Split('_')
+  $Path -replace '^HKEY_[^\\]+\\', "HK$($(foreach ($Item in $HkeyParts) { $Item[0] }) -Join ''):"
 }
 
 function GetFullHiveName {
   param(
-    [Parameter(Mandatory,HelpMessage = "Registry path.")]
+    [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^HK(LM|CU|CR|U|CC|PD):')]
     [string]$Path
   )
@@ -67,7 +67,7 @@ function Escape {
   if ($null -eq $Value) {
     return ""
   }
-  $Value -replace '"','""' -replace '%','%%'
+  $Value -replace '"', '""' -replace '%', '%%'
 }
 
 function ConvertValueForReg {
@@ -107,7 +107,7 @@ function DoWriteRegCommand {
     [string]$RegKey
   )
   $GetValuePropArg = if ($Prop -eq '(default)') { $null } else { $Prop }
-  $Value = $RegKeyObj.GetValue($GetValuePropArg,$null,
+  $Value = $RegKeyObj.GetValue($GetValuePropArg, $null,
     [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
   $RegProp = FixVParameter $Prop
   try {
@@ -138,7 +138,7 @@ function DoWriteRegCommand {
 
 function DoWriteRegCommands {
   param(
-    [Parameter(Mandatory,HelpMessage = "Registry path.")]
+    [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^HK(LM|CU|CR|U|CC):')]
     [string]$Path
   )
@@ -151,8 +151,8 @@ function DoWriteRegCommands {
     'HKU:*' { [Microsoft.Win32.Registry]::Users }
     default { throw }
   }
-  $PathWithoutPrefix = $Path -replace '^HK(LM|CU|CR|U|CC):',''
-  $RegKey = $Path -replace ':','\' -replace '\\\\','\'
+  $PathWithoutPrefix = $Path -replace '^HK(LM|CU|CR|U|CC):', ''
+  $RegKey = $Path -replace ':', '\' -replace '\\\\', '\'
   $RegKeyObj = $Hive.OpenSubKey($PathWithoutPrefix.TrimStart('\'))
   foreach ($Prop in $(Get-Item -ErrorAction SilentlyContinue $Path | Select-Object -ExpandProperty Property)) {
     DoWriteRegCommand $RegKeyObj $Prop $RegKey
@@ -194,7 +194,7 @@ function DoWriteRegCommands {
 #>
 function Write-RegCommands {
   param(
-    [Parameter(Mandatory,HelpMessage = "Registry path.")]
+    [Parameter(Mandatory, HelpMessage = "Registry path.")]
     [ValidatePattern('^^HK(LM|CU|CR|U|CC):')]
     [string]$Path,
 
@@ -206,7 +206,7 @@ function Write-RegCommands {
     [int]$Depth)
   begin {
     $SkipRe = '(^HK..:.*\\CurrentVersion\\Explorer\\.*MRU.*)|(\\\*$)|' + `
-       '(.*\\Shell\\Bags\\[0-9]+\\Shell\\\{.*)'
+      '(.*\\Shell\\Bags\\[0-9]+\\Shell\\\{.*)'
   }
   process {
     if ($Depth -ge $MaxDepth) {
@@ -238,9 +238,9 @@ function Write-RegCommands {
           'HKU:*' { [Microsoft.Win32.Registry]::Users }
           default { throw }
         }
-        $Components = $($Path -replace '^HK(LM|CU|CR|U|CC):','').TrimStart('\').Split('\')
+        $Components = $($Path -replace '^HK(LM|CU|CR|U|CC):', '').TrimStart('\').Split('\')
         $RegKeyObj = $Hive.OpenSubKey($($Components[0..($Components.Length - 2)] -join '\'))
-        DoWriteRegCommand $RegKeyObj $($Path.Split('\')[-1]) $($Path -replace ':','')
+        DoWriteRegCommand $RegKeyObj $($Path.Split('\')[-1]) $($Path -replace ':', '')
       }
       else {
         Write-Output $out
@@ -311,7 +311,7 @@ function Save-Preferences {
   }
   New-Item -Force -ItemType directory -Path "$OutputDirectory" | Out-Null
   Write-RegCommands -MaxDepth $MaxDepth -Path $Path | `
-     Sort-Object -CaseSensitive -Unique > "$OutputDirectory\exec-reg.bat"
+    Sort-Object -CaseSensitive -Unique > "$OutputDirectory\exec-reg.bat"
   $Git = (Get-Command git).Path
   if ($Commit -and $Git) {
     if (-not (Test-Path -PathType Container -Path ".git")) {
@@ -324,13 +324,13 @@ function Save-Preferences {
     Write-Debug "Committing changes"
     git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" add .
     git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" commit --no-gpg-sign `
-       --quiet --no-verify "--author=winprefs <winprefs@tat.sh>" `
-       -m "Automatic commit @ $(Get-Date -UFormat %c)"
+      --quiet --no-verify "--author=winprefs <winprefs@tat.sh>" `
+      -m "Automatic commit @ $(Get-Date -UFormat %c)"
     if (Test-Path -PathType Leaf -Path $DeployKey) {
       git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" config core.sshCommand `
-         "ssh -i ${DeployKey} -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no"
+        "ssh -i ${DeployKey} -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no"
       git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" push -u --porcelain `
-         --no-signed origin origin $(git branch --show-current)
+        --no-signed origin origin $(git branch --show-current)
     }
   }
 }
@@ -340,7 +340,7 @@ function GetSafePathName {
     [Parameter(Mandatory)]
     [string]$Path
   )
-  $Path -replace ':','-' -replace '\\','-' -replace '-+$',''
+  $Path -replace ':', '-' -replace '\\', '-' -replace '-+$', ''
 }
 
 <#
@@ -402,32 +402,32 @@ function Register-SavePreferencesScheduledTask {
   if (Get-ScheduledTaskInfo -TaskName $TaskName -TaskPath $TaskPath) {
     # Only updating the script is necessary.
     Write-Output -NoEnumerate `
-       "Task already exists. If you want to restore to the default task settings, you must delete the
+      "Task already exists. If you want to restore to the default task settings, you must delete the
 existing task '$TaskPath\$TaskName' in Task Scheduler. You can also run
 Unregister-SavePreferencesScheduledTask with the same -Path argument."
     return
   }
   $Action = New-ScheduledTaskAction `
-     -Argument "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfileLoadTime -WindowStyle Hidden -File $TaskFile" `
-     -Execute 'pwsh.exe' `
-     -WorkingDirectory $HOME
+    -Argument "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfileLoadTime -WindowStyle Hidden -File $TaskFile" `
+    -Execute 'pwsh.exe' `
+    -WorkingDirectory $HOME
   $Trigger = New-ScheduledTaskTrigger `
-     -At ([datetime]::Today.AddDays(1)) `
-     -Once `
-     -RandomDelay (New-TimeSpan -Minutes 30) `
-     -RepetitionInterval (New-TimeSpan -Hours 12)
+    -At ([datetime]::Today.AddDays(1)) `
+    -Once `
+    -RandomDelay (New-TimeSpan -Minutes 30) `
+    -RepetitionInterval (New-TimeSpan -Hours 12)
   $Settings = New-ScheduledTaskSettingsSet `
-     -MultipleInstances IgnoreNew `
-     -ExecutionTimeLimit (New-TimeSpan -Hours 2) `
-     -StartWhenAvailable
+    -MultipleInstances IgnoreNew `
+    -ExecutionTimeLimit (New-TimeSpan -Hours 2) `
+    -StartWhenAvailable
   Register-ScheduledTask `
-     -Action $Action `
-     -Description "Run SavePreferences every 12 hours (path $Path)." `
-     -Force `
-     -Settings $Settings `
-     -TaskName "SavePreferences-$SafePathName" `
-     -TaskPath $TaskPath `
-     -Trigger $Trigger
+    -Action $Action `
+    -Description "Run SavePreferences every 12 hours (path $Path)." `
+    -Force `
+    -Settings $Settings `
+    -TaskName "SavePreferences-$SafePathName" `
+    -TaskPath $TaskPath `
+    -Trigger $Trigger
 }
 
 <#
@@ -462,10 +462,10 @@ function Unregister-SavePreferencesScheduledTask {
   if (-not (Get-ScheduledTask | Where-Object { $_.TaskPath -eq '\tat.sh\WinPrefs\' })) {
     $ScheduleObject = New-Object -ComObject Schedule.Service
     $ScheduleObject.connect()
-    $ScheduleObject.GetFolder('\').DeleteFolder('tat.sh\WinPrefs',$null)
+    $ScheduleObject.GetFolder('\').DeleteFolder('tat.sh\WinPrefs', $null)
     if (-not (Get-ScheduledTask | Where-Object { $_.TaskPath -eq '\tat.sh\' })) {
       # Again for tat.sh
-      $ScheduleObject.GetFolder('\').DeleteFolder('tat.sh',$null)
+      $ScheduleObject.GetFolder('\').DeleteFolder('tat.sh', $null)
     }
   }
   if (((Get-ChildItem -Path $TasksDir -Force) | Measure-Object).Count -eq 0) {
@@ -481,6 +481,6 @@ Set-Alias -Name path2reg -Value Write-RegCommands
 Set-Alias -Name prefs-export -Value Save-Preferences
 Set-Alias -Name winprefs-install-job -Value Register-SavePreferencesScheduledTask
 Set-Alias -Name winprefs-uninstall-job -Value Unregister-SavePreferencesScheduledTask
-Export-ModuleMember -Alias path2reg,prefs-export,winprefs-install-job,winprefs-uninstall-job `
-   -Function Register-SavePreferencesScheduledTask,Save-Preferences,`
-   Unregister-SavePreferencesScheduledTask,Write-RegCommands
+Export-ModuleMember -Alias path2reg, prefs-export, winprefs-install-job, winprefs-uninstall-job `
+  -Function Register-SavePreferencesScheduledTask, Save-Preferences, `
+  Unregister-SavePreferencesScheduledTask, Write-RegCommands
