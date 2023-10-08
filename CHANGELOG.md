@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- Use `pwsh.exe` not `powershell.exe` for the scheduled task.
+- Fixed invoking the scheduled task.
+
+### Changed
+
+- Try to hide the window of the scheduled task. Affected by
+  [PowerShell #3028](https://github.com/PowerShell/PowerShell/issues/3028).
+
 ## [0.2.0] - 2023-10-08
 
 ### Added
