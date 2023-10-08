@@ -191,8 +191,6 @@ function DoWriteRegCommands {
 .EXAMPLE
   PS> prefs-export 'HKCU:\Control Panel\Desktop'
   reg add ...
-.EXAMPLE
-  PS> prefs-export HKLM: > hklm.bat
 #>
 function Write-RegCommands {
   param(
@@ -410,8 +408,8 @@ Unregister-SavePreferencesScheduledTask with the same -Path argument."
     return
   }
   $Action = New-ScheduledTaskAction `
-     -Argument $TaskFile `
-     -Execute 'powershell.exe' `
+     -Argument "-ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfileLoadTime -WindowStyle Hidden -File $TaskFile" `
+     -Execute 'pwsh.exe' `
      -WorkingDirectory $HOME
   $Trigger = New-ScheduledTaskTrigger `
      -At ([datetime]::Today.AddDays(1)) `
@@ -424,7 +422,7 @@ Unregister-SavePreferencesScheduledTask with the same -Path argument."
      -StartWhenAvailable
   Register-ScheduledTask `
      -Action $Action `
-     -Description "Run prefs-export every 12 hours (path $Path)." `
+     -Description "Run SavePreferences every 12 hours (path $Path)." `
      -Force `
      -Settings $Settings `
      -TaskName "SavePreferences-$SafePathName" `
