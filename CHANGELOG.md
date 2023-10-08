@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Add `Register-SavePreferencesScheduledTask` and `Unregister-SavePreferencesScheduledTask` to
+  setup an automatic backup job. Can have multiple jobs with different paths.
+
 ## [0.1.0] - 2023-10-07
 
 ### Added

@@ -12,9 +12,10 @@
   RequiredModules = @()
   RootModule = 'WinPrefs'
 
-  AliasesToExport = @('path2reg','prefs-export')
+  AliasesToExport = @('path2reg','prefs-export','winprefs-install-job','winprefs-uninstall-job')
   CmdletsToExport = @()
-  FunctionsToExport = @('Save-Preferences','Write-RegCommands')
+  FunctionsToExport = @('Register-SavePreferencesScheduledTask','Save-Preferences',
+    'Unregister-SavePreferencesScheduledTask','Write-RegCommands')
   VariablesToExport = '*'
 
   PrivateData = @{
