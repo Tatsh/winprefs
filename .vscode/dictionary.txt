@@ -2,6 +2,7 @@ analyzer
 appdata
 cmder
 codeql
+datetime
 dword
 ehthumbs
 esbenp
