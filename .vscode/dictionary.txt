@@ -15,8 +15,7 @@ macprefs
 psscriptanalyzer
 qword
 sarif
-shellcheck
-shfmt
+securestring
 tatsh
 udvare
 userprofile
