@@ -22,5 +22,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[Unreleased]: <https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD>
-[0.1.0]: <https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0>
+[Unreleased]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0
