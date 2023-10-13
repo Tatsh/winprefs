@@ -1,8 +1,18 @@
 {
+  "[c]": {
+    "editor.tabSize": 4
+  },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
   "cSpell.enabled": true,
+  "cmake.configureArgs": [
+    "-G",
+    "Ninja",
+    "-DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc",
+    "-DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres=ON",
+    "-DCMAKE_VERBOSE_MAKEFILE=ON"
+  ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,

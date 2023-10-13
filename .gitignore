@@ -13,3 +13,4 @@ Thumbs.db
 # Other
 *.bat
 node_modules/
+build/
