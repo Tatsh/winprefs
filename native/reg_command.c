@@ -19,7 +19,7 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
         *heap = false;
         return REG_PARAM_SLASH_V_EMPTY;
     }
-    size_t escaped_len = (7 + wcslen(escaped)) * sizeof(wchar_t);
+    size_t escaped_len = (7 + wcslen(escaped)) * WL;
     wchar_t *out = malloc(escaped_len);
     if (!out) {
         abort();
@@ -55,12 +55,11 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         return out;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
-        wchar_t *s =
-            escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : (data_len / sizeof(wchar_t)) - 1);
+        wchar_t *s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : (data_len / WL) - 1);
         if (s == nullptr) {
             return nullptr;
         }
-        size_t s_size = (wcslen(s) + 8) * sizeof(wchar_t);
+        size_t s_size = (wcslen(s) + 8) * WL;
         wchar_t *out = malloc(s_size);
         if (!out) {
             abort();
@@ -70,7 +69,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         return out;
     }
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
-        size_t s_size = 32 * sizeof(wchar_t);
+        size_t s_size = 32 * WL;
         wchar_t *out = malloc(s_size);
         if (!out) {
             abort();
@@ -160,7 +159,7 @@ void do_write_reg_commands(HKEY hk, unsigned n_values, const wchar_t *full_path,
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
         value[0] = '\0';
-        value_len = MAX_VALUE_NAME * sizeof(wchar_t);
+        value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
         ret = RegEnumValue(hk, i, value, &value_len, 0, &reg_type, (LPBYTE)data, &data_len);
         if (ret == ERROR_MORE_DATA) {

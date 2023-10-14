@@ -22,16 +22,16 @@ void write_reg_commands(
         return;
     }
     HKEY hk_out;
-    size_t full_path_len = sizeof(wchar_t) * MAX_KEY_LENGTH;
+    size_t full_path_len = WL * MAX_KEY_LENGTH;
     wchar_t *full_path = malloc(full_path_len);
     if (full_path == nullptr) {
         fwprintf(stderr, L"%s: Stopping due to malloc error.", prior_stem);
         abort();
     }
     memset(full_path, 0, full_path_len);
-    size_t prior_stem_len = wcslen(prior_stem) * sizeof(wchar_t);
+    size_t prior_stem_len = wcslen(prior_stem) * WL;
     size_t stem_len = stem ? wcslen(stem) : 0;
-    if ((prior_stem_len + (stem_len * sizeof(wchar_t)) + 2) > (full_path_len - 2)) {
+    if ((prior_stem_len + (stem_len * WL) + 2) > (full_path_len - 2)) {
         if (debug) {
             fwprintf(stderr, L"%ls: Skipping %ls because of length limitation", prior_stem, stem);
         }
