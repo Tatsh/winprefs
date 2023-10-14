@@ -120,12 +120,28 @@ int save_preferences(bool commit,
                      HKEY hk,
                      bool debug) {
     (void)commit;
-    (void)deploy_key;
-    (void)output_dir;
-    // if deploy_key -> resolved_deploy_key = resolve_path(deploy_key)
-    // mkdir(output_dir)
+    if (output_dir) {
+        wchar_t full_output_dir[_MAX_PATH];
+        if (_wfullpath(full_output_dir, output_dir, _MAX_PATH) == nullptr) {
+            abort();
+        }
+        if (debug) {
+            fwprintf(stderr, L"Output directory: %ls\n", full_output_dir);
+        }
+        // mkdir with parents
+    }
+    if (deploy_key) {
+        wchar_t full_deploy_key_path[_MAX_PATH];
+        if (_wfullpath(full_deploy_key_path, deploy_key, _MAX_PATH) == nullptr) {
+            abort();
+        }
+        if (debug) {
+            fwprintf(stderr, L"Deploy key: %ls\n", full_deploy_key_path);
+        }
+    }
     write_reg_commands(hk, nullptr, max_depth, 0, L"HKCU", debug);
     // if commit and has_git
+    // if deploy key, then push
     return 0;
 }
 
@@ -134,13 +150,16 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *argv0 = argv[0];
     bool commit = false;
     bool debug = false;
-    wchar_t *output_dir = nullptr;
     wchar_t *deploy_key = nullptr;
+    wchar_t *output_dir = nullptr;
     int max_depth = 20;
     HKEY starting_key = HKEY_CURRENT_USER;
     ARG_BEGIN {
-        if (ARG_LONG("commit"))
-        case 'c': {
+        if (ARG_LONG("deploy-key"))
+        case 'K': {
+            deploy_key = ARG_VAL();
+        }
+        else if (ARG_LONG("commit")) case 'c': {
             commit = true;
             ARG_FLAG();
         }
