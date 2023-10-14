@@ -213,7 +213,10 @@ int save_preferences(bool commit,
 
     if (commit) {
         if (!has_git) {
-            fwprintf(stderr, L"Wanted to commit but git.exe is not in Path or failed to run.\n");
+            if (debug) {
+                fwprintf(stderr,
+                         L"Wanted to commit but git.exe is not in Path or failed to run.\n");
+            }
             return 0;
         }
         if (debug) {
