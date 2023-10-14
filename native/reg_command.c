@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <wchar.h>
 
 #include "constants.h"
 #include "reg_command.h"
@@ -20,7 +21,7 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
         return REG_PARAM_SLASH_V_EMPTY;
     }
     size_t escaped_len = (7 + wcslen(escaped)) * WL;
-    wchar_t *out = malloc(escaped_len);
+    wchar_t *out = calloc(7 + wcslen(escaped), WL);
     if (!out) {
         abort();
     }
@@ -34,23 +35,23 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     if (reg_type == REG_BINARY) {
         size_t i;
         size_t n_bin_chars = 2 * data_len;
-        size_t new_len = (n_bin_chars + 1) * WL;
-        wchar_t *bin = malloc(new_len);
+        size_t new_len = n_bin_chars + 1;
+        wchar_t *bin = calloc(new_len, WL);
         if (!bin) {
             abort();
         }
-        memset(bin, 0, new_len);
+        wmemset(bin, L'\0', new_len);
         for (i = 0; i < data_len; i++) {
             wchar_t conv[3];
             _snwprintf(conv, 3, L"%02x", data[i]);
             wcsncat(&bin[i], conv, 2);
         }
-        size_t s_size = new_len + (5 * WL);
-        wchar_t *out = malloc(s_size);
+        size_t s_size = new_len + 5;
+        wchar_t *out = calloc(s_size, WL);
         if (!out) {
             abort();
         }
-        memset(out, 0, s_size);
+        wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L" /d %ls ", bin);
         return out;
     }
@@ -59,8 +60,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         if (s == nullptr) {
             return nullptr;
         }
-        size_t s_size = (wcslen(s) + 8) * WL;
-        wchar_t *out = malloc(s_size);
+        size_t s_size = (wcslen(s) + 8);
+        wchar_t *out = calloc(s_size, WL);
         if (!out) {
             abort();
         }
@@ -69,8 +70,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         return out;
     }
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
-        size_t s_size = 32 * WL;
-        wchar_t *out = malloc(s_size);
+        size_t s_size = 20;
+        wchar_t *out = calloc(s_size, WL);
         if (!out) {
             abort();
         }

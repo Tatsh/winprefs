@@ -1,6 +1,7 @@
 #include "unicode.h"
 
 #include <stdio.h>
+#include <wchar.h>
 
 #include <shlwapi.h>
 #include <windows.h>
@@ -23,12 +24,12 @@ void write_reg_commands(
     }
     HKEY hk_out;
     size_t full_path_len = WL * MAX_KEY_LENGTH;
-    wchar_t *full_path = malloc(full_path_len);
+    wchar_t *full_path = calloc(MAX_KEY_LENGTH, WL);
     if (full_path == nullptr) {
-        fwprintf(stderr, L"%ls: Stopping due to malloc error.\n", prior_stem);
+        fwprintf(stderr, L"%ls: Stopping due to memory error.\n", prior_stem);
         abort();
     }
-    memset(full_path, 0, full_path_len);
+    wmemset(full_path, L'\0', MAX_KEY_LENGTH);
     size_t prior_stem_len = wcslen(prior_stem) * WL;
     size_t stem_len = stem ? wcslen(stem) : 0;
     if ((prior_stem_len + (stem_len * WL) + 2) > (full_path_len - 2)) {
