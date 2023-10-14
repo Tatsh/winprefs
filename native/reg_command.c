@@ -27,7 +27,7 @@ char *fix_v_param(const char *prop, size_t prop_len, bool *heap) {
     return out;
 }
 
-char *convert_data_for_reg(DWORD reg_type, const unsigned char *data, size_t data_len) {
+char *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len) {
     if (reg_type == REG_BINARY) {
         size_t i;
         size_t new_len = (2 * data_len) + 1;
@@ -83,7 +83,7 @@ char *convert_data_for_reg(DWORD reg_type, const unsigned char *data, size_t dat
 void do_write_reg_command(HKEY hk,
                           const char *full_path,
                           const char *prop,
-                          const unsigned char *value,
+                          const char *value,
                           size_t data_len,
                           DWORD type,
                           bool debug) {
@@ -149,13 +149,13 @@ void do_write_reg_commands(HKEY hk, unsigned n_values, const char *full_path, bo
     DWORD value_len;
     char value[MAX_VALUE_NAME];
     int ret = ERROR_SUCCESS;
-    unsigned char data[8192];
+    char data[8192];
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
         value[0] = '\0';
         value_len = MAX_VALUE_NAME;
         reg_type = REG_NONE;
-        ret = RegEnumValue(hk, i, value, &value_len, 0, &reg_type, data, &data_len);
+        ret = RegEnumValue(hk, i, value, &value_len, 0, &reg_type, (LPBYTE)data, &data_len);
         if (ret == ERROR_MORE_DATA) {
             continue;
         }

@@ -2,12 +2,13 @@
 #define REG_COMMAND_H
 
 #include "unicode.h"
+
 #include <windows.h>
 
 void do_write_reg_command(HKEY hk,
-                          const char *prior_stem,
+                          const char *full_path,
                           const char *prop,
-                          const unsigned char *value,
+                          const char *value,
                           size_t value_len,
                           DWORD type,
                           bool debug);
