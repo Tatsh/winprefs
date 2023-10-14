@@ -41,10 +41,11 @@ set(GCC_CLANG_DEBUG_C_FLAGS
 add_executable(winprefs constants.c main.c reg_command.c shell.c)
 if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
   target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
-  target_link_options(winprefs PRIVATE -municode)
-  target_link_libraries(winprefs PUBLIC shlwapi)
   target_compile_options(
     winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
                      $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+  target_link_libraries(winprefs PUBLIC ole32 pathcch shell32 shlwapi)
+  target_link_options(winprefs PRIVATE -municode)
+
 endif()
 # install(TARGETS winprefs DESTINATION ${CMAKE_INSTALL_BINDIR})

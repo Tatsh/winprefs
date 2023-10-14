@@ -7,6 +7,7 @@ codeql
 color
 colors
 cond
+csidl
 datetime
 dcmake
 domaain
@@ -39,6 +40,7 @@ municode
 objbase
 olaf
 parens
+pathcch
 pidl
 popen
 priv
@@ -52,14 +54,19 @@ sarif
 securestring
 shlwapi
 snwprintf
+startf
+startupinfow
 strequal
 struct
 tatsh
 udvare
 userprofile
+useshowwindow
+usestdhandles
 wdeprecated
 wempty
 werror
+wfopen
 wfullpath
 windres
 winprefs
@@ -69,6 +76,7 @@ wparentheses
 wpointer
 wshadow
 wsign
+wspawnl
 wswitch
 wuninitialized
 wunknown

@@ -86,7 +86,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     return nullptr;
 }
 
-void do_write_reg_command(const wchar_t *full_path,
+void do_write_reg_command(FILE *out_fp,
+                          const wchar_t *full_path,
                           const wchar_t *prop,
                           const char *value,
                           size_t data_len,
@@ -139,7 +140,7 @@ void do_write_reg_command(const wchar_t *full_path,
         char *mb_out = malloc(req_size);
         WideCharToMultiByte(
             CP_UTF8, WC_ERR_INVALID_CHARS, out, -1, mb_out, (int)req_size, NULL, NULL);
-        printf("%s\n", mb_out);
+        fprintf(out_fp, "%s\n", mb_out);
         free(mb_out);
     } else {
         if (debug) {
@@ -155,7 +156,11 @@ void do_write_reg_command(const wchar_t *full_path,
     free(escaped_reg_key);
 }
 
-void do_write_reg_commands(HKEY hk, unsigned n_values, const wchar_t *full_path, bool debug) {
+void do_write_reg_commands(FILE *out_fp,
+                           HKEY hk,
+                           unsigned n_values,
+                           const wchar_t *full_path,
+                           bool debug) {
     DWORD data_len;
     DWORD i;
     DWORD reg_type;
@@ -163,6 +168,9 @@ void do_write_reg_commands(HKEY hk, unsigned n_values, const wchar_t *full_path,
     wchar_t value[MAX_VALUE_NAME];
     int ret = ERROR_SUCCESS;
     char data[8192];
+    if (!out_fp) {
+        abort();
+    }
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
         value[0] = '\0';
@@ -175,6 +183,6 @@ void do_write_reg_commands(HKEY hk, unsigned n_values, const wchar_t *full_path,
         if (ret == ERROR_NO_MORE_ITEMS) {
             break;
         }
-        do_write_reg_command(full_path, value, data, data_len, reg_type, debug);
+        do_write_reg_command(out_fp, full_path, value, data, data_len, reg_type, debug);
     }
 }
