@@ -5,7 +5,7 @@
       "compilerPath": "/usr/bin/gcc",
       "configurationProvider": "ms-vscode.cmake-tools",
       "cppStandard": "gnu++23",
-      "defines": [],
+      "defines": ["UNICODE", "_UNICODE"],
       "forcedInclude": [
         "${workspaceFolder}/types.h",
         "/usr/include/wine-staging-8.13/wine/msvcrt/stdio.h",
