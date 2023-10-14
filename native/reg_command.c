@@ -25,7 +25,7 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
         abort();
     }
     memset(out, 0, escaped_len);
-    _snwprintf(out, escaped_len, L"/v \"%s\" ", escaped);
+    _snwprintf(out, escaped_len, L"/v \"%ls\" ", escaped);
     free(escaped);
     return out;
 }
@@ -65,7 +65,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             abort();
         }
         memset(out, 0, s_size);
-        _snwprintf(out, s_size, L" /d \"%s\" ", s);
+        _snwprintf(out, s_size, L" /d \"%ls\" ", s);
         return out;
     }
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
@@ -125,7 +125,7 @@ void do_write_reg_command(const wchar_t *full_path,
     wchar_t out[CMD_MAX_COMMAND_LENGTH];
     int wrote = _snwprintf(out,
                            CMD_MAX_COMMAND_LENGTH,
-                           L"reg add \"%ls\" %ls/t %s%ls/f",
+                           L"reg add \"%ls\" %ls/t %ls%ls/f",
                            escaped_reg_key,
                            v_param,
                            reg_type,
@@ -136,7 +136,7 @@ void do_write_reg_command(const wchar_t *full_path,
         wprintf(L"%ls\n", out);
     } else {
         if (debug) {
-            fwprintf(stderr, L"%ls %ls: Skipping due to length of command.", full_path, prop);
+            fwprintf(stderr, L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
         }
     }
     if (escaped_d) {

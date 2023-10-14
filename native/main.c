@@ -14,7 +14,7 @@ void write_reg_commands(
     if (depth >= max_depth) {
         if (debug) {
             fwprintf(stderr,
-                     L"%s: Skipping %s due to depth limit of %d.\n",
+                     L"%ls: Skipping %ls due to depth limit of %d.\n",
                      prior_stem,
                      stem,
                      max_depth);
@@ -25,7 +25,7 @@ void write_reg_commands(
     size_t full_path_len = WL * MAX_KEY_LENGTH;
     wchar_t *full_path = malloc(full_path_len);
     if (full_path == nullptr) {
-        fwprintf(stderr, L"%s: Stopping due to malloc error.", prior_stem);
+        fwprintf(stderr, L"%ls: Stopping due to malloc error.\n", prior_stem);
         abort();
     }
     memset(full_path, 0, full_path_len);
@@ -33,7 +33,8 @@ void write_reg_commands(
     size_t stem_len = stem ? wcslen(stem) : 0;
     if ((prior_stem_len + (stem_len * WL) + 2) > (full_path_len - 2)) {
         if (debug) {
-            fwprintf(stderr, L"%ls: Skipping %ls because of length limitation", prior_stem, stem);
+            fwprintf(
+                stderr, L"%ls: Skipping %ls because of length limitation.\n", prior_stem, stem);
         }
         free(full_path);
         return;
@@ -56,7 +57,7 @@ void write_reg_commands(
         wcsstr(full_path, L"Microsoft\\Windows\\Shell\\Bags") ||
         wcsstr(full_path, L"Windows\\Shell\\BagMRU")) {
         if (debug) {
-            fwprintf(stderr, L"%s: Skipping %s due to filter.\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: Skipping %ls due to filter.\n", prior_stem, stem);
         }
         free(full_path);
         return;
@@ -96,17 +97,17 @@ void write_reg_commands(
                 }
             }
         } else if (debug) {
-            fwprintf(stderr, L"%ls: No subkeys at %ls.\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
         if (n_values) {
             do_write_reg_commands(hk_out, n_values, full_path, debug);
         } else if (debug) {
-            fwprintf(stderr, L"%ls: No values at %ls.\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: No values in %ls.\n", prior_stem, stem);
         }
         RegCloseKey(hk_out);
     } else {
         if (debug) {
-            fwprintf(stderr, L"%ls: Skipping %s. Does the location exist?\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: Skipping %ls. Does the location exist?\n", prior_stem, stem);
         }
     }
     free(full_path);
