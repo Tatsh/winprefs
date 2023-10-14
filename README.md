@@ -148,3 +148,23 @@ Requirements:
 
 - `yarn format`: to format the project's files.
 - `yarn qa`: Perform a QA check.
+
+## Native version
+
+A native version is in the works and is much faster than PowerShell. Note that its output is
+_always_ UTF-8 regardless of your set locale. Be aware that it may have bugs!
+
+### Build the native version
+
+Cross compiling:
+
+```shell
+mkdir build
+cd build
+cmake -G Ninja -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc -DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres ..
+ninja
+```
+
+You may need to adjust paths above.
+
+After building `winprefs.exe` will be in `build/native/winprefs.exe`.
