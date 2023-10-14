@@ -5,17 +5,19 @@
 #include "shell.h"
 
 static wchar_t REG_PARAM_SLASH_VE[] = L"/ve ";
+static wchar_t REG_PARAM_SLASH_V_EMPTY[] = L"/v \"\"";
 
 wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
     (void)prop_len;
     *heap = true;
-    if (!wcsncmp(L"(default)", prop, 9)) {
+    if (!wcsncmp(L"(default)", prop, 9) || prop_len == 0 || prop == nullptr) {
         *heap = false;
         return REG_PARAM_SLASH_VE;
     }
     wchar_t *escaped = escape_for_batch(prop, prop_len);
     if (escaped == nullptr) {
-        return nullptr;
+        *heap = false;
+        return REG_PARAM_SLASH_V_EMPTY;
     }
     size_t escaped_len = (7 + wcslen(escaped)) * sizeof(wchar_t);
     wchar_t *out = malloc(escaped_len);
@@ -95,42 +97,43 @@ void do_write_reg_command(const wchar_t *full_path,
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));
     bool v_heap = false;
     wchar_t *v_param = fix_v_param(prop, wcslen(prop), &v_heap);
-    char reg_type[32] = "REG_NONE";
-    if (type != REG_NONE) {
-        memset(reg_type, 0, sizeof(reg_type));
-        switch (type) {
-        case REG_BINARY:
-            strncpy(reg_type, "REG_BINARY", 10);
-            break;
-        case REG_SZ:
-            strncpy(reg_type, "REG_SZ", 6);
-            break;
-        case REG_EXPAND_SZ:
-            strncpy(reg_type, "REG_EXPAND_SZ", 13);
-            break;
-        case REG_MULTI_SZ:
-            strncpy(reg_type, "REG_MULTI_SZ", 12);
-            break;
-        case REG_DWORD:
-            strncpy(reg_type, "REG_DWORD", 9);
-            break;
-        case REG_QWORD:
-            strncpy(reg_type, "REG_QWORD", 9);
-            break;
-        }
+    wchar_t reg_type[13];
+    memset(reg_type, 0, sizeof(reg_type));
+    switch (type) {
+    case REG_NONE:
+        wcsncpy(reg_type, L"REG_NONE", 8);
+        break;
+    case REG_BINARY:
+        wcsncpy(reg_type, L"REG_BINARY", 10);
+        break;
+    case REG_SZ:
+        wcsncpy(reg_type, L"REG_SZ", 6);
+        break;
+    case REG_EXPAND_SZ:
+        wcsncpy(reg_type, L"REG_EXPAND_SZ", 13);
+        break;
+    case REG_MULTI_SZ:
+        wcsncpy(reg_type, L"REG_MULTI_SZ", 12);
+        break;
+    case REG_DWORD:
+        wcsncpy(reg_type, L"REG_DWORD", 9);
+        break;
+    case REG_QWORD:
+        wcsncpy(reg_type, L"REG_QWORD", 9);
+        break;
     }
-    char out[CMD_MAX_COMMAND_LENGTH];
-    int wrote = snprintf(out,
-                         CMD_MAX_COMMAND_LENGTH,
-                         "reg add \"%ls\" %ls/t %s%ls/f",
-                         escaped_reg_key,
-                         v_param,
-                         reg_type,
-                         escaped_d ? escaped_d : L" ");
+    wchar_t out[CMD_MAX_COMMAND_LENGTH];
+    int wrote = _snwprintf(out,
+                           CMD_MAX_COMMAND_LENGTH,
+                           L"reg add \"%ls\" %ls/t %s%ls/f",
+                           escaped_reg_key,
+                           v_param,
+                           reg_type,
+                           escaped_d ? escaped_d : L" ");
     if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
         ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == 'f' &&
          out[CMD_MAX_COMMAND_LENGTH - 2] == '/' && out[CMD_MAX_COMMAND_LENGTH - 3] == ' ')) {
-        printf("%s\n", out);
+        wprintf(L"%ls\n", out);
     } else {
         if (debug) {
             fwprintf(stderr, L"%ls %ls: Skipping due to length of command.", full_path, prop);
