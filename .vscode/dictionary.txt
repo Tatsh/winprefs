@@ -60,6 +60,7 @@ userprofile
 wdeprecated
 wempty
 werror
+wfullpath
 windres
 winprefs
 wmain
