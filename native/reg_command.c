@@ -85,7 +85,8 @@ void do_write_reg_command(HKEY hk,
                           const char *prop,
                           const unsigned char *value,
                           size_t data_len,
-                          DWORD type) {
+                          DWORD type,
+                          bool debug) {
     (void)hk;
     char *escaped_d = convert_data_for_reg(type, value, data_len);
     char *escaped_reg_key = escape_for_batch(full_path, strlen(full_path));
@@ -128,7 +129,9 @@ void do_write_reg_command(HKEY hk,
          out[CMD_MAX_COMMAND_LENGTH - 2] == '/' && out[CMD_MAX_COMMAND_LENGTH - 3] == ' ')) {
         printf("%s\n", out);
     } else {
-        fprintf(stderr, "%s %s: Skipping due to length of command.", full_path, prop);
+        if (debug) {
+            fprintf(stderr, "%s %s: Skipping due to length of command.", full_path, prop);
+        }
     }
     if (escaped_d) {
         free(escaped_d);
@@ -139,7 +142,7 @@ void do_write_reg_command(HKEY hk,
     free(escaped_reg_key);
 }
 
-void do_write_reg_commands(HKEY hk, unsigned n_values, const char *full_path) {
+void do_write_reg_commands(HKEY hk, unsigned n_values, const char *full_path, bool debug) {
     DWORD data_len;
     DWORD i;
     DWORD reg_type;
@@ -159,6 +162,6 @@ void do_write_reg_commands(HKEY hk, unsigned n_values, const char *full_path) {
         if (ret == ERROR_NO_MORE_ITEMS) {
             break;
         }
-        do_write_reg_command(hk, full_path, value, data, data_len, reg_type);
+        do_write_reg_command(hk, full_path, value, data, data_len, reg_type, debug);
     }
 }

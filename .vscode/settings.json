@@ -7,11 +7,11 @@
   },
   "cSpell.enabled": true,
   "cmake.configureArgs": [
-    "-G",
-    "Ninja",
     "-DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc",
-    "-DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres=ON",
-    "-DCMAKE_VERBOSE_MAKEFILE=ON"
+    "-DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres",
+    "-DCMAKE_VERBOSE_MAKEFILE=ON",
+    "-G",
+    "Ninja"
   ],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
@@ -23,6 +23,9 @@
   "editor.tabSize": 2,
   "editor.wordWrapColumn": 100,
   "eslint.lintTask.enable": true,
+  "files.associations": {
+    "*.h": "c"
+  },
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,

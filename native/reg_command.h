@@ -9,7 +9,8 @@ void do_write_reg_command(HKEY hk,
                           const char *prop,
                           const unsigned char *value,
                           size_t value_len,
-                          DWORD type);
-void do_write_reg_commands(HKEY hk, unsigned n_values, const char *prior_stem);
+                          DWORD type,
+                          bool debug);
+void do_write_reg_commands(HKEY hk, unsigned n_values, const char *prior_stem, bool debug);
 
 #endif // REG_COMMAND_H

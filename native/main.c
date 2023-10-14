@@ -8,9 +8,12 @@
 #include "reg_command.h"
 
 void write_reg_commands(
-    HKEY hk, const char *stem, int max_depth, int depth, const char *prior_stem) {
+    HKEY hk, const char *stem, int max_depth, int depth, const char *prior_stem, bool debug) {
     if (depth >= max_depth) {
-        fprintf(stderr, "%s: Skipping %s due to depth limit of %d.\n", prior_stem, stem, max_depth);
+        if (debug) {
+            fprintf(
+                stderr, "%s: Skipping %s due to depth limit of %d.\n", prior_stem, stem, max_depth);
+        }
         return;
     }
     HKEY hk_out;
@@ -20,10 +23,19 @@ void write_reg_commands(
         abort();
     }
     memset(full_path, 0, MAX_KEY_LENGTH);
-    memcpy(full_path, prior_stem, strlen(prior_stem));
+    size_t prior_stem_len = strlen(prior_stem);
+    size_t stem_len = stem ? strlen(stem) : 0;
+    if ((prior_stem_len + stem_len + 1) > (MAX_KEY_LENGTH - 1)) {
+        if (debug) {
+            fprintf(stderr, "%s: Skipping %s because of length limitation", prior_stem, stem);
+        }
+        free(full_path);
+        return;
+    }
+    memcpy(full_path, prior_stem, prior_stem_len);
     if (stem) {
         strncat(full_path, "\\", 1);
-        strncat(full_path, stem, strlen(stem));
+        strncat(full_path, stem, stem_len);
     }
     if (strstr(full_path, "Classes\\Extensions\\ContractId\\Windows.BackgroundTasks\\PackageId") ||
         strstr(full_path, "CloudStore\\Store\\Cache\\") ||
@@ -37,7 +49,9 @@ void write_reg_commands(
         strstr(full_path, "IrisService\\Cache") ||
         strstr(full_path, "Microsoft\\Windows\\Shell\\Bags") ||
         strstr(full_path, "Windows\\Shell\\BagMRU")) {
-        fprintf(stderr, "%s: Skipping %s due to filter.\n", prior_stem, stem);
+        if (debug) {
+            fprintf(stderr, "%s: Skipping %s due to filter.\n", prior_stem, stem);
+        }
         free(full_path);
         return;
     }
@@ -65,30 +79,31 @@ void write_reg_commands(
                 ret_code = RegEnumKeyEx(
                     hk_out, i, ach_key, &ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
-                    write_reg_commands(hk_out, ach_key, max_depth, depth + 1, full_path);
+                    write_reg_commands(hk_out, ach_key, max_depth, depth + 1, full_path, debug);
                 } else {
-                    fprintf(stderr,
-                            "%s: Skipping %s because RegEnumKeyEx() failed.\n",
-                            prior_stem,
-                            full_path);
+                    if (debug) {
+                        fprintf(stderr,
+                                "%s: Skipping %s because RegEnumKeyEx() failed.\n",
+                                prior_stem,
+                                full_path);
+                    }
                 }
             }
+        } else if (debug) {
+            fprintf(stderr, "%s: No subkeys at %s.\n", prior_stem, stem);
         }
-        // else {
-        // fprintf(stderr, "%s: No subkeys at %s.\n", prior_stem, stem);
-        // }
         if (n_values) {
-            do_write_reg_commands(hk_out, n_values, full_path);
+            do_write_reg_commands(hk_out, n_values, full_path, debug);
+        } else if (debug) {
+            fprintf(stderr, "%s: No values at %s.\n", prior_stem, stem);
         }
-        // else {
-        // fprintf(stderr, "%s: No values at %s.\n", prior_stem, stem);
-        // }
         RegCloseKey(hk_out);
     } else {
-        fprintf(stderr, "Skipping %s. Does the location exist?\n", stem);
+        if (debug) {
+            fprintf(stderr, "%s: Skipping %s. Does the location exist?\n", prior_stem, stem);
+        }
     }
-    // FIXME Why does this sometimes cause crashes?
-    // free(full_path);
+    free(full_path);
 }
 
 int save_preferences(
@@ -98,7 +113,7 @@ int save_preferences(
     (void)output_dir;
     // if deploy_key -> resolved_deploy_key = resolve_path(deploy_key)
     // mkdir(output_dir)
-    write_reg_commands(hk, nullptr, max_depth, 0, "HKCU");
+    write_reg_commands(hk, nullptr, max_depth, 0, "HKCU", false);
     // if commit and has_git
     return 0;
 }
