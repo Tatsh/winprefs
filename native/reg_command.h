@@ -1,8 +1,6 @@
 #ifndef REG_COMMAND_H
 #define REG_COMMAND_H
 
-#include "unicode.h"
-
 #include <windows.h>
 
 void do_write_reg_command(const wchar_t *full_path,

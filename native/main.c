@@ -1,5 +1,3 @@
-#include "unicode.h"
-
 #include <stdio.h>
 #include <wchar.h>
 
