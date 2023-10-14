@@ -284,12 +284,10 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *argv0 = argv[0];
     bool commit = false;
     bool debug = false;
-
     wchar_t *output_dir = nullptr;
     wchar_t *deploy_key = nullptr;
-
     int max_depth = 20;
-    HKEY starting_key = HKEY_CURRENT_USER;
+    HKEY starting_key = HKEY_CURRENT_USER; // FIXME default to this, read from argv
     ARG_BEGIN {
         if (ARG_LONG("deploy-key"))
         case 'K': {
