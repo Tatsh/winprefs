@@ -54,6 +54,8 @@ ARG_LONG_func(wchar_t **argv0, char const *name)
 
 #if defined(ARG_EXAMPLE) || defined(ARG_FUZZ)
 
+// spell-checker: disable
+
 #include <stdlib.h>
 #include <stdio.h>
 

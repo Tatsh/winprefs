@@ -27,6 +27,7 @@ hklm
 hkpd
 isort
 iwyu
+lpbyte
 lstatus
 macprefs
 memb
@@ -36,6 +37,7 @@ msvc
 msvcrt
 municode
 objbase
+olaf
 parens
 pidl
 popen
@@ -48,6 +50,8 @@ qword
 reflow
 sarif
 securestring
+shlwapi
+snwprintf
 strequal
 struct
 tatsh

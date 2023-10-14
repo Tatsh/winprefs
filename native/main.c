@@ -2,55 +2,61 @@
 
 #include <stdio.h>
 
+#include <shlwapi.h>
 #include <windows.h>
 
+#include "arg.h"
 #include "constants.h"
 #include "reg_command.h"
 
 void write_reg_commands(
-    HKEY hk, const char *stem, int max_depth, int depth, const char *prior_stem, bool debug) {
+    HKEY hk, const wchar_t *stem, int max_depth, int depth, const wchar_t *prior_stem, bool debug) {
     if (depth >= max_depth) {
         if (debug) {
-            fprintf(
-                stderr, "%s: Skipping %s due to depth limit of %d.\n", prior_stem, stem, max_depth);
+            fwprintf(stderr,
+                     L"%s: Skipping %s due to depth limit of %d.\n",
+                     prior_stem,
+                     stem,
+                     max_depth);
         }
         return;
     }
     HKEY hk_out;
-    char *full_path = malloc(MAX_KEY_LENGTH);
+    size_t full_path_len = sizeof(wchar_t) * MAX_KEY_LENGTH;
+    wchar_t *full_path = malloc(full_path_len);
     if (full_path == nullptr) {
-        fprintf(stderr, "%s: Stopping due to malloc error.", prior_stem);
+        fwprintf(stderr, L"%s: Stopping due to malloc error.", prior_stem);
         abort();
     }
-    memset(full_path, 0, MAX_KEY_LENGTH);
-    size_t prior_stem_len = strlen(prior_stem);
-    size_t stem_len = stem ? strlen(stem) : 0;
-    if ((prior_stem_len + stem_len + 1) > (MAX_KEY_LENGTH - 1)) {
+    memset(full_path, 0, full_path_len);
+    size_t prior_stem_len = wcslen(prior_stem) * sizeof(wchar_t);
+    size_t stem_len = stem ? wcslen(stem) : 0;
+    if ((prior_stem_len + (stem_len * sizeof(wchar_t)) + 2) > (full_path_len - 2)) {
         if (debug) {
-            fprintf(stderr, "%s: Skipping %s because of length limitation", prior_stem, stem);
+            fwprintf(stderr, L"%ls: Skipping %ls because of length limitation", prior_stem, stem);
         }
         free(full_path);
         return;
     }
     memcpy(full_path, prior_stem, prior_stem_len);
     if (stem) {
-        strncat(full_path, "\\", 1);
-        strncat(full_path, stem, stem_len);
+        wcsncat(full_path, L"\\", 1);
+        wcsncat(full_path, stem, stem_len);
     }
-    if (strstr(full_path, "Classes\\Extensions\\ContractId\\Windows.BackgroundTasks\\PackageId") ||
-        strstr(full_path, "CloudStore\\Store\\Cache\\") ||
-        strstr(full_path,
-               "CurrentVersion\\Authentication\\LogonUI\\Notifications\\BackgroundCapability") ||
-        strstr(full_path, "CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\") ||
-        strstr(full_path, "Explorer\\ComDlg32\\CIDSizeMRU") ||
-        strstr(full_path, "Explorer\\ComDlg32\\FirstFolder") ||
-        strstr(full_path, "Explorer\\ComDlg32\\LastVisitedPidlMRU") ||
-        strstr(full_path, "Explorer\\ComDlg32\\OpenSavePidlMRU") ||
-        strstr(full_path, "IrisService\\Cache") ||
-        strstr(full_path, "Microsoft\\Windows\\Shell\\Bags") ||
-        strstr(full_path, "Windows\\Shell\\BagMRU")) {
+    if (wcsstr(full_path, L"Classes\\Extensions\\ContractId\\Windows.BackgroundTasks\\PackageId") ||
+        wcsstr(full_path, L"CloudStore\\Store\\Cache\\") ||
+        wcsstr(full_path,
+               L"CurrentVersion\\Authentication\\LogonUI\\Notifications\\BackgroundCapability") ||
+        wcsstr(full_path, L"CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\") ||
+        wcsstr(full_path, L"Explorer\\ComDlg32\\CIDSizeMRU") ||
+        wcsstr(full_path, L"Explorer\\ComDlg32\\FirstFolder") ||
+        wcsstr(full_path, L"Explorer\\ComDlg32\\LastVisitedPidlMRU") ||
+        wcsstr(full_path, L"Explorer\\ComDlg32\\OpenSavePidlMRU") ||
+        wcsstr(full_path, L"IrisService\\Cache") ||
+        wcsstr(full_path, L"Microsoft\\Windows\\Shell\\Bags") ||
+        wcsstr(full_path, L"Windows\\Shell\\BagMRU")) {
         if (debug) {
-            fprintf(stderr, "%s: Skipping %s due to filter.\n", prior_stem, stem);
+            fwprintf(stderr, L"%s: Skipping %s due to filter.\n", prior_stem, stem);
         }
         free(full_path);
         return;
@@ -72,7 +78,7 @@ void write_reg_commands(
                                            nullptr);
         if (n_sub_keys) {
             DWORD ach_key_len = 0;
-            char ach_key[MAX_KEY_LENGTH];
+            wchar_t ach_key[MAX_KEY_LENGTH];
             unsigned i;
             for (i = 0; i < n_sub_keys; i++) {
                 ach_key_len = MAX_KEY_LENGTH;
@@ -83,44 +89,89 @@ void write_reg_commands(
                 } else {
                     if (debug) {
                         fprintf(stderr,
-                                "%s: Skipping %s because RegEnumKeyEx() failed.\n",
+                                "%ls: Skipping %ls because RegEnumKeyEx() failed.\n",
                                 prior_stem,
                                 full_path);
                     }
                 }
             }
         } else if (debug) {
-            fprintf(stderr, "%s: No subkeys at %s.\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: No subkeys at %ls.\n", prior_stem, stem);
         }
         if (n_values) {
             do_write_reg_commands(hk_out, n_values, full_path, debug);
         } else if (debug) {
-            fprintf(stderr, "%s: No values at %s.\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: No values at %ls.\n", prior_stem, stem);
         }
         RegCloseKey(hk_out);
     } else {
         if (debug) {
-            fprintf(stderr, "%s: Skipping %s. Does the location exist?\n", prior_stem, stem);
+            fwprintf(stderr, L"%ls: Skipping %s. Does the location exist?\n", prior_stem, stem);
         }
     }
     free(full_path);
 }
 
-int save_preferences(
-    bool commit, const char *deploy_key, const char *output_dir, int max_depth, HKEY hk) {
+int save_preferences(bool commit,
+                     const wchar_t *deploy_key,
+                     const wchar_t *output_dir,
+                     int max_depth,
+                     HKEY hk,
+                     bool debug) {
     (void)commit;
     (void)deploy_key;
     (void)output_dir;
     // if deploy_key -> resolved_deploy_key = resolve_path(deploy_key)
     // mkdir(output_dir)
-    write_reg_commands(hk, nullptr, max_depth, 0, "HKCU", false);
+    write_reg_commands(hk, nullptr, max_depth, 0, L"HKCU", debug);
     // if commit and has_git
     return 0;
 }
 
 int wmain(int argc, wchar_t *argv[]) {
-    (void)argc;
-    (void)argv;
-    save_preferences(false, nullptr, nullptr, 20, HKEY_CURRENT_USER);
-    return 0;
+    // (void)argc;
+    wchar_t *argv0 = argv[0];
+    bool commit = false;
+    bool debug = false;
+    wchar_t *output_dir = nullptr;
+    wchar_t *deploy_key = nullptr;
+    int max_depth = 20;
+    HKEY starting_key = HKEY_CURRENT_USER;
+    ARG_BEGIN {
+        if (ARG_LONG("commit"))
+        case 'c': {
+            commit = true;
+            ARG_FLAG();
+        }
+        else if (ARG_LONG("debug")) case 'd': {
+            debug = true;
+            ARG_FLAG();
+        }
+        else if (ARG_LONG("output-dir")) case 'o': {
+            output_dir = ARG_VAL();
+        }
+        else if (ARG_LONG("max-depth")) case 'm': {
+            wchar_t *val = ARG_VAL();
+            size_t w_len = wcslen(val);
+            char *as_char = malloc(w_len + 1);
+            memset(as_char, 0, w_len + 1);
+            wcstombs(as_char, val, w_len);
+            max_depth = atoi(as_char);
+            free(as_char);
+        }
+        else if (ARG_LONG("help")) case 'h':
+        case '?': {
+            PathStripPath(argv0);
+            wprintf(L"Usage: %ls [OPTION...] [REG_PATH]\n", argv0);
+            puts("Options:");
+            puts("  -c, --commit        Commit changes.");
+            puts("  -d, --debug         Enable debug logging.");
+            puts("  -m, --max-depth=INT Set maximum depth.");
+            puts("  -h, --help          Display this help and exit.");
+            return EXIT_SUCCESS;
+        }
+    }
+    ARG_END;
+    save_preferences(commit, deploy_key, output_dir, max_depth, starting_key, debug);
+    return EXIT_SUCCESS;
 }

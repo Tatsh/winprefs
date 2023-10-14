@@ -6,34 +6,38 @@
 #include "constants.h"
 #include "shell.h"
 
-static const unsigned MAX_DATA_SIZE = 8192;
-
-char *escape_for_batch(const char *input, size_t input_len) {
-    if (input == nullptr || input_len == 0) {
+wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
+    if (input == nullptr || n_chars == 0) {
         return nullptr;
     }
     unsigned i, j;
-    size_t new_len = 0;
-    for (i = 0; i < input_len; i++) {
-        new_len++;
+    size_t new_n_chars = 0;
+    //size_t w_size = n_chars * WL;
+    for (i = 0; i < n_chars; i++) {
+        new_n_chars++;
         // Last condition is to handle REG_MULTI_SZ string sets
-        if (input[i] == '\\' || input[i] == '%' || (input[i] == '\0' && i < (input_len - 1))) {
-            new_len++;
+        if (input[i] == L'\\' || input[i] == L'%' || (input[i] == L'\0' && i < (n_chars - 1))) {
+            new_n_chars++;
         }
     }
-    char *out = malloc(MAX_DATA_SIZE);
+    size_t out_size = (new_n_chars + 1) * WL;
+    wchar_t *out = malloc(out_size);
     if (!out) {
         abort();
     }
-    memset(out, 0, MAX_DATA_SIZE);
-    for (i = 0, j = 0; i < input_len && j < new_len && j < MAX_DATA_SIZE; i++, j++) {
+    if (n_chars == new_n_chars) {
+        memcpy(out, input, out_size);
+        return out;
+    }
+    memset(out, 0, out_size);
+    for (i = 0, j = 0; i < n_chars && j < new_n_chars; i++, j++) {
         // This condition is to handle REG_MULTI_SZ string sets
-        if (input[i] == '\0' && i < (input_len - 1) && j < (new_len - 1)) {
+        if (input[i] == '\0' && i < (n_chars - 1) && j < (new_n_chars - 1)) {
             out[j] = '\\';
             out[++j] = '0';
         } else {
             out[j] = input[i];
-            if (input[i] == '"' || input[i] == '%') {
+            if (input[i] == L'"' || input[i] == L'%') {
                 out[++j] = input[i];
             }
         }
