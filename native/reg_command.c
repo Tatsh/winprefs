@@ -33,25 +33,26 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
 wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len) {
     if (reg_type == REG_BINARY) {
         size_t i;
-        size_t new_len = (2 * data_len) + 1;
-        wchar_t *bin = malloc(new_len * sizeof(wchar_t));
+        size_t n_bin_chars = 2 * data_len;
+        size_t new_len = (n_bin_chars + 1) * WL;
+        wchar_t *bin = malloc(new_len);
         if (!bin) {
             abort();
         }
         memset(bin, 0, new_len);
-        for (i = 0; i < (new_len - 1); i += 2) {
-            char conv[3];
-            snprintf(conv, 3, "%02x", data[i]);
-            memcpy(bin + i, conv, 2);
+        for (i = 0; i < data_len; i++) {
+            wchar_t conv[3];
+            _snwprintf(conv, 3, L"%02x", data[i]);
+            wcsncat(&bin[i], conv, 2);
         }
-        size_t out_size = ((2 * data_len) + 7) * sizeof(wchar_t);
-        wchar_t *s = malloc(out_size);
-        if (!s) {
+        size_t s_size = new_len + (5 * WL);
+        wchar_t *out = malloc(s_size);
+        if (!out) {
             abort();
         }
-        memset(s, 0, out_size);
-        _snwprintf(s, out_size, L" /d %s ", bin);
-        return s;
+        memset(out, 0, s_size);
+        _snwprintf(out, s_size, L" /d %ls ", bin);
+        return out;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
         wchar_t *s =
@@ -131,8 +132,8 @@ void do_write_reg_command(const wchar_t *full_path,
                            reg_type,
                            escaped_d ? escaped_d : L" ");
     if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
-        ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == 'f' &&
-         out[CMD_MAX_COMMAND_LENGTH - 2] == '/' && out[CMD_MAX_COMMAND_LENGTH - 3] == ' ')) {
+        ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == L'f' &&
+         out[CMD_MAX_COMMAND_LENGTH - 2] == L'/' && out[CMD_MAX_COMMAND_LENGTH - 3] == L' ')) {
         wprintf(L"%ls\n", out);
     } else {
         if (debug) {
