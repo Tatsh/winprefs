@@ -166,6 +166,8 @@ function Save-Preferences {
       Set-Location -Path $OriginalLocation
     }
     Write-Debug "Committing changes"
+    $branch = git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" branch `
+      --show-current
     git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" add .
     git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" commit --no-gpg-sign `
       --quiet --no-verify "--author=winprefs <winprefs@tat.sh>" `
@@ -174,7 +176,7 @@ function Save-Preferences {
       git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" config core.sshCommand `
         "ssh -i ${DeployKey} -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no"
       git "--git-dir=$OutputDirectory\.git" "--work-tree=$OutputDirectory" push -u --porcelain `
-        --no-signed origin origin $(git branch --show-current)
+        --no-signed origin origin $branch
     }
   }
 }
