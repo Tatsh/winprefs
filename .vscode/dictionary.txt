@@ -34,8 +34,10 @@ mktemp
 mscgen
 msvc
 msvcrt
+municode
 objbase
 parens
+pidl
 popen
 priv
 proc
@@ -56,6 +58,7 @@ wempty
 werror
 windres
 winprefs
+wmain
 wmissing
 wparentheses
 wpointer
