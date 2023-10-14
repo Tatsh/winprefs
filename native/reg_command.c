@@ -97,7 +97,7 @@ void do_write_reg_command(const wchar_t *full_path,
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));
     bool v_heap = false;
     wchar_t *v_param = fix_v_param(prop, wcslen(prop), &v_heap);
-    wchar_t reg_type[13];
+    wchar_t reg_type[14];
     memset(reg_type, 0, sizeof(reg_type));
     switch (type) {
     case REG_NONE:
@@ -133,7 +133,13 @@ void do_write_reg_command(const wchar_t *full_path,
     if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
         ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == L'f' &&
          out[CMD_MAX_COMMAND_LENGTH - 2] == L'/' && out[CMD_MAX_COMMAND_LENGTH - 3] == L' ')) {
-        wprintf(L"%ls\n", out);
+        size_t req_size = (size_t)WideCharToMultiByte(
+            CP_UTF8, WC_ERR_INVALID_CHARS, out, -1, NULL, 0, NULL, NULL);
+        char *mb_out = malloc(req_size);
+        WideCharToMultiByte(
+            CP_UTF8, WC_ERR_INVALID_CHARS, out, -1, mb_out, (int)req_size, NULL, NULL);
+        printf("%s\n", mb_out);
+        free(mb_out);
     } else {
         if (debug) {
             fwprintf(stderr, L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
