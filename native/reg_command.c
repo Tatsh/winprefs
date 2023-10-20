@@ -32,56 +32,66 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
 }
 
 wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len) {
-    if (reg_type == REG_BINARY) {
-        size_t i;
-        size_t n_bin_chars = 2 * data_len;
-        size_t new_len = n_bin_chars + 1;
-        wchar_t *bin = calloc(new_len, WL);
-        if (!bin) {
-            abort();
+    switch (reg_type) {
+        case REG_BINARY: {
+            size_t i;
+            size_t n_bin_chars = 2 * data_len;
+            size_t new_len = n_bin_chars + 1;
+            wchar_t *bin = calloc(new_len, WL);
+            if (!bin) {
+                abort();
+            }
+            wmemset(bin, L'\0', new_len);
+            for (i = 0; i < data_len; i++) {
+                wchar_t conv[3];
+                _snwprintf(conv, 3, L"%02x", data[i]);
+                wcsncat(&bin[i], conv, 2);
+            }
+            size_t s_size = new_len + 5;
+            wchar_t *out = calloc(s_size, WL);
+            if (!out) {
+                abort();
+            }
+            wmemset(out, L'\0', s_size);
+            _snwprintf(out, s_size, L" /d %ls ", bin);
+            return out;
         }
-        wmemset(bin, L'\0', new_len);
-        for (i = 0; i < data_len; i++) {
-            wchar_t conv[3];
-            _snwprintf(conv, 3, L"%02x", data[i]);
-            wcsncat(&bin[i], conv, 2);
+        case REG_EXPAND_SZ:
+        case REG_SZ:
+        case REG_MULTI_SZ: {
+            wchar_t *s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : (data_len / WL) - 1);
+            if (s == nullptr) {
+                return nullptr;
+            }
+            size_t s_size = (wcslen(s) + 8);
+            wchar_t *out = calloc(s_size, WL);
+            if (!out) {
+                abort();
+            }
+            memset(out, 0, s_size);
+            _snwprintf(out, s_size, L" /d \"%ls\" ", s);
+            return out;
         }
-        size_t s_size = new_len + 5;
-        wchar_t *out = calloc(s_size, WL);
-        if (!out) {
-            abort();
-        }
-        wmemset(out, L'\0', s_size);
-        _snwprintf(out, s_size, L" /d %ls ", bin);
-        return out;
-    }
-    if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
-        wchar_t *s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : (data_len / WL) - 1);
-        if (s == nullptr) {
-            return nullptr;
-        }
-        size_t s_size = (wcslen(s) + 8);
-        wchar_t *out = calloc(s_size, WL);
-        if (!out) {
-            abort();
-        }
-        memset(out, 0, s_size);
-        _snwprintf(out, s_size, L" /d \"%ls\" ", s);
-        return out;
-    }
-    if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
-        size_t s_size = 20;
-        wchar_t *out = calloc(s_size, WL);
-        if (!out) {
-            abort();
-        }
-        memset(out, 0, s_size);
-        if (reg_type == REG_DWORD) {
+        case REG_DWORD: {
+            size_t s_size = 20;
+            wchar_t *out = calloc(s_size, WL);
+            if (!out) {
+                abort();
+            }
+            memset(out, 0, s_size);
             _snwprintf(out, s_size, L" /d %lu ", *(DWORD *)data);
-        } else {
-            _snwprintf(out, s_size, L" /d %llu ", *(unsigned __int64 *)data);
+            return out;
         }
-        return out;
+        case REG_QWORD: {
+            size_t s_size = 20;
+            wchar_t *out = calloc(s_size, WL);
+            if (!out) {
+                abort();
+            }
+            memset(out, 0, s_size);
+            _snwprintf(out, s_size, L" /d %llu ", *(unsigned __int64 *)data);
+            return out;
+        }
     }
     return nullptr;
 }
