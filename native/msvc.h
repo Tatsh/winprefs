@@ -1,12 +1,16 @@
-#ifndef MEH_H
-#define MEH_H
+#ifndef MSVC_H
+#define MSVC_H
 
 #ifdef _MSC_VER
 #define nullptr NULL
-#define bool BOOL
+#endif
 
+#ifndef _MSC_VER
+#include <stdbool.h>
+#else
+#define bool BOOL
 #define true TRUE
 #define false FALSE
 #endif
 
-#endif // MEH_H
+#endif // MSVC_H
