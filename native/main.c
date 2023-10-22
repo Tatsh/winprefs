@@ -21,18 +21,18 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                         size_t work_tree_arg_len) {
     char *result = malloc(255);
     if (!result) {
-        return NULL;
+        return nullptr;
     }
     memset(result, 0, 255);
     HANDLE pipe_read, pipe_write;
-    SECURITY_ATTRIBUTES sa_attr = {.lpSecurityDescriptor = NULL,
+    SECURITY_ATTRIBUTES sa_attr = {.lpSecurityDescriptor = nullptr,
                                    .bInheritHandle =
                                        TRUE, // Pipe handles are inherited by child process.
                                    .nLength = sizeof(SECURITY_ATTRIBUTES)};
     // Create a pipe to get results from child's stdout.
     if (!CreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
         free(result);
-        return NULL;
+        return nullptr;
     }
     STARTUPINFOW si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
                        .hStdOutput = pipe_write,
@@ -45,17 +45,18 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         free(result);
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
-        return NULL;
+        return nullptr;
     }
     wmemset(cmd, L'\0', cmd_len);
     _snwprintf(cmd, cmd_len, L"git.exe %ls %ls branch --show-current", git_dir_arg, work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
-    BOOL ret = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
+    BOOL ret = CreateProcess(
+        nullptr, cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);
     if (!ret) {
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
         free(result);
-        return NULL;
+        return nullptr;
     }
     bool proc_ended = false;
     for (; !proc_ended;) {
@@ -68,13 +69,13 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
             memset(buf, L'\0', 255);
             DWORD read = 0;
             DWORD avail = 0;
-            if (!PeekNamedPipe(pipe_read, NULL, 0, NULL, &avail, NULL)) {
+            if (!PeekNamedPipe(pipe_read, nullptr, 0, nullptr, &avail, nullptr)) {
                 break;
             }
             if (!avail) { // No data available, return
                 break;
             }
-            if (!ReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, NULL) || !read) {
+            if (!ReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, nullptr) || !read) {
                 // Error, the child process might have ended
                 break;
             }
@@ -88,13 +89,13 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     CloseHandle(pipe_read);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    int res_len = strlen(result);
-    int w_len = MultiByteToWideChar(CP_UTF8, 0, result, res_len, nullptr, 0);
-    wchar_t *w_result = calloc(w_len + 1, WL);
+    size_t res_len = strlen(result);
+    int w_len = MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, nullptr, 0);
+    wchar_t *w_result = calloc((size_t)w_len + 1, WL);
     if (!w_result) {
-        return NULL;
+        return nullptr;
     }
-    MultiByteToWideChar(CP_UTF8, 0, result, res_len, w_result, w_len);
+    MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
     w_result[w_len] = L'\0';
     free(result);
     return w_result;
@@ -228,7 +229,7 @@ int save_preferences(bool commit,
     if (debug) {
         fwprintf(stderr, L"Output directory: %ls\n", full_output_dir);
     }
-    SHCreateDirectoryEx(NULL, full_output_dir, NULL);
+    SHCreateDirectoryEx(nullptr, full_output_dir, nullptr);
     PathAppend(full_output_dir, L"exec-reg.bat");
     full_output_dir[MAX_PATH - 1] = L'\0';
     wchar_t full_deploy_key_path[MAX_PATH];
@@ -401,7 +402,7 @@ int wmain(int argc, wchar_t *argv[]) {
             abort();
         }
         wmemset(output_dir, L'\0', MAX_PATH);
-        if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, output_dir))) {
+        if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA, nullptr, 0, output_dir))) {
             PathAppend(output_dir, L"prefs-export");
         }
         output_dir[MAX_PATH - 1] = L'\0';
