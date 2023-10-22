@@ -152,17 +152,41 @@ Requirements:
 ## Native version
 
 A native version is in the works and is much faster than PowerShell. Note that its output is
-_always_ UTF-8 regardless of your set locale. Be aware that it may have bugs!
+_always_ UTF-8 regardless of your set locale. It even works with Wine. Be aware that it may have
+bugs!
 
-### Build the native version
+Usage is similar to the PowerShell version:
 
-Cross compiling:
+```plain
+Usage: winprefs.exe [OPTION...] [REG_PATH]
+Options:
+  -K, --deploy-key    Deploy key for committing.
+  -c, --commit        Commit changes.
+  -d, --debug         Enable debug logging.
+  -m, --max-depth=INT Set maximum depth.
+  -h, --help          Display this help and exit.
+```
+
+### Building
+
+#### Visual Studio
+
+On Windows with Visual Studio installed, using the _Developer Command Prompt_:
 
 ```shell
 mkdir build
 cd build
-cmake -G Ninja -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc -DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres ..
-ninja
+cmake -Wno-dev ..
+cmake --config Release --build --verbose .
+```
+
+#### Cross-compiling
+
+```shell
+mkdir build
+cd build
+cmake -G Ninja -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc -Wno-dev ..
+cmake --config Release --build --verbose .
 ```
 
 You may need to adjust paths above.
