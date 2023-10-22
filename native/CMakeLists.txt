@@ -55,7 +55,7 @@ add_executable(
   shell.c
   shell.h
   msvc.h)
-target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
+target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE _WIN32_WINNT=0x0500)
 target_link_libraries(winprefs PRIVATE shlwapi)
 if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
   target_compile_definitions(winprefs PRIVATE ENABLE_VLD)

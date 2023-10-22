@@ -13,4 +13,9 @@
 #define false FALSE
 #endif
 
+#ifndef WC_ERR_INVALID_CHARS
+#define WC_ERR_INVALID_CHARS 0
+#define _WC_ERR_INVALID_CHARS 0x0080
+#endif
+
 #endif // MSVC_H

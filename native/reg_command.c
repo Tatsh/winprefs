@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <wchar.h>
 
+#include <windows.h>
+// Has to come after
+#include <versionhelpers.h>
+
 #include "constants.h"
 #include "reg_command.h"
 #include "shell.h"
@@ -140,11 +144,24 @@ void do_write_reg_command(FILE *out_fp,
     if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
         ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == L'f' &&
          out[CMD_MAX_COMMAND_LENGTH - 2] == L'/' && out[CMD_MAX_COMMAND_LENGTH - 3] == L' ')) {
-        size_t req_size = (size_t)WideCharToMultiByte(
-            CP_UTF8, WC_ERR_INVALID_CHARS, out, -1, NULL, 0, NULL, NULL);
+        size_t req_size =
+            (size_t)WideCharToMultiByte(CP_UTF8,
+                                        IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
+                                        out,
+                                        -1,
+                                        NULL,
+                                        0,
+                                        NULL,
+                                        NULL);
         char *mb_out = malloc(req_size);
-        WideCharToMultiByte(
-            CP_UTF8, WC_ERR_INVALID_CHARS, out, -1, mb_out, (int)req_size, NULL, NULL);
+        WideCharToMultiByte(CP_UTF8,
+                            IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
+                            out,
+                            -1,
+                            mb_out,
+                            (int)req_size,
+                            NULL,
+                            NULL);
         fprintf(out_fp, "%s\n", mb_out);
         free(mb_out);
     } else {
