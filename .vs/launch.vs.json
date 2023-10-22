@@ -2,9 +2,9 @@
   "configurations": [
     {
       "args": ["-K", "st", "-c", "-d"],
-      "name": "winprefs.exe (native\\Debug\\winprefs.exe)",
+      "name": "winprefs.exe (native\\winprefs.exe)",
       "project": "CMakeLists.txt",
-      "projectTarget": "winprefs.exe (native\\Debug\\winprefs.exe)",
+      "projectTarget": "winprefs.exe (native\\winprefs.exe)",
       "type": "default"
     }
   ],

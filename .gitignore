@@ -11,6 +11,14 @@
 ehthumbs.db
 Thumbs.db
 # Other
-*.bat
-node_modules/
+*.db
+*.sqlite
+/.vs/CMake Overview
+/.vs/CMakeWorkspaceSettings.json
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
+/.vs/tasks.vs.json
+/.vs/winprefs/
 build/
+exec-reg.bat
+node_modules/

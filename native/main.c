@@ -14,6 +14,11 @@
 #include "msvc.h"
 #include "reg_command.h"
 
+BOOL dir_exists(wchar_t *path) {
+    DWORD attrib = GetFileAttributes(path);
+    return (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY));
+}
+
 // Based on https://stackoverflow.com/a/35658917/374110
 wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                         size_t git_dir_arg_len,
@@ -264,7 +269,33 @@ int save_preferences(bool commit,
         }
         wmemset(work_tree_arg, L'\0', work_tree_arg_len);
         _snwprintf(work_tree_arg, work_tree_arg_len, L"--work-tree=%ls", output_dir);
-        size_t git_dir_arg_len = wcslen(output_dir) + wcslen(L"--git-dir=") + wcslen(L"\\.git") + 1;
+        size_t git_dir_len = wcslen(output_dir) + wcslen(L"\\.git") + 1;
+        wchar_t *git_dir = calloc(git_dir_len, WL);
+        if (!git_dir) {
+            abort();
+        }
+        _snwprintf(git_dir, git_dir_len, L"%ls\\.git", output_dir);
+        git_dir[git_dir_len - 1] = L'\0';
+        if (!dir_exists(git_dir)) {
+            wchar_t *cwd = calloc(MAX_PATH, WL);
+            if (!cwd) {
+                abort();
+            }
+            wmemset(cwd, L'\0', MAX_PATH);
+            if (!_wgetcwd(cwd, MAX_PATH)) {
+                abort();
+            }
+            if (_wchdir(output_dir) != 0) {
+                abort();
+            }
+            if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init") != 0) {
+                abort();
+            }
+            if (_wchdir(cwd) != 0) {
+                abort();
+            }
+        }
+        size_t git_dir_arg_len = git_dir_len + wcslen(L"--git-dir=") + 1;
         wchar_t *git_dir_arg = calloc(git_dir_arg_len, WL);
         if (!git_dir_arg) {
             abort();
