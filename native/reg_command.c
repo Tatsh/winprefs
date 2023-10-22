@@ -162,11 +162,8 @@ void do_write_reg_command(FILE *out_fp,
     free(escaped_reg_key);
 }
 
-void do_write_reg_commands(FILE *out_fp,
-                           HKEY hk,
-                           unsigned n_values,
-                           const wchar_t *full_path,
-                           bool debug) {
+void do_write_reg_commands(
+    FILE *out_fp, HKEY hk, unsigned n_values, const wchar_t *full_path, bool debug) {
     DWORD data_len;
     DWORD i;
     DWORD reg_type;

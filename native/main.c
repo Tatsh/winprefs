@@ -48,10 +48,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         return NULL;
     }
     wmemset(cmd, L'\0', cmd_len);
-    _snwprintf(cmd,
-               cmd_len,
-               L"git.exe %ls %ls branch --show-current", git_dir_arg,
-               work_tree_arg);
+    _snwprintf(cmd, cmd_len, L"git.exe %ls %ls branch --show-current", git_dir_arg, work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
     BOOL ret = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
     if (!ret) {
@@ -280,19 +277,19 @@ int save_preferences(bool commit,
             abort();
         }
         if (_wspawnlp(P_WAIT,
-                 L"git.exe",
-                  L"git",
-                 git_dir_arg,
-                 work_tree_arg,
-                 L"commit",
-                 L"--no-gpg-sign",
-                 L"--quiet",
-                 L"--no-verify",
-                 L"\"--author=winprefs <winprefs@tat.sh>\"",
-                 L"-m",
+                      L"git.exe",
+                      L"git",
+                      git_dir_arg,
+                      work_tree_arg,
+                      L"commit",
+                      L"--no-gpg-sign",
+                      L"--quiet",
+                      L"--no-verify",
+                      L"\"--author=winprefs <winprefs@tat.sh>\"",
+                      L"-m",
                       L"\"Automatic commit @ \"",
                       nullptr) != 0) {
-        abort();
+            abort();
         }
         if (deploy_key) {
             size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
@@ -301,18 +298,18 @@ int save_preferences(bool commit,
                 abort();
             }
             wmemset(ssh_command, L'\0', ssh_command_len);
-            _snwprintf(ssh_command,
-                       ssh_command_len,
-                       L"\"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no\"",
-                       full_deploy_key_path);
-            if (
-            _wspawnlp(P_WAIT,
-                     L"git.exe",
-                      L"git",
-                     git_dir_arg,
-                     work_tree_arg,
-                     L"config",
-                     L"core.sshCommand",
+            _snwprintf(
+                ssh_command,
+                ssh_command_len,
+                L"\"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no\"",
+                full_deploy_key_path);
+            if (_wspawnlp(P_WAIT,
+                          L"git.exe",
+                          L"git",
+                          git_dir_arg,
+                          work_tree_arg,
+                          L"config",
+                          L"core.sshCommand",
                           ssh_command,
                           nullptr) != 0) {
                 abort();
@@ -327,16 +324,16 @@ int save_preferences(bool commit,
                          branch_arg);
             }
             if (_wspawnlp(P_WAIT,
-                     L"git.exe",
-                      L"git",
-                     git_dir_arg,
-                     work_tree_arg,
-                     L"push",
-                     L"-u",
-                     L"--porcelain",
-                     L"--no-signed",
-                     L"origin",
-                     L"origin",
+                          L"git.exe",
+                          L"git",
+                          git_dir_arg,
+                          work_tree_arg,
+                          L"push",
+                          L"-u",
+                          L"--porcelain",
+                          L"--no-signed",
+                          L"origin",
+                          L"origin",
                           branch_arg,
                           nullptr) != 0) {
                 abort();
