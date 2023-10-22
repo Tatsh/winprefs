@@ -24,7 +24,8 @@
   "editor.wordWrapColumn": 100,
   "eslint.lintTask.enable": true,
   "files.associations": {
-    "*.h": "c"
+    "*.h": "c",
+    ".cmake-format": "yaml"
   },
   "files.eol": "\n",
   "files.insertFinalNewline": true,

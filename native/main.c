@@ -418,7 +418,7 @@ int wmain(int argc, wchar_t *argv[]) {
             PathStripPath(argv0);
             wprintf(L"Usage: %ls [OPTION...] [REG_PATH]\n", argv0);
             puts("Options:");
-            puts("  -K, --deploy-key    Deploy key for comitting.");
+            puts("  -K, --deploy-key    Deploy key for committing.");
             puts("  -c, --commit        Commit changes.");
             puts("  -d, --debug         Enable debug logging.");
             puts("  -m, --max-depth=INT Set maximum depth.");
