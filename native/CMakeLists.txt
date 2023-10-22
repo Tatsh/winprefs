@@ -35,10 +35,19 @@ set(GCC_CLANG_DEBUG_C_FLAGS
 -Wunused-function;\
 -Wunused-label;\
 -Wunused-parameter;\
--Wunused-value;\
 -Wunused-variable")
 
-add_executable(winprefs arg.h constants.c constants.h main.c reg_command.c reg_command.h shell.c shell.h msvc.h)
+add_executable(
+  winprefs
+  arg.h
+  constants.c
+  constants.h
+  main.c
+  reg_command.c
+  reg_command.h
+  shell.c
+  shell.h
+  msvc.h)
 target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
 target_link_libraries(winprefs PRIVATE shlwapi)
 if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
