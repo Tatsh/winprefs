@@ -1,0 +1,18 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+        "type": "default",
+        "project": "CMakeLists.txt",
+        "projectTarget": "winprefs.exe (native\\Debug\\winprefs.exe)",
+        "name": "winprefs.exe (native\\Debug\\winprefs.exe)",
+        "args": [
+            "-K",
+            "st",
+            "-c",
+            "-d"
+        ]
+    }
+  ]
+}
