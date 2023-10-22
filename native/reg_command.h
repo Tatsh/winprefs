@@ -3,6 +3,8 @@
 
 #include <windows.h>
 
+#include "msvc.h"
+
 void do_write_reg_command(FILE *out_fp,
                           const wchar_t *full_path,
                           const wchar_t *prop,

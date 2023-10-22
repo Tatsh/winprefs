@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <wchar.h>
 
+#ifndef _MSC_VER
 #include <pathcch.h>
+#endif
 #include <process.h>
 #include <shlobj.h>
 #include <shlwapi.h>
@@ -9,6 +11,7 @@
 
 #include "arg.h"
 #include "constants.h"
+#include "msvc.h"
 #include "reg_command.h"
 
 // Based on https://stackoverflow.com/a/35658917/374110
@@ -16,7 +19,11 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                         size_t git_dir_arg_len,
                         const wchar_t *work_tree_arg,
                         size_t work_tree_arg_len) {
-    wchar_t *result = calloc(255, WL);
+    char *result = malloc(255);
+    if (!result) {
+        return NULL;
+    }
+    memset(result, 0, 255);
     HANDLE pipe_read, pipe_write;
     SECURITY_ATTRIBUTES sa_attr = {.lpSecurityDescriptor = NULL,
                                    .bInheritHandle =
@@ -24,22 +31,34 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                                    .nLength = sizeof(SECURITY_ATTRIBUTES)};
     // Create a pipe to get results from child's stdout.
     if (!CreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
-        abort();
+        free(result);
+        return NULL;
     }
     STARTUPINFOW si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
                        .hStdOutput = pipe_write,
                        .hStdError = pipe_write,
                        .wShowWindow = SW_HIDE};
     PROCESS_INFORMATION pi = {0};
-    size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 28;
+    size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 30;
     wchar_t *cmd = calloc(cmd_len, WL);
+    if (!cmd) {
+        free(result);
+        CloseHandle(pipe_write);
+        CloseHandle(pipe_read);
+        return NULL;
+    }
     wmemset(cmd, L'\0', cmd_len);
-    _snwprintf(cmd, cmd_len, L"git %ls %ls branch --show-current", git_dir_arg, work_tree_arg);
+    _snwprintf(cmd,
+               cmd_len,
+               L"git.exe %ls %ls branch --show-current", git_dir_arg,
+               work_tree_arg);
+    cmd[cmd_len - 1] = L'\0';
     BOOL ret = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
     if (!ret) {
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
-        return result;
+        free(result);
+        return NULL;
     }
     bool proc_ended = false;
     for (; !proc_ended;) {
@@ -48,7 +67,8 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         // Even if process exited - we continue reading, if
         // there is some data available over pipe.
         for (;;) {
-            wchar_t buf[255];
+            char buf[255];
+            memset(buf, L'\0', 255);
             DWORD read = 0;
             DWORD avail = 0;
             if (!PeekNamedPipe(pipe_read, NULL, 0, NULL, &avail, NULL)) {
@@ -61,15 +81,26 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                 // Error, the child process might have ended
                 break;
             }
-            buf[read] = 0;
-            wcsncat(result, buf, 255);
+            buf[min(sizeof(buf) - 1, avail)] = L'\0';
+            if (avail) {
+                strncat(result, buf, proc_ended ? avail - 1 : avail); // Strip newline
+            }
         }
     }
     CloseHandle(pipe_write);
     CloseHandle(pipe_read);
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
-    return result;
+    int res_len = strlen(result);
+    int w_len = MultiByteToWideChar(CP_UTF8, 0, result, res_len, nullptr, 0);
+    wchar_t *w_result = calloc(w_len + 1, WL);
+    if (!w_result) {
+        return NULL;
+    }
+    MultiByteToWideChar(CP_UTF8, 0, result, res_len, w_result, w_len);
+    w_result[w_len] = L'\0';
+    free(result);
+    return w_result;
 }
 
 void write_reg_commands(HKEY hk,
@@ -147,10 +178,14 @@ void write_reg_commands(HKEY hk,
                                            nullptr);
         if (n_sub_keys) {
             DWORD ach_key_len = 0;
-            wchar_t ach_key[MAX_KEY_LENGTH];
+            wchar_t *ach_key = calloc(MAX_KEY_LENGTH, WL);
+            if (!ach_key) {
+                abort();
+            }
             unsigned i;
             for (i = 0; i < n_sub_keys; i++) {
                 ach_key_len = MAX_KEY_LENGTH;
+                wmemset(ach_key, L'\0', MAX_KEY_LENGTH);
                 ret_code = RegEnumKeyEx(
                     hk_out, i, ach_key, &ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
@@ -165,6 +200,7 @@ void write_reg_commands(HKEY hk,
                     }
                 }
             }
+            free(ach_key);
         } else if (debug) {
             fwprintf(stderr, L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
@@ -196,7 +232,8 @@ int save_preferences(bool commit,
         fwprintf(stderr, L"Output directory: %ls\n", full_output_dir);
     }
     SHCreateDirectoryEx(NULL, full_output_dir, NULL);
-    PathCchAppend(full_output_dir, MAX_PATH, L"exec-reg.bat");
+    PathAppend(full_output_dir, L"exec-reg.bat");
+    full_output_dir[MAX_PATH - 1] = L'\0';
     wchar_t full_deploy_key_path[MAX_PATH];
     if (deploy_key) {
         if (_wfullpath(full_deploy_key_path, deploy_key, MAX_PATH) == nullptr) {
@@ -206,61 +243,92 @@ int save_preferences(bool commit,
             fwprintf(stderr, L"Deploy key: %ls\n", full_deploy_key_path);
         }
     }
+    full_output_dir[MAX_PATH - 1] = '\0';
     FILE *out_fp = _wfopen(full_output_dir, L"w+");
     write_reg_commands(hk, nullptr, max_depth, 0, out_fp, L"HKCU", debug);
     fclose(out_fp);
-    intptr_t has_git = _wspawnl(P_WAIT, L"git.exe", L"-v") == 0;
-
+    bool has_git = _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;
     if (commit) {
         if (!has_git) {
             if (debug) {
                 fwprintf(stderr,
-                         L"Wanted to commit but git.exe is not in Path or failed to run.\n");
+                         L"Wanted to commit but git.exe is not in PATH or failed to run.\n");
             }
             return 0;
         }
         if (debug) {
-            fwprintf(stderr, L"Committing changes.");
+            fwprintf(stderr, L"Committing changes.\n");
         }
         size_t work_tree_arg_len = wcslen(output_dir) + wcslen(L"--work-tree=") + 1;
         wchar_t *work_tree_arg = calloc(work_tree_arg_len, WL);
+        if (!work_tree_arg) {
+            abort();
+        }
         wmemset(work_tree_arg, L'\0', work_tree_arg_len);
         _snwprintf(work_tree_arg, work_tree_arg_len, L"--work-tree=%ls", output_dir);
         size_t git_dir_arg_len = wcslen(output_dir) + wcslen(L"--git-dir=") + wcslen(L"\\.git") + 1;
         wchar_t *git_dir_arg = calloc(git_dir_arg_len, WL);
+        if (!git_dir_arg) {
+            abort();
+        }
         wmemset(git_dir_arg, L'\0', git_dir_arg_len);
         _snwprintf(git_dir_arg, git_dir_arg_len, L"--git-dir=%ls\\.git", output_dir);
-        _wspawnl(P_WAIT, L"git.exe", git_dir_arg, work_tree_arg, L"add", L".");
-        _wspawnl(P_WAIT,
+        git_dir_arg[git_dir_arg_len - 1] = L'\0';
+        if (_wspawnlp(
+                P_WAIT, L"git.exe", L"git", git_dir_arg, work_tree_arg, L"add", L".", nullptr) !=
+            0) {
+            abort();
+        }
+        if (_wspawnlp(P_WAIT,
                  L"git.exe",
+                  L"git",
                  git_dir_arg,
                  work_tree_arg,
                  L"commit",
                  L"--no-gpg-sign",
                  L"--quiet",
                  L"--no-verify",
-                 L"--author=winprefs <winprefs@tat.sh>",
+                 L"\"--author=winprefs <winprefs@tat.sh>\"",
                  L"-m",
-                 L"Automatic commit @ ");
+                      L"\"Automatic commit @ \"",
+                      nullptr) != 0) {
+        abort();
+        }
         if (deploy_key) {
-            size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 1;
+            size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
             wchar_t *ssh_command = calloc(ssh_command_len, WL);
+            if (!ssh_command) {
+                abort();
+            }
             wmemset(ssh_command, L'\0', ssh_command_len);
             _snwprintf(ssh_command,
                        ssh_command_len,
-                       L"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no",
+                       L"\"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no\"",
                        full_deploy_key_path);
-            _wspawnl(P_WAIT,
+            if (
+            _wspawnlp(P_WAIT,
                      L"git.exe",
+                      L"git",
                      git_dir_arg,
                      work_tree_arg,
                      L"config",
                      L"core.sshCommand",
-                     ssh_command);
+                          ssh_command,
+                          nullptr) != 0) {
+                abort();
+            }
             wchar_t *branch_arg =
                 get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
-            _wspawnl(P_WAIT,
+            if (debug) {
+                fwprintf(stderr,
+                         L"git.exe %ls %ls push -u --porcelain --no-signed origin origin %ls\n",
+                         git_dir_arg,
+                         work_tree_arg,
+                         branch_arg);
+            }
+            if (_wspawnlp(P_WAIT,
                      L"git.exe",
+                      L"git",
                      git_dir_arg,
                      work_tree_arg,
                      L"push",
@@ -269,7 +337,10 @@ int save_preferences(bool commit,
                      L"--no-signed",
                      L"origin",
                      L"origin",
-                     branch_arg);
+                          branch_arg,
+                          nullptr) != 0) {
+                abort();
+            }
             free(ssh_command);
             free(branch_arg);
         }
@@ -280,7 +351,7 @@ int save_preferences(bool commit,
 }
 
 int wmain(int argc, wchar_t *argv[]) {
-    // (void)argc;
+    (void)argc;
     wchar_t *argv0 = argv[0];
     bool commit = false;
     bool debug = false;
@@ -318,6 +389,7 @@ int wmain(int argc, wchar_t *argv[]) {
             PathStripPath(argv0);
             wprintf(L"Usage: %ls [OPTION...] [REG_PATH]\n", argv0);
             puts("Options:");
+            puts("  -K, --deploy-key    Deploy key for comitting.");
             puts("  -c, --commit        Commit changes.");
             puts("  -d, --debug         Enable debug logging.");
             puts("  -m, --max-depth=INT Set maximum depth.");
@@ -327,12 +399,18 @@ int wmain(int argc, wchar_t *argv[]) {
     }
     ARG_END;
     if (!output_dir) {
-        output_dir = calloc(MAX_PATH, sizeof(wchar_t));
-        if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, output_dir))) {
-            PathCchAppend(output_dir, MAX_PATH, L"prefs-export");
+        output_dir = calloc(MAX_PATH, WL);
+        if (!output_dir) {
+            abort();
         }
+        wmemset(output_dir, L'\0', MAX_PATH);
+        if (SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, output_dir))) {
+            PathAppend(output_dir, L"prefs-export");
+        }
+        output_dir[MAX_PATH - 1] = L'\0';
     }
-    save_preferences(commit, deploy_key, output_dir, max_depth, starting_key, debug);
+    int exit_code =
+        save_preferences(commit, deploy_key, output_dir, max_depth, starting_key, debug);
     free(output_dir);
-    return EXIT_SUCCESS;
+    return exit_code;
 }

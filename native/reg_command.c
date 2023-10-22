@@ -44,6 +44,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         for (i = 0; i < data_len; i++) {
             wchar_t conv[3];
             _snwprintf(conv, 3, L"%02x", data[i]);
+            conv[2] = L'\0';
             wcsncat(&bin[i], conv, 2);
         }
         size_t s_size = new_len + 5;
@@ -124,7 +125,11 @@ void do_write_reg_command(FILE *out_fp,
         wcsncpy(reg_type, L"REG_QWORD", 9);
         break;
     }
-    wchar_t out[CMD_MAX_COMMAND_LENGTH];
+    wchar_t *out = calloc(CMD_MAX_COMMAND_LENGTH, WL);
+    if (!out) {
+        abort();
+    }
+    wmemset(out, L'\0', CMD_MAX_COMMAND_LENGTH);
     int wrote = _snwprintf(out,
                            CMD_MAX_COMMAND_LENGTH,
                            L"reg add \"%ls\" %ls/t %ls%ls/f",
@@ -153,6 +158,7 @@ void do_write_reg_command(FILE *out_fp,
     if (v_param && v_heap) {
         free(v_param);
     }
+    free(out);
     free(escaped_reg_key);
 }
 
@@ -165,15 +171,15 @@ void do_write_reg_commands(FILE *out_fp,
     DWORD i;
     DWORD reg_type;
     DWORD value_len;
-    wchar_t value[MAX_VALUE_NAME];
+    wchar_t *value = calloc(MAX_VALUE_NAME, WL);
     int ret = ERROR_SUCCESS;
     char data[8192];
-    if (!out_fp) {
+    if (!out_fp || !value) {
         abort();
     }
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
-        value[0] = '\0';
+        wmemset(value, L'\0', MAX_VALUE_NAME);
         value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
         ret = RegEnumValue(hk, i, value, &value_len, 0, &reg_type, (LPBYTE)data, &data_len);
@@ -185,4 +191,5 @@ void do_write_reg_commands(FILE *out_fp,
         }
         do_write_reg_command(out_fp, full_path, value, data, data_len, reg_type, debug);
     }
+    free(value);
 }
