@@ -1,11 +1,9 @@
 ---
-env:
-  BUILD_TYPE: Release
 jobs:
   build:
     permissions:
       contents: write
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
       - id: fixed_workspace
         name: Fix path
@@ -18,27 +16,96 @@ jobs:
         id: latest_tag
         uses: WyriHaximus/github-action-get-previous-tag@v1
       - name: Configure
-        run: cmake -B ${{github.workspace}}/build --install-prefix ${{github.workspace}}/build/prefix
+        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build --install-prefix ${{github.workspace}}/build/prefix
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --verbose
+        run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
-        run: cmake --install ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
-      - name: Install NSIS
+        run: cmake --install ${{github.workspace}}/build --config ${{matrix.build-type}}
+      - name: Configure Git
         run: |
-          iwr -useb get.scoop.sh -outfile 'install.ps1'
-          .\install.ps1 -RunAsAdmin
-          scoop update
-          scoop bucket add extras
-          scoop install nsis
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+      - name: Crash test
+        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -d -c
+      - name: Show Git log of export
+        run: |
+          cd "${env:APPDATA}/prefs-export"
+          git --no-pager log
       - name: Package
-        run: cpack -C ${{env.BUILD_TYPE}} --config ${{github.workspace}}/build/CPackConfig.cmake
-      - name: Upload package
+        run: cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
+      - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
+        name: Upload package
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
           tag_name: ${{ steps.latest_tag.outputs.tag }}
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
+        os:
+          - windows-2019
+          - windows-2022
+  build_msys:
+    runs-on: ${{matrix.os}}
+    steps:
+      - id: fixed_workspace
+        name: Fix path
+        run: |
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            make
+          msystem: ${{matrix.sys.name}}
+          pacboy: >-
+            cmake:p
+            ninja:p
+            toolchain:p
+          update: true
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure
+        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DWITH_64BIT=${{matrix.sys.with_64bit}} -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+        shell: 'msys2 {0}'
+      - name: Build
+        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        shell: 'msys2 {0}'
+      - name: Install
+        run: cmake --install ${{steps.fixed_workspace.outputs.out}}/build --config ${{matrix.build-type}}
+        shell: 'msys2 {0}'
+      - name: Package
+        run: cpack -C ${{matrix.build-type}} --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake
+        shell: 'msys2 {0}'
+      - name: Configure Git
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+      - name: Crash test
+        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -d -c
+      - name: Show Git log of export
+        run: |
+          cd "${env:APPDATA}/prefs-export"
+          git --no-pager log
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
+        os:
+          - windows-2019
+          - windows-2022
+        sys:
+          - { name: clang32, env: clang-i686, with_64bit: 'OFF' }
+          - { name: clang64, env: clang-x86_64, with_64bit: 'ON' }
+          - { name: mingw32, env: i686, with_64bit: 'OFF' }
+          - { name: mingw64, env: x86_64, with_64bit: 'ON' }
+          - { name: ucrt64, env: ucrt-x86_64, with_64bit: 'ON' }
+        exclude:
+          # Crashes in Release but not reproducible on Win11
+          - { sys: { name: clang32 }, build-type: Release }
 name: Build
 'on':
   pull_request:

@@ -2,6 +2,7 @@ analyzer
 appdata
 autogen
 bindir
+bitness
 cmder
 codeql
 color
@@ -41,12 +42,15 @@ mktemp
 mscgen
 msvc
 msvcrt
+msys
+msystem
 municode
 nsis
 nxcompat
 objbase
 olaf
 outfile
+pacboy
 parens
 pidl
 popen
@@ -69,6 +73,7 @@ strequal
 struct
 tatsh
 tlbid
+ucrt
 udvare
 useb
 userprofile
