@@ -10,13 +10,13 @@ add_subdirectory(native)
 
 set(CPACK_PACKAGE_NAME "winprefs")
 set(CPACK_PACKAGE_VENDOR "Tatsh")
-# FIXME include license file in zip FIXME install path should not have version number
+# FIXME include license file in zip
+
+# FIXME install path should not have version number
 
 # FIXME may need Visual C++ runtime
 
 # FIXME missing license in installer
-
-# FIXME NSIS does not create shortcut to app
 
 # FIXME Set publisher
 
