@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
-project(winprefs)
+project(
+  winprefs
+  DESCRIPTION "Dump a registry path to a series of 'reg add' commands."
+  HOMEPAGE_URL "https://github.com/Tatsh/winprefs"
+  LANGUAGES C
+  VERSION 0.2.1)
 
 add_subdirectory(native)
 
