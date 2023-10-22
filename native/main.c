@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <wchar.h>
 
-#ifndef _MSC_VER
-#include <pathcch.h>
-#endif
 #include <process.h>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <windows.h>
+
+#ifdef ENABLE_VLD
+#include <vld.h>
+#endif
 
 #include "arg.h"
 #include "constants.h"
@@ -63,6 +64,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         free(result);
         return nullptr;
     }
+    free(cmd);
     bool proc_ended = false;
     for (; !proc_ended;) {
         // Give some time slice (50 ms), so we won't waste 100% CPU.
@@ -301,7 +303,8 @@ int save_preferences(bool commit,
             abort();
         }
         wmemset(git_dir_arg, L'\0', git_dir_arg_len);
-        _snwprintf(git_dir_arg, git_dir_arg_len, L"--git-dir=%ls\\.git", output_dir);
+        _snwprintf(git_dir_arg, git_dir_arg_len, L"--git-dir=%ls", git_dir);
+        free(git_dir);
         git_dir_arg[git_dir_arg_len - 1] = L'\0';
         if (_wspawnlp(
                 P_WAIT, L"git.exe", L"git", git_dir_arg, work_tree_arg, L"add", L".", nullptr) !=

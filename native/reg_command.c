@@ -54,6 +54,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         }
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L" /d %ls ", bin);
+        free(bin);
         return out;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
@@ -68,6 +69,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         }
         memset(out, 0, s_size);
         _snwprintf(out, s_size, L" /d \"%ls\" ", s);
+        free(s);
         return out;
     }
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
@@ -94,8 +96,6 @@ void do_write_reg_command(FILE *out_fp,
                           size_t data_len,
                           DWORD type,
                           bool debug) {
-    (void)value;
-    (void)data_len;
     wchar_t *escaped_d = convert_data_for_reg(type, value, data_len);
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));
     bool v_heap = false;

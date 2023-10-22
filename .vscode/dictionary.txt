@@ -9,9 +9,11 @@ colors
 cond
 cpack
 csidl
+ctest
 datetime
 dcmake
 domaain
+dwith
 dword
 dynamicbase
 ehthumbs
