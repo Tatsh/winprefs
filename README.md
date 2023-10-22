@@ -1,5 +1,6 @@
 # winprefs
 
+[![Build](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml)
 [![QA](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml)
 [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/WinPrefs)](https://www.powershellgallery.com/packages/WinPrefs)
 [![PowerShell Gallery Platform Support](https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported)](https://www.powershellgallery.com/packages/WinPrefs)
