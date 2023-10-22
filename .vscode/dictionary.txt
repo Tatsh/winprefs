@@ -33,6 +33,7 @@ hkpd
 isort
 iwyu
 lpbyte
+lpdword
 lstatus
 macprefs
 memb

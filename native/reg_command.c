@@ -182,10 +182,10 @@ void do_write_reg_command(FILE *out_fp,
 
 void do_write_reg_commands(
     FILE *out_fp, HKEY hk, unsigned n_values, const wchar_t *full_path, bool debug) {
-    DWORD data_len;
+    size_t data_len;
     DWORD i;
     DWORD reg_type;
-    DWORD value_len;
+    size_t value_len;
     wchar_t *value = calloc(MAX_VALUE_NAME, WL);
     int ret = ERROR_SUCCESS;
     char data[8192];
@@ -197,7 +197,8 @@ void do_write_reg_commands(
         wmemset(value, L'\0', MAX_VALUE_NAME);
         value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
-        ret = RegEnumValue(hk, i, value, &value_len, 0, &reg_type, (LPBYTE)data, &data_len);
+        ret = RegEnumValue(
+            hk, i, value, (LPDWORD)&value_len, 0, &reg_type, (LPBYTE)data, (LPDWORD)&data_len);
         if (ret == ERROR_MORE_DATA) {
             continue;
         }

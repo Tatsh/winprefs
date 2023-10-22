@@ -57,18 +57,29 @@ add_executable(
   msvc.h)
 target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
 target_link_libraries(winprefs PRIVATE shlwapi)
-if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
-  target_compile_definitions(winprefs PRIVATE ENABLE_VLD)
-  target_include_directories(winprefs PRIVATE "${VLD_H}")
-  target_link_libraries(winprefs PRIVATE "${VLD}")
-endif()
-if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+target_compile_definitions(
+  winprefs
+  PRIVATE
+    $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:ENABLE_VLD>
+)
+target_include_directories(
+  winprefs
+  PRIVATE
+    $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD_H}>
+)
+target_link_libraries(
+  winprefs
+  PRIVATE
+    $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
+)
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   # mingw can do NT 4 without extra help
-  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x400)
-  target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
-                                          $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=$<IF:$<BOOL:${WITH_64BIT}>,0x501,0x400>)
+  target_compile_options(
+    winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS} $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
+                     $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
   target_link_libraries(winprefs PRIVATE ole32 shell32)
-  target_link_options(winprefs PRIVATE -municode)
+  target_link_options(winprefs PRIVATE -municode $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
 else() # MSVC gets Vista+
   target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x600)
   target_compile_options(winprefs PRIVATE /Zc:wchar_t /Zc:forScope /Zc:inline)

@@ -182,7 +182,7 @@ void write_reg_commands(HKEY hk,
                                            nullptr,
                                            nullptr);
         if (n_sub_keys) {
-            DWORD ach_key_len = 0;
+            size_t ach_key_len = 0;
             wchar_t *ach_key = calloc(MAX_KEY_LENGTH, WL);
             if (!ach_key) {
                 abort();
@@ -192,7 +192,7 @@ void write_reg_commands(HKEY hk,
                 ach_key_len = MAX_KEY_LENGTH;
                 wmemset(ach_key, L'\0', MAX_KEY_LENGTH);
                 ret_code = RegEnumKeyEx(
-                    hk_out, i, ach_key, &ach_key_len, nullptr, nullptr, nullptr, nullptr);
+                    hk_out, i, ach_key, (LPDWORD)&ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
                     write_reg_commands(
                         hk_out, ach_key, max_depth, depth + 1, out_fp, full_path, debug);
