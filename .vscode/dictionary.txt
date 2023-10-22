@@ -43,6 +43,7 @@ nsis
 nxcompat
 objbase
 olaf
+outfile
 parens
 pathcch
 pidl
@@ -66,6 +67,7 @@ struct
 tatsh
 tlbid
 udvare
+useb
 userprofile
 useshowwindow
 usestdhandles
