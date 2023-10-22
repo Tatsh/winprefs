@@ -1,5 +1,10 @@
 include(GNUInstallDirs)
 
+if (CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
+  find_library(VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64" "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
+  find_path(VLD_H vld.h HINTS "C:/Program Files (x86)/Visual Leak Detector/include" "C:/Program Files/Visual Leak Detector/include" REQUIRED)
+endif()
+
 set(GCC_CLANG_SHARED_C_FLAGS "-fno-builtin;-std=gnu2x")
 set(GCC_CLANG_DEBUG_C_FLAGS
     "-ggdb;\
@@ -50,6 +55,11 @@ add_executable(
   msvc.h)
 target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
 target_link_libraries(winprefs PRIVATE shlwapi)
+if (CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
+  target_compile_definitions(winprefs PRIVATE ENABLE_VLD)
+  target_include_directories(winprefs PRIVATE "${VLD_H}")
+  target_link_libraries(winprefs PRIVATE "${VLD}")
+endif()
 if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
   target_compile_options(
     winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
