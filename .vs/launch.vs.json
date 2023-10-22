@@ -1,7 +1,7 @@
 {
   "configurations": [
     {
-      "args": ["-K", "st", "-c", "-d"],
+      "args": ["-c", "-d"],
       "name": "winprefs.exe (native\\winprefs.exe)",
       "project": "CMakeLists.txt",
       "projectTarget": "winprefs.exe (native\\winprefs.exe)",
