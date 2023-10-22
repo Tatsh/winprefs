@@ -55,7 +55,7 @@ add_executable(
   shell.c
   shell.h
   msvc.h)
-target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE _WIN32_WINNT=0x0500)
+target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
 target_link_libraries(winprefs PRIVATE shlwapi)
 if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
   target_compile_definitions(winprefs PRIVATE ENABLE_VLD)
@@ -63,12 +63,16 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
   target_link_libraries(winprefs PRIVATE "${VLD}")
 endif()
 if(CMAKE_COMPILER_IS_GNUCC OR ${CMAKE_C_COMPILER_ID} STREQUAL "Clang")
+  # mingw can do NT 4 without extra help
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x400)
   target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
                                           $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
   target_link_libraries(winprefs PRIVATE ole32 shell32)
   target_link_options(winprefs PRIVATE -municode)
-else()
+else() # MSVC gets Vista+
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x600)
   target_compile_options(winprefs PRIVATE /Zc:wchar_t /Zc:forScope /Zc:inline)
+  target_link_libraries(winprefs PRIVATE kernel32)
   target_link_options(winprefs PRIVATE /DYNAMICBASE /NXCOMPAT /TLBID:1)
 endif()
 install(TARGETS winprefs DESTINATION ${CMAKE_INSTALL_BINDIR})

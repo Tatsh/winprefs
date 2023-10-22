@@ -13,8 +13,7 @@
 #define false FALSE
 #endif
 
-#ifndef WC_ERR_INVALID_CHARS
-#define WC_ERR_INVALID_CHARS 0
+#ifndef _WC_ERR_INVALID_CHARS
 #define _WC_ERR_INVALID_CHARS 0x0080
 #endif
 

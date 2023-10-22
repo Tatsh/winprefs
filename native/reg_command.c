@@ -6,6 +6,7 @@
 #include <versionhelpers.h>
 
 #include "constants.h"
+#include "msvc.h"
 #include "reg_command.h"
 #include "shell.h"
 
