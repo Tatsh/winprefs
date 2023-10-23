@@ -250,7 +250,18 @@ int save_preferences(bool commit,
     }
     full_output_dir[MAX_PATH - 1] = '\0';
     FILE *out_fp = _wfopen(full_output_dir, L"w+");
-    write_reg_commands(hk, nullptr, max_depth, 0, out_fp, L"HKCU", debug);
+    write_reg_commands(hk,
+                       nullptr,
+                       max_depth,
+                       0,
+                       out_fp,
+                       hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
+                       hk == HKEY_CURRENT_CONFIG ? L"HKCC" :
+                       hk == HKEY_CURRENT_USER   ? L"HKCU" :
+                       hk == HKEY_LOCAL_MACHINE  ? L"HKLM" :
+                       hk == HKEY_USERS          ? L"HKU" :
+                                                   L"HKDD",
+                       debug);
     fclose(out_fp);
     bool has_git = _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;
     if (commit) {
@@ -410,7 +421,7 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *output_dir = nullptr;
     wchar_t *deploy_key = nullptr;
     int max_depth = 20;
-    HKEY starting_key = HKEY_CURRENT_USER; // FIXME default to this, read from argv
+    HKEY starting_key = HKEY_CURRENT_USER;
     ARG_BEGIN {
         if (ARG_LONG("deploy-key"))
         case 'K': {
@@ -449,8 +460,38 @@ int wmain(int argc, wchar_t *argv[]) {
             puts("  -h, --help          Display this help and exit.");
             return EXIT_SUCCESS;
         }
+            else {
+            default:
+                fwprintf(stderr,
+                         L"%ls: invalid option '%ls'\n"
+                         L"Try '%s --help' for more information.\n",
+                         argv0,
+                         *argv,
+                         argv0);
+                return EXIT_FAILURE;
+            }
     }
     ARG_END;
+    wchar_t *reg_path = *argv;
+    if (reg_path) {
+        if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
+            starting_key = HKEY_CLASSES_ROOT;
+        } else if (!_wcsnicmp(reg_path, L"HKLM", 4) ||
+                   !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
+            fwprintf(stderr, L"Switch to HKEY_LOCAL_MACHINE\n");
+            starting_key = HKEY_LOCAL_MACHINE;
+        } else if (!_wcsnicmp(reg_path, L"HKCC", 4) ||
+                   !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
+            starting_key = HKEY_CURRENT_CONFIG;
+        } else if (!_wcsnicmp(reg_path, L"HKU", 3) || !_wcsnicmp(reg_path, L"HKEY_USERS", 10)) {
+            starting_key = HKEY_USERS;
+        } else if (!_wcsnicmp(reg_path, L"HKDD", 4) || !_wcsnicmp(reg_path, L"HKEY_DYN_DATA", 13)) {
+            starting_key = HKEY_DYN_DATA;
+        } else {
+            fwprintf(stderr, L"Invalid registry path.\n");
+            return EXIT_FAILURE;
+        }
+    }
     if (!output_dir) {
         output_dir = calloc(MAX_PATH, WL);
         if (!output_dir) {
