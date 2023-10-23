@@ -328,7 +328,7 @@ int save_preferences(bool commit,
             abort();
         }
         wchar_t *time_buf = calloc(needed_size, WL);
-        if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, 0)) {
+        if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, needed_size)) {
             abort();
         }
         needed_size += wcslen(AUTOMATIC_COMMIT_MESSAGE_PREFIX) + 2;
