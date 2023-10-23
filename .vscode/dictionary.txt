@@ -28,6 +28,7 @@ gtest
 hkcc
 hkcr
 hkcu
+hkdd
 hkey
 hklm
 hkpd
@@ -81,6 +82,7 @@ useshowwindow
 usestdhandles
 wchar
 wchdir
+wcsnicmp
 wdeprecated
 wempty
 werror
