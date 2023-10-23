@@ -301,7 +301,7 @@ int save_preferences(bool commit,
             if (_wchdir(output_dir) != 0) {
                 abort();
             }
-            if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init") != 0) {
+            if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init", "--quiet") != 0) {
                 abort();
             }
             if (_wchdir(cwd) != 0) {
