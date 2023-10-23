@@ -311,6 +311,24 @@ int save_preferences(bool commit,
             0) {
             abort();
         }
+        size_t needed_size =
+            (size_t)GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
+        if (!needed_size) {
+            abort();
+        }
+        wchar_t *time_buf = calloc(needed_size, WL);
+        if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, 0)) {
+            abort();
+        }
+        needed_size += wcslen(AUTOMATIC_COMMIT_MESSAGE_PREFIX) + 2;
+        wchar_t *message_buf = calloc(needed_size, WL);
+        if (!message_buf) {
+            abort();
+        }
+        wmemset(message_buf, L'\0', needed_size);
+        _snwprintf(
+            message_buf, needed_size, L"\"%ls%ls\"", AUTOMATIC_COMMIT_MESSAGE_PREFIX, time_buf);
+        free(time_buf);
         if (_wspawnlp(P_WAIT,
                       L"git.exe",
                       L"git",
@@ -322,10 +340,11 @@ int save_preferences(bool commit,
                       L"--no-verify",
                       L"\"--author=winprefs <winprefs@tat.sh>\"",
                       L"-m",
-                      L"\"Automatic commit @ \"",
+                      message_buf,
                       nullptr) != 0) {
             abort();
         }
+        free(message_buf);
         if (deploy_key) {
             size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
             wchar_t *ssh_command = calloc(ssh_command_len, WL);
@@ -352,11 +371,12 @@ int save_preferences(bool commit,
             wchar_t *branch_arg =
                 get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
             if (debug) {
-                fwprintf(stderr,
-                         L"git.exe %ls %ls push -u --porcelain --no-signed origin origin %ls\n",
-                         git_dir_arg,
-                         work_tree_arg,
-                         branch_arg);
+                fwprintf(
+                    stderr,
+                    L"git.exe \"%ls\" \"%ls\" push -u --porcelain --no-signed origin origin %ls\n",
+                    git_dir_arg,
+                    work_tree_arg,
+                    branch_arg);
             }
             if (_wspawnlp(P_WAIT,
                           L"git.exe",
