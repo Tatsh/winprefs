@@ -301,7 +301,7 @@ int save_preferences(bool commit,
             if (_wchdir(output_dir) != 0) {
                 abort();
             }
-            if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init", "--quiet") != 0) {
+            if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init", L"--quiet", nullptr) != 0) {
                 abort();
             }
             if (_wchdir(cwd) != 0) {
@@ -355,6 +355,7 @@ int save_preferences(bool commit,
                    AUTOMATIC_COMMIT_MESSAGE_PREFIX,
                    date_buf,
                    time_buf);
+        free(date_buf);
         free(time_buf);
         if (_wspawnlp(P_WAIT,
                       L"git.exe",
