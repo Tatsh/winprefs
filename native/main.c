@@ -445,6 +445,7 @@ int wmain(int argc, wchar_t *argv[]) {
             puts("  -c, --commit        Commit changes.");
             puts("  -d, --debug         Enable debug logging.");
             puts("  -m, --max-depth=INT Set maximum depth.");
+            puts("  -o, --output-dir    Output directory.");
             puts("  -h, --help          Display this help and exit.");
             return EXIT_SUCCESS;
         }
