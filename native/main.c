@@ -495,7 +495,6 @@ int wmain(int argc, wchar_t *argv[]) {
             starting_key = HKEY_CLASSES_ROOT;
         } else if (!_wcsnicmp(reg_path, L"HKLM", 4) ||
                    !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
-            fwprintf(stderr, L"Switch to HKEY_LOCAL_MACHINE\n");
             starting_key = HKEY_LOCAL_MACHINE;
         } else if (!_wcsnicmp(reg_path, L"HKCC", 4) ||
                    !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
