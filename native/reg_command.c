@@ -41,7 +41,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             if (!bin) {
                 abort();
             }
-            wmemset(bin, L'\0', new_len);
             for (i = 0; i < data_len; i++) {
                 wchar_t conv[3];
                 _snwprintf(conv, 3, L"%02x", data[i]);
@@ -52,7 +51,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             if (!out) {
                 abort();
             }
-            wmemset(out, L'\0', s_size);
             _snwprintf(out, s_size, L" /d %ls ", bin);
             return out;
         }
@@ -68,7 +66,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             if (!out) {
                 abort();
             }
-            memset(out, 0, s_size);
             _snwprintf(out, s_size, L" /d \"%ls\" ", s);
             return out;
         }
@@ -78,7 +75,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             if (!out) {
                 abort();
             }
-            memset(out, 0, s_size);
             _snwprintf(out, s_size, L" /d %lu ", *(DWORD *)data);
             return out;
         }
@@ -88,7 +84,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
             if (!out) {
                 abort();
             }
-            memset(out, 0, s_size);
             _snwprintf(out, s_size, L" /d %llu ", *(unsigned __int64 *)data);
             return out;
         }
