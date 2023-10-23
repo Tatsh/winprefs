@@ -322,23 +322,39 @@ int save_preferences(bool commit,
             0) {
             abort();
         }
-        size_t needed_size =
+        size_t time_needed_size =
             (size_t)GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
-        if (!needed_size) {
+        if (!time_needed_size) {
             abort();
         }
-        wchar_t *time_buf = calloc(needed_size, WL);
-        if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, needed_size)) {
+        wchar_t *time_buf = calloc(time_needed_size, WL);
+        if (!GetTimeFormat(
+                LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, (int)time_needed_size)) {
             abort();
         }
-        needed_size += wcslen(AUTOMATIC_COMMIT_MESSAGE_PREFIX) + 2;
+        size_t date_needed_size =
+            (size_t)GetDateFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
+        if (!date_needed_size) {
+            abort();
+        }
+        wchar_t *date_buf = calloc(date_needed_size, WL);
+        if (!GetDateFormat(
+                LOCALE_USER_DEFAULT, 0, nullptr, nullptr, date_buf, (int)date_needed_size)) {
+            abort();
+        }
+        size_t needed_size =
+            wcslen(AUTOMATIC_COMMIT_MESSAGE_PREFIX) + 3 + time_needed_size + date_needed_size;
         wchar_t *message_buf = calloc(needed_size, WL);
         if (!message_buf) {
             abort();
         }
         wmemset(message_buf, L'\0', needed_size);
-        _snwprintf(
-            message_buf, needed_size, L"\"%ls%ls\"", AUTOMATIC_COMMIT_MESSAGE_PREFIX, time_buf);
+        _snwprintf(message_buf,
+                   needed_size,
+                   L"\"%ls%ls %ls\"",
+                   AUTOMATIC_COMMIT_MESSAGE_PREFIX,
+                   date_buf,
+                   time_buf);
         free(time_buf);
         if (_wspawnlp(P_WAIT,
                       L"git.exe",
