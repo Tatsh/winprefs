@@ -12,15 +12,15 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Get Latest Tag
-        id: latest_tag
+      - id: latest_tag
+        name: Get Latest Tag
         uses: WyriHaximus/github-action-get-previous-tag@v1
       - name: Configure
         run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build --install-prefix ${{github.workspace}}/build/prefix
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
-        run: cmake --install ${{github.workspace}}/build --config ${{matrix.build-type}}
+        run: cmake --install ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
       - name: Configure Git
         run: |
           git config --global user.email "you@example.com"
@@ -32,7 +32,7 @@ jobs:
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
       - name: Package
-        run: cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
+        run: cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
       - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
         name: Upload package
         uses: softprops/action-gh-release@v1
@@ -49,7 +49,7 @@ jobs:
           - windows-2019
           - windows-2022
   build_msys:
-    runs-on: ${{matrix.os}}
+    runs-on: windows-latest
     steps:
       - id: fixed_workspace
         name: Fix path
@@ -70,16 +70,16 @@ jobs:
           fetch-depth: 0
       - name: Configure
         run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DWITH_64BIT=${{matrix.sys.with_64bit}} -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
-        shell: 'msys2 {0}'
+        shell: msys2 {0}
       - name: Build
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
-        shell: 'msys2 {0}'
+        shell: msys2 {0}
       - name: Install
-        run: cmake --install ${{steps.fixed_workspace.outputs.out}}/build --config ${{matrix.build-type}}
-        shell: 'msys2 {0}'
+        run: cmake --install ${{steps.fixed_workspace.outputs.out}}/build --config ${{matrix.build-type}} --verbose
+        shell: msys2 {0}
       - name: Package
-        run: cpack -C ${{matrix.build-type}} --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake
-        shell: 'msys2 {0}'
+        run: cpack -C ${{matrix.build-type}} --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
+        shell: msys2 {0}
       - name: Configure Git
         run: |
           git config --global user.email "you@example.com"
@@ -94,18 +94,15 @@ jobs:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-        os:
-          - windows-2019
-          - windows-2022
-        sys:
-          - { name: clang32, env: clang-i686, with_64bit: 'OFF' }
-          - { name: clang64, env: clang-x86_64, with_64bit: 'ON' }
-          - { name: mingw32, env: i686, with_64bit: 'OFF' }
-          - { name: mingw64, env: x86_64, with_64bit: 'ON' }
-          - { name: ucrt64, env: ucrt-x86_64, with_64bit: 'ON' }
         exclude:
           # Crashes in Release but not reproducible on Win11
-          - { sys: { name: clang32 }, build-type: Release }
+          - { build-type: Release, sys: { name: clang32 } }
+        sys:
+          - { env: clang-i686, name: clang32, with_64bit: 'OFF' }
+          - { env: clang-x86_64, name: clang64, with_64bit: 'ON' }
+          - { env: i686, name: mingw32, with_64bit: 'OFF' }
+          - { env: x86_64, name: mingw64, with_64bit: 'ON' }
+          - { env: ucrt-x86_64, name: ucrt64, with_64bit: 'ON' }
 name: Build
 'on':
   pull_request:
