@@ -75,6 +75,7 @@ struct
 tatsh
 tlbid
 ucrt
+ucrtbase
 udvare
 useb
 userprofile
@@ -90,6 +91,7 @@ wfopen
 wfullpath
 wgetcwd
 windres
+winegcc
 winprefs
 wmain
 wmissing

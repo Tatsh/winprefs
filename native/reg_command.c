@@ -3,7 +3,11 @@
 
 #include <windows.h>
 // Has to come after
+#ifndef __WINE__
 #include <versionhelpers.h>
+#else
+#define IsWindowsVistaOrGreater() 0
+#endif
 
 #include "constants.h"
 #include "msvc.h"

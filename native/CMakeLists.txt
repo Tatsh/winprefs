@@ -72,7 +72,7 @@ target_link_libraries(
   PRIVATE
     $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
 )
-if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
   # mingw can do NT 4 without extra help
   target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=$<IF:$<BOOL:${WITH_64BIT}>,0x501,0x400>)
   target_compile_options(
@@ -80,6 +80,10 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
                      $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
   target_link_libraries(winprefs PRIVATE ole32 shell32)
   target_link_options(winprefs PRIVATE -municode $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
+  if(CMAKE_C_COMPILER MATCHES "/winegcc$")
+    target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)
+    target_link_libraries(winprefs PRIVATE ucrtbase)
+  endif()
 else() # MSVC gets Vista+
   target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x600)
   target_compile_options(winprefs PRIVATE /Zc:wchar_t /Zc:forScope /Zc:inline)
