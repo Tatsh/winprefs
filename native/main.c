@@ -228,6 +228,7 @@ int save_preferences(bool commit,
                      const wchar_t *output_dir,
                      int max_depth,
                      HKEY hk,
+                     const wchar_t *specified_path,
                      bool debug) {
     wchar_t full_output_dir[MAX_PATH];
     if (_wfullpath(full_output_dir, output_dir, MAX_PATH) == nullptr) {
@@ -260,7 +261,8 @@ int save_preferences(bool commit,
                        hk == HKEY_CURRENT_USER   ? L"HKCU" :
                        hk == HKEY_LOCAL_MACHINE  ? L"HKLM" :
                        hk == HKEY_USERS          ? L"HKU" :
-                                                   L"HKDD",
+                       hk == HKEY_DYN_DATA       ? L"HKDD" :
+                                                   specified_path,
                        debug);
     fclose(out_fp);
     bool has_git = _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;
@@ -430,6 +432,25 @@ int save_preferences(bool commit,
     return 0;
 }
 
+HKEY get_top_key(wchar_t *reg_path) {
+    if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
+        return HKEY_CLASSES_ROOT;
+    }
+    if (!_wcsnicmp(reg_path, L"HKLM", 4) || !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
+        return HKEY_LOCAL_MACHINE;
+    }
+    if (!_wcsnicmp(reg_path, L"HKCC", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
+        return HKEY_CURRENT_CONFIG;
+    }
+    if (!_wcsnicmp(reg_path, L"HKU", 3) || !_wcsnicmp(reg_path, L"HKEY_USERS", 10)) {
+        return HKEY_USERS;
+    }
+    if (!_wcsnicmp(reg_path, L"HKDD", 4) || !_wcsnicmp(reg_path, L"HKEY_DYN_DATA", 13)) {
+        return HKEY_DYN_DATA;
+    }
+    return nullptr;
+}
+
 int wmain(int argc, wchar_t *argv[]) {
     (void)argc;
     wchar_t *argv0 = argv[0];
@@ -468,6 +489,8 @@ int wmain(int argc, wchar_t *argv[]) {
         case '?': {
             PathStripPath(argv0);
             wprintf(L"Usage: %ls [OPTION...] [REG_PATH]\n", argv0);
+            wprintf(L"\nIf a path to a value name is specified, the output directory argument is "
+                    L"ignored and the line is printed to\nstandard output.\n\n");
             puts("Options:");
             puts("  -K, --deploy-key    Deploy key for committing.");
             puts("  -c, --commit        Commit changes.");
@@ -491,21 +514,53 @@ int wmain(int argc, wchar_t *argv[]) {
     ARG_END;
     wchar_t *reg_path = *argv;
     if (reg_path) {
-        if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
-            starting_key = HKEY_CLASSES_ROOT;
-        } else if (!_wcsnicmp(reg_path, L"HKLM", 4) ||
-                   !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
-            starting_key = HKEY_LOCAL_MACHINE;
-        } else if (!_wcsnicmp(reg_path, L"HKCC", 4) ||
-                   !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
-            starting_key = HKEY_CURRENT_CONFIG;
-        } else if (!_wcsnicmp(reg_path, L"HKU", 3) || !_wcsnicmp(reg_path, L"HKEY_USERS", 10)) {
-            starting_key = HKEY_USERS;
-        } else if (!_wcsnicmp(reg_path, L"HKDD", 4) || !_wcsnicmp(reg_path, L"HKEY_DYN_DATA", 13)) {
-            starting_key = HKEY_DYN_DATA;
-        } else {
-            fwprintf(stderr, L"Invalid registry path.\n");
+        size_t len = wcslen(reg_path);
+        bool top_key_only =
+            (reg_path[len - 1] == L'\\' && reg_path[len - 2] == L':') || reg_path[len - 1] == L':';
+        if (reg_path[len - 1] == L'\\' && reg_path[len - 2] == L':') {
+            reg_path[len - 2] = L'\0';
+        } else if (reg_path[len - 1] == L':') {
+            reg_path[len - 1] = L'\0';
+        }
+        HKEY top_key = get_top_key(reg_path);
+        if (!top_key) {
+            fwprintf(stderr, L"Invalid top-level key in '%ls'.\n", reg_path);
             return EXIT_FAILURE;
+        }
+        if (!top_key_only) {
+            wchar_t *subkey = wcschr(reg_path, L'\\') + 1;
+            if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
+                // See if it's a full path to value
+                wchar_t *last_backslash = wcsrchr(reg_path, '\\');
+                wchar_t *value_name_p = last_backslash + 1;
+                size_t value_name_len = wcslen(value_name_p);
+                wchar_t *value_name = calloc(value_name_len, WL);
+                wmemcpy(value_name, value_name_p, value_name_len);
+                *last_backslash = L'\0';
+                if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
+                    free(value_name);
+                    fwprintf(stderr, L"Invalid subkey: '%ls'.\n", subkey);
+                    return EXIT_FAILURE;
+                }
+                size_t buf_size = 8192;
+                char *data = malloc(buf_size);
+                DWORD reg_type = REG_NONE;
+                LSTATUS ret = RegQueryValueEx(
+                    starting_key, value_name, NULL, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);
+                if (ret == ERROR_MORE_DATA) {
+                    free(data);
+                    fwprintf(stderr, L"Value too large (%ls\\%ls).\n", subkey, value_name);
+                    return EXIT_FAILURE;
+                }
+                if (ret != ERROR_SUCCESS) {
+                    free(data);
+                    fwprintf(stderr, L"Invalid value name '%ls'.\n", value_name);
+                    return EXIT_FAILURE;
+                }
+                do_write_reg_command(stdout, reg_path, value_name, data, buf_size, reg_type, debug);
+                free(data);
+                return EXIT_SUCCESS;
+            }
         }
     }
     if (!output_dir) {
@@ -520,7 +575,7 @@ int wmain(int argc, wchar_t *argv[]) {
         output_dir[MAX_PATH - 1] = L'\0';
     }
     int exit_code =
-        save_preferences(commit, deploy_key, output_dir, max_depth, starting_key, debug);
+        save_preferences(commit, deploy_key, output_dir, max_depth, starting_key, reg_path, debug);
     free(output_dir);
     return exit_code;
 }
