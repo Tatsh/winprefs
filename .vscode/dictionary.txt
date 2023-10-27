@@ -12,6 +12,7 @@ csidl
 ctest
 datetime
 dcmake
+denable
 domaain
 dwith
 dword
