@@ -7,8 +7,8 @@
   },
   "cSpell.enabled": true,
   "cmake.configureArgs": [
+    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
     "-DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc",
-    "-DCMAKE_RC_COMPILER_INIT=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-windres",
     "-DCMAKE_VERBOSE_MAKEFILE=ON",
     "-G",
     "Ninja"
