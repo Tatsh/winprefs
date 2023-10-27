@@ -2,7 +2,6 @@ analyzer
 appdata
 autogen
 bindir
-bitness
 cmder
 codeql
 color
@@ -23,7 +22,6 @@ excpt
 fopen
 ggdb
 gmock
-gnucc
 gtest
 hkcc
 hkcr
@@ -50,7 +48,6 @@ nsis
 nxcompat
 objbase
 olaf
-outfile
 pacboy
 parens
 pidl
@@ -77,7 +74,6 @@ tlbid
 ucrt
 ucrtbase
 udvare
-useb
 userprofile
 useshowwindow
 usestdhandles
@@ -90,7 +86,6 @@ werror
 wfopen
 wfullpath
 wgetcwd
-windres
 winegcc
 winprefs
 wmain
