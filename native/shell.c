@@ -17,7 +17,8 @@ wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     for (i = 0; i < n_chars; i++) {
         new_n_chars++;
         // Last condition is to handle REG_MULTI_SZ string sets
-        if (input[i] == L'\\' || input[i] == L'%' || (input[i] == L'\0' && i < (n_chars - 1))) {
+        if (input[i] == L'\\' || input[i] == L'%' || input[i] == L'"' ||
+            (input[i] == L'\0' && i < (n_chars - 1))) {
             new_n_chars++;
         }
     }
