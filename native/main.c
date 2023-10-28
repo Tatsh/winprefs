@@ -535,6 +535,9 @@ int wmain(int argc, wchar_t *argv[]) {
                 wchar_t *value_name_p = last_backslash + 1;
                 size_t value_name_len = wcslen(value_name_p);
                 wchar_t *value_name = calloc(value_name_len, WL);
+                if (!value_name) {
+                    abort();
+                }
                 wmemcpy(value_name, value_name_p, value_name_len);
                 *last_backslash = L'\0';
                 if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {

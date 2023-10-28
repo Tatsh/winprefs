@@ -49,12 +49,12 @@ add_executable(
   arg.h
   constants.c
   constants.h
+  macros.h
   main.c
   reg_command.c
   reg_command.h
   shell.c
-  shell.h
-  msvc.h)
+  shell.h)
 target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
 target_link_libraries(winprefs PRIVATE shlwapi)
 target_compile_definitions(
@@ -73,8 +73,8 @@ target_link_libraries(
     $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
 )
 if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
-  # mingw can do NT 4 without extra help
-  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=$<IF:$<BOOL:${WITH_64BIT}>,0x501,0x400>)
+  # mingw can do 2000 without extra help. 64-bit requires at least XP.
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=$<IF:$<BOOL:${WITH_64BIT}>,0x501,0x0500>)
   target_compile_options(
     winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS} $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
                      $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
