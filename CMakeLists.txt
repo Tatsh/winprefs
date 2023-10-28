@@ -6,8 +6,8 @@ project(
   LANGUAGES C
   VERSION 0.2.1)
 
-option(WITH_64BIT "Build 64-bit binaries." ON)
-option(WITH_VLD "Debug only: enable Visual Leak Detector." OFF)
+option(BUILD_64BIT "Build 64-bit binaries." ON)
+option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 
 add_subdirectory(native)
 

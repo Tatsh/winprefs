@@ -1,8 +1,9 @@
 #ifndef MSVC_H
 #define MSVC_H
 
-#ifdef _MSC_VER
-#define nullptr NULL
+#ifndef _GCC_NULLPTR_T
+#define nullptr (void *)0
+typedef void *nullptr_t;
 #endif
 
 #ifndef _MSC_VER
