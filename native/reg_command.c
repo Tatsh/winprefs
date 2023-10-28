@@ -103,7 +103,7 @@ void do_write_reg_command(FILE *out_fp,
                           const wchar_t *prop,
                           const char *value,
                           size_t data_len,
-                          DWORD type,
+                          unsigned long type,
                           bool debug) {
     wchar_t *escaped_d = convert_data_for_reg(type, value, data_len);
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));

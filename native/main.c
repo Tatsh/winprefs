@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <wchar.h>
 
@@ -17,7 +18,7 @@
 
 BOOL dir_exists(wchar_t *path) {
     DWORD attrib = GetFileAttributes(path);
-    return (attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY));
+    return attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 // Based on https://stackoverflow.com/a/35658917/374110
