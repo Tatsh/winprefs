@@ -1,7 +1,9 @@
-#ifndef MSVC_H
-#define MSVC_H
+#ifndef MACROS_H
+#define MACROS_H
 
-#ifndef _GCC_NULLPTR_T
+#if (defined(__STDC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 202000L))
+#include <stddef.h>
+#else
 #define nullptr (void *)0
 typedef void *nullptr_t;
 #endif
@@ -18,4 +20,4 @@ typedef void *nullptr_t;
 #define _WC_ERR_INVALID_CHARS 0x0080
 #endif
 
-#endif // MSVC_H
+#endif // MACROS_H

@@ -5,7 +5,7 @@
 #include <wchar.h>
 
 #include "constants.h"
-#include "msvc.h"
+#include "macros.h"
 #include "shell.h"
 
 wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {

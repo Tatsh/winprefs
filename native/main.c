@@ -12,7 +12,7 @@
 
 #include "arg.h"
 #include "constants.h"
-#include "msvc.h"
+#include "macros.h"
 #include "reg_command.h"
 
 BOOL dir_exists(wchar_t *path) {

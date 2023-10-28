@@ -10,7 +10,7 @@
 #endif
 
 #include "constants.h"
-#include "msvc.h"
+#include "macros.h"
 #include "reg_command.h"
 #include "shell.h"
 
