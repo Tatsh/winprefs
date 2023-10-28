@@ -14,7 +14,6 @@ wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     }
     unsigned i, j;
     size_t new_n_chars = 0;
-    //size_t w_size = n_chars * WL;
     for (i = 0; i < n_chars; i++) {
         new_n_chars++;
         // Last condition is to handle REG_MULTI_SZ string sets
