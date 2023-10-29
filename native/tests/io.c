@@ -2,29 +2,26 @@
 #include <stddef.h>
 
 #include <cmocka.h>
+#include <io.h>
+#include <windows.h>
 
 #include "io.h"
 #include "macros.h"
 
-bool ends_with_ext_gcda(const char *s) {
-    return strlen(s) > 5 && !strcmp(s + strlen(s) - 5, ".gcda");
+bool ends_with_ext_gcda(const wchar_t *s) {
+    return wcslen(s) > 5 && !wcsncmp(s + wcslen(s) - 5, L".gcda", 4);
 }
 
 bool is_gcda(FILE *restrict stream) {
     (void)stream;
-    // char proc_lnk[32];
-    // ssize_t r;
-    // char filename[PATH_MAX];
-    // int fno = fileno(stream);
-    // if (fno >= 0) {
-    //     sprintf(proc_lnk, "/proc/self/fd/%d", fno);
-    //     r = readlink(proc_lnk, filename, PATH_MAX);
-    //     if (r < 0) {
-    //         return false;
-    //     }
-    //     filename[r] = '\0';
-    //     return ends_with_ext_gcda(filename);
-    // }
+    HANDLE h_file = _get_osfhandle(_fileno(stream));
+    if (h_file > 2) {
+        FILE_NAME_INFO file_name_info;
+        if (GetFileInformationByHandleEx(
+                h_file, FileNameInfo, &file_name_info, sizeof(FILE_NAME_INFO))) {
+            return ends_with_ext_gcda(file_name_info.FileName);
+        }
+    }
     return false;
 }
 
