@@ -1,3 +1,5 @@
+enable_testing()
+
 set(mocked_functions
     CloseHandle
     CreateProcessW
@@ -34,7 +36,6 @@ add_executable(
   ../constants.c
   ../constants.h
   ../macros.h
-  ../main.c
   ../reg_command.c
   ../reg_command.h
   ../shell.c
@@ -55,7 +56,10 @@ target_compile_options(winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBU
                                               ${GCC_CLANG_SHARED_C_FLAGS})
 target_include_directories(winprefs-tests PRIVATE ${CMAKE_SOURCE_DIR}/native)
 target_link_libraries(winprefs-tests PRIVATE cmocka::cmocka shlwapi)
+target_link_options(winprefs-tests PRIVATE -municode)
 if(ENABLE_COVERAGE)
-  target_link_libraries(winprefs-tests PRIVATE gcov)
+  target_compile_options(winprefs-tests PRIVATE --coverage)
+  target_link_options(winprefs-tests PRIVATE --coverage)
 endif()
 target_link_options(winprefs-tests PRIVATE ${test_flags})
+add_test(NAME winprefs-tests COMMAND winprefs-tests)
