@@ -27,11 +27,11 @@ wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     if (!out) {
         return nullptr;
     }
+    wmemset(out, L'\0', new_n_chars + 1);
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);
         return out;
     }
-    wmemset(out, L'\0', new_n_chars + 1);
     for (i = 0, j = 0; i < n_chars && j < new_n_chars; i++, j++) {
         // This condition is to handle REG_MULTI_SZ string sets
         if (input[i] == '\0' && i < (n_chars - 1) && j < (new_n_chars - 1)) {

@@ -95,10 +95,10 @@ int main(int argc, char **argv) {
             reverse = 1;
             ARG_FLAG();
         }
-        else if (ARG_LONG("input")) case 'i': {
+        else if (ARG_LONG("input")) case 'i' : {
             input = ARG_VAL();
         }
-        else if (ARG_LONG("output")) case 'o': {
+        else if (ARG_LONG("output")) case 'o' : {
             output = ARG_VAL();
         }
         else if (ARG_LONG("help")) case 'h':

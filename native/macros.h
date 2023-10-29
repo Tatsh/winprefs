@@ -15,6 +15,7 @@
 #ifndef _MSC_VER
 #include <stdbool.h>
 #else
+#include <windows.h>
 #define bool BOOL
 #define true TRUE
 #define false FALSE

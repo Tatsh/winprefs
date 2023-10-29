@@ -68,7 +68,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         return out;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
-        wchar_t *s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : (data_len / WL) - 1);
+        wchar_t *s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : data_len / WL);
         if (s == nullptr) {
             return nullptr;
         }
@@ -83,7 +83,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         return out;
     }
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
-        size_t s_size = 20;
+        size_t s_size = 128;
         wchar_t *out = calloc(s_size, WL);
         if (!out) {
             return nullptr;
@@ -159,7 +159,14 @@ bool do_write_reg_command(HANDLE out_fp,
                                         0,
                                         NULL,
                                         NULL);
-        char *mb_out = malloc(req_size);
+        if (req_size == 0) {
+            fwprintf(stdout, L"%ls\n", out);
+        }
+        char *mb_out = malloc(req_size + 3);
+        if (!mb_out) {
+            return false;
+        }
+        memset(mb_out, 0, req_size + 3);
         WideCharToMultiByte(CP_UTF8,
                             IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
                             out,
@@ -168,10 +175,15 @@ bool do_write_reg_command(HANDLE out_fp,
                             (int)req_size,
                             NULL,
                             NULL);
-        mb_out[req_size - 1] = '\n';
-        DWORD written;
-        WriteFile(out_fp, mb_out, (DWORD)(req_size), &written, nullptr);
+        printf("%lld %s\n", req_size, mb_out);
+        mb_out[req_size - 1] = '\r';
+        mb_out[req_size] = '\n';
+        DWORD written = 0;
+        bool ret = WriteFile(out_fp, mb_out, (DWORD)(req_size), &written, nullptr);
         free(mb_out);
+        if (!ret || written == 0) {
+            return false;
+        }
     } else {
         debug_print(L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
     }
@@ -207,6 +219,7 @@ bool do_write_reg_commands(HANDLE out_fp, HKEY hk, unsigned n_values, const wcha
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
         wmemset(value, L'\0', MAX_VALUE_NAME);
+        memset(data, 0, 8192);
         value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
         ret = RegEnumValue(
@@ -263,7 +276,8 @@ bool write_reg_commands(HKEY hk,
         wcsstr(full_path, L"Explorer\\ComDlg32\\OpenSavePidlMRU") ||
         wcsstr(full_path, L"IrisService\\Cache") ||
         wcsstr(full_path, L"Microsoft\\Windows\\Shell\\Bags") ||
-        wcsstr(full_path, L"Windows\\Shell\\BagMRU")) {
+        wcsstr(full_path, L"Windows\\Shell\\BagMRU") ||
+        wcsstr(full_path, L"Windows\\Shell\\MuiCache")) {
         debug_print(L"%ls: Skipping %ls due to filter.\n", prior_stem, stem);
         free(full_path);
         return true;
