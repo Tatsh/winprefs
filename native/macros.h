@@ -4,6 +4,7 @@
 #if (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
 #include <stddef.h>
 #else
+//! `nullptr` definition if not defined by `stddef.h`.
 #define nullptr (void *)0
 #endif
 
@@ -16,6 +17,7 @@
 #endif
 
 #ifndef _WC_ERR_INVALID_CHARS
+//! Fallback for pre-Vista. Same value as `WC_ERR_INVALID_CHARS`.
 #define _WC_ERR_INVALID_CHARS 0x0080
 #endif
 

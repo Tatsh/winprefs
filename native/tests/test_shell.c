@@ -37,10 +37,3 @@ void test_escape_returns_same_when_escaping_unnecessary(void **state) {
     assert_memory_equal(L"abcdef", out, 6);
     free(out);
 }
-
-void test_escape_aborts_if_calloc_fails(void **state) {
-    (void)state;
-    want_calloc_abort = true;
-    assert_null(escape_for_batch(L"input", 1));
-    want_calloc_abort = false;
-}

@@ -6,12 +6,25 @@ project(
   LANGUAGES C
   VERSION 0.2.1)
 
+option(BUILD_DOCS "Build documentation." OFF)
 option(BUILD_TESTS "Build and run tests." OFF)
 option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 
 if(BUILD_TESTS)
   find_package(cmocka REQUIRED)
+endif()
+
+if(BUILD_DOCS)
+  find_package(Doxygen REQUIRED)
+  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
+  add_custom_target(
+    doc ALL
+    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html
+          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/bincookie-0.1.6)
 endif()
 
 add_subdirectory(native)

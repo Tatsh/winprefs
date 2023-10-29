@@ -6,47 +6,49 @@
 
 #ifndef ARG_H_INCLUDED
 
-static int
-ARG_LONG_func(wchar_t **argv0, char const *name)
-{
-	wchar_t *argIt = *argv0;
-	while (*argIt == *name && *argIt)
-		argIt++, name++;
-	if (*argIt == *name || (*argIt == '=' && !*name)) {
-		*argv0 = argIt;
-		return 1;
-	}
-	return 0;
+static int ARG_LONG_func(wchar_t **argv0, char const *name) {
+    wchar_t *argIt = *argv0;
+    while (*argIt == *name && *argIt)
+        argIt++, name++;
+    if (*argIt == *name || (*argIt == '=' && !*name)) {
+        *argv0 = argIt;
+        return 1;
+    }
+    return 0;
 }
 
-#define ARG_BEGIN do { \
-	for (argv[0] && (--argc, ++argv); \
-	     argv[0] && argv[0][0] == '-'; \
-	     argv[0] && (--argc, ++argv)) { \
-		int isFlag = 1; \
-		wchar_t *arg = argv[0]; \
-		if (arg[1] == '-' && arg[2] == 0 && (--argc, ++argv, 1)) \
-			break; \
-		ARG_BEGIN_REP: \
-		switch ((++arg)[0]) { \
-		case '-': \
-			isFlag = 0; \
-			if (arg[-1] == '-') \
-				++arg;
+#define ARG_BEGIN                                                                                  \
+    do {                                                                                           \
+        for (argv[0] && (--argc, ++argv); argv[0] && argv[0][0] == '-';                            \
+             argv[0] && (--argc, ++argv)) {                                                        \
+            int isFlag = 1;                                                                        \
+            wchar_t *arg = argv[0];                                                                \
+            if (arg[1] == '-' && arg[2] == 0 && (--argc, ++argv, 1))                               \
+                break;                                                                             \
+        ARG_BEGIN_REP:                                                                             \
+            switch ((++arg)[0]) {                                                                  \
+            case '-':                                                                              \
+                isFlag = 0;                                                                        \
+                if (arg[-1] == '-')                                                                \
+                    ++arg;
 
 #define ARG_LONG(name) ARG_LONG_func(&(arg), (name))
 
-#define ARG_VAL() \
-		(isFlag ? (arg[1] ? ++arg : *(--argc, ++argv)) : \
-		          (arg[0] == '=' ? ++arg : *(--argc, ++argv)))
+#define ARG_VAL()                                                                                  \
+    (isFlag ? (arg[1] ? ++arg : *(--argc, ++argv)) : (arg[0] == '=' ? ++arg : *(--argc, ++argv)))
 
-#define ARG_FLAG() if (isFlag && arg[1]) goto ARG_BEGIN_REP
+#define ARG_FLAG()                                                                                 \
+    if (isFlag && arg[1])                                                                          \
+    goto ARG_BEGIN_REP
 
-#define ARG_END } } } while(0)
+#define ARG_END                                                                                    \
+    }                                                                                              \
+    }                                                                                              \
+    }                                                                                              \
+    while (0)
 
 #define ARG_H_INCLUDED
 #endif
-
 
 /*
  * Example:
@@ -56,8 +58,8 @@ ARG_LONG_func(wchar_t **argv0, char const *name)
 
 // spell-checker: disable
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef ARG_FUZZ
 #define main argMain
@@ -65,63 +67,81 @@ ARG_LONG_func(wchar_t **argv0, char const *name)
 #define stderr stdout
 #endif
 
+int main(int argc, char **argv) {
+    char *argv0 = argv[0];
+    int a = 0, b = 0, c = 0, reverse = 0;
+    char const *input = "default", *output = "default";
+    int readstdin = 0;
 
-int
-main(int argc, char **argv)
-{
-	char *argv0 = argv[0];
-	int a = 0, b = 0, c = 0, reverse = 0;
-	char const *input = "default", *output = "default";
-	int readstdin = 0;
+    ARG_BEGIN {
+        if (0) {
+        case 'a':
+            a = 1;
+            ARG_FLAG();
+            break;
+        case 'b':
+            b = 1;
+            ARG_FLAG();
+            break;
+        case 'c':
+            c = 1;
+            ARG_FLAG();
+            break;
+        case '\0':
+            readstdin = 1;
+            break;
+        } else if (ARG_LONG("reverse"))
+        case 'r': {
+            reverse = 1;
+            ARG_FLAG();
+        }
+        else if (ARG_LONG("input")) case 'i': {
+            input = ARG_VAL();
+        }
+        else if (ARG_LONG("output")) case 'o': {
+            output = ARG_VAL();
+        }
+        else if (ARG_LONG("help")) case 'h':
+        case '?': {
+            printf("Usage: %s [OPTION...] [STRING...]\n", argv0);
+            puts("Example usage of arg.h\n");
+            puts("Options:");
+            puts("  -a,                set a to true");
+            puts("  -b,                set b to true");
+            puts("  -c,                set c to true");
+            puts("  -r, --reverse      set reverse to true");
+            puts("  -i, --input=STR    set input string to STR");
+            puts("  -o, --output=STR   set output string to STR");
+            puts("  -h, --help         display this help and exit");
+            return EXIT_SUCCESS;
+        }
+            else {
+            default:
+                fprintf(stderr,
+                        "%s: invalid option '%s'\n"
+                        "Try '%s --help' for more information.\n",
+                        argv0,
+                        *argv,
+                        argv0);
+                return EXIT_FAILURE;
+            }
+    }
+    ARG_END;
 
-	ARG_BEGIN {
-		if (0) {
-			case 'a': a = 1; ARG_FLAG(); break;
-			case 'b': b = 1; ARG_FLAG(); break;
-			case 'c': c = 1; ARG_FLAG(); break;
-			case '\0': readstdin = 1; break;
-		} else if (ARG_LONG("reverse")) case 'r': {
-			reverse = 1;
-			ARG_FLAG();
-		} else if (ARG_LONG("input")) case 'i': {
-			input = ARG_VAL();
-		} else if (ARG_LONG("output")) case 'o': {
-			output = ARG_VAL();
-		} else if (ARG_LONG("help")) case 'h': case '?': {
-			printf("Usage: %s [OPTION...] [STRING...]\n", argv0);
-			puts("Example usage of arg.h\n");
-			puts("Options:");
-			puts("  -a,                set a to true");
-			puts("  -b,                set b to true");
-			puts("  -c,                set c to true");
-			puts("  -r, --reverse      set reverse to true");
-			puts("  -i, --input=STR    set input string to STR");
-			puts("  -o, --output=STR   set output string to STR");
-			puts("  -h, --help         display this help and exit");
-			return EXIT_SUCCESS;
-		} else { default:
-			fprintf(stderr,
-			        "%s: invalid option '%s'\n"
-			        "Try '%s --help' for more information.\n",
-			        argv0, *argv, argv0);
-			return EXIT_FAILURE;
-		}
-	} ARG_END;
+    printf("a = %s\n", a ? "true" : "false");
+    printf("b = %s\n", b ? "true" : "false");
+    printf("c = %s\n", c ? "true" : "false");
+    printf("reverse = %s\n", reverse ? "true" : "false");
+    printf("readstdin = %s\n", readstdin ? "true" : "false");
+    printf("input = %s\n", input);
+    printf("output = %s\n", output);
 
-	printf("a = %s\n", a ? "true" : "false");
-	printf("b = %s\n", b ? "true" : "false");
-	printf("c = %s\n", c ? "true" : "false");
-	printf("reverse = %s\n", reverse ? "true" : "false");
-	printf("readstdin = %s\n", readstdin ? "true" : "false");
-	printf("input = %s\n", input);
-	printf("output = %s\n", output);
+    printf("\nargc: %d", argc);
+    puts("\nargv:");
+    while (*argv)
+        printf("  %s\n", *argv++);
 
-	printf("\nargc: %d", argc);
-	puts("\nargv:");
-	while (*argv)
-		printf("  %s\n", *argv++);
-
-	return 0;
+    return 0;
 }
 
 #endif /* ARG_EXAMPLE */
@@ -136,32 +156,30 @@ main(int argc, char **argv)
 #include <string.h>
 #define MAX_ARGC 50000
 
-int
-LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
-{
-	if (size < 2)
-		return -1;
+int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+    if (size < 2)
+        return -1;
 
-	char *buf = malloc(size+2);
-	memcpy(buf, data, size);
-	buf[size] = buf[size+1] = 0;
+    char *buf = malloc(size + 2);
+    memcpy(buf, data, size);
+    buf[size] = buf[size + 1] = 0;
 
-	static char *argv[MAX_ARGC+1];
-	size_t argc = 0;
-	for (char *ptr = buf; *ptr && argc < MAX_ARGC;) {
-		argv[argc++] = ptr;
-		while (*ptr++);
-	}
-	argv[argc] = 0;
+    static char *argv[MAX_ARGC + 1];
+    size_t argc = 0;
+    for (char *ptr = buf; *ptr && argc < MAX_ARGC;) {
+        argv[argc++] = ptr;
+        while (*ptr++)
+            ;
+    }
+    argv[argc] = 0;
 
-	main(argc, argv);
-	free(buf);
+    main(argc, argv);
+    free(buf);
 
-	return 0;
+    return 0;
 }
 
 #endif
-
 
 /*
  * Copyright (c) 2021 Olaf Berstein

@@ -40,8 +40,9 @@ add_executable(
 target_compile_definitions(winprefs-tests PRIVATE UNICODE _UNICODE)
 get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 target_compile_definitions(winprefs-tests PRIVATE _WIN32_WINNT=0x600)
-target_compile_options(winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
-                                              ${GCC_CLANG_SHARED_C_FLAGS})
+target_compile_options(
+  winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
+                         ${GCC_CLANG_SHARED_C_FLAGS})
 target_include_directories(winprefs-tests PRIVATE ${CMAKE_SOURCE_DIR}/native)
 target_link_libraries(winprefs-tests PRIVATE cmocka::cmocka kernel32 shlwapi)
 target_link_options(winprefs-tests PRIVATE -municode)

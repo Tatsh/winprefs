@@ -1,10 +1,12 @@
 include(GNUInstallDirs)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
-  find_library(VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64"
-                             "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
-  find_path(VLD_H vld.h HINTS "C:/Program Files (x86)/Visual Leak Detector/include"
-                              "C:/Program Files/Visual Leak Detector/include" REQUIRED)
+  find_library(
+    VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64"
+                  "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
+  find_path(VLD_H vld.h
+            HINTS "C:/Program Files (x86)/Visual Leak Detector/include"
+                  "C:/Program Files/Visual Leak Detector/include" REQUIRED)
 endif()
 
 set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin -std=gnu2x)
@@ -49,10 +51,16 @@ add_executable(
   arg.h
   constants.c
   constants.h
+  debug.c
+  debug.h
+  git.c
+  git.h
   macros.h
   main.c
   reg_command.c
   reg_command.h
+  registry.c
+  registry.h
   shell.c
   shell.h)
 target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
@@ -72,14 +80,17 @@ target_link_libraries(
   PRIVATE
     $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
 )
-if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES
+                                              "/winegcc$")
   get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
   # mingw can do 2000 without extra help. 64-bit requires at least XP.
-  target_compile_definitions(winprefs
-                             PRIVATE _WIN32_WINNT=$<IF:$<STREQUAL:${IS_64BIT},TRUE>,0x501,0x0500>)
-  target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
-                                          $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
-  target_link_libraries(winprefs PRIVATE ole32 shell32)
+  target_compile_definitions(
+    winprefs
+    PRIVATE _WIN32_WINNT=$<IF:$<STREQUAL:${IS_64BIT},TRUE>,0x501,0x0500>)
+  target_compile_options(
+    winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
+                     $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+  target_link_libraries(winprefs PRIVATE shell32)
   target_link_options(winprefs PRIVATE -municode)
   if(CMAKE_C_COMPILER MATCHES "/winegcc$")
     target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)

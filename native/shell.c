@@ -10,6 +10,7 @@
 
 wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     if (input == nullptr || n_chars == 0) {
+        errno = EINVAL;
         return nullptr;
     }
     unsigned i, j;
@@ -24,7 +25,7 @@ wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     }
     wchar_t *out = calloc(new_n_chars + 1, WL);
     if (!out) {
-        abort();
+        return nullptr;
     }
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);
