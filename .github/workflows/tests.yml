@@ -41,7 +41,7 @@ jobs:
         run: lcov --capture --directory ${{steps.fixed_workspace.outputs.out}}/build --output-file coverage.info
         shell: msys2 {0}
       - name: Coveralls
-        run: coveralls
+        run: coveralls -E 'tests/test.*\.(h|c)' -E '^build'
 name: Tests
 'on':
   pull_request:
