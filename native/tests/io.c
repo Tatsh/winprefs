@@ -8,18 +8,25 @@
 #include "io.h"
 #include "macros.h"
 
-bool ends_with_ext_gcda(const wchar_t *s) {
-    return wcslen(s) > 5 && !wcsncmp(s + wcslen(s) - 5, L".gcda", 4);
+static bool ends_with_ext_gcda(const char *s) {
+    size_t len = strlen(s);
+    return len > 5 && !strncmp(s + len - 5, ".gcda", 4);
 }
 
 bool is_gcda(FILE *restrict stream) {
     (void)stream;
-    HANDLE h_file = _get_osfhandle(_fileno(stream));
-    if (h_file > 2) {
+    HANDLE h_file = (HANDLE)_get_osfhandle(_fileno(stream));
+    if ((long long)h_file > 2) {
         FILE_NAME_INFO file_name_info;
         if (GetFileInformationByHandleEx(
                 h_file, FileNameInfo, &file_name_info, sizeof(FILE_NAME_INFO))) {
-            return ends_with_ext_gcda(file_name_info.FileName);
+            size_t req_size = wcstombs(nullptr, file_name_info.FileName, 0);
+            char *narrow = malloc(req_size);
+            memset(narrow, 0, req_size);
+            wcstombs(narrow, file_name_info.FileName, req_size);
+            bool ret = ends_with_ext_gcda(narrow);
+            free(narrow);
+            return ret;
         }
     }
     return false;

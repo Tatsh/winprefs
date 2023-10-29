@@ -5,13 +5,6 @@
 
 #include <stdio.h>
 
-typedef struct {
-    char path[MAX_PATH];
-    char data[2048];
-    long len;
-    long pos;
-} fake_file_t;
-
 FILE *__real_fopen(const char *restrict path, const char *restrict mode);
 int __real_fread(void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream);
 int __real_fseek(FILE *stream, long offset, int whence);
