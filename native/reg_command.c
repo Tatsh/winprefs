@@ -98,7 +98,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     return nullptr;
 }
 
-void do_write_reg_command(FILE *out_fp,
+void do_write_reg_command(HANDLE out_fp,
                           const wchar_t *full_path,
                           const wchar_t *prop,
                           const char *value,
@@ -158,7 +158,7 @@ void do_write_reg_command(FILE *out_fp,
                                         0,
                                         NULL,
                                         NULL);
-        char *mb_out = malloc(req_size);
+        char *mb_out = malloc(req_size + 1);
         WideCharToMultiByte(CP_UTF8,
                             IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
                             out,
@@ -167,7 +167,9 @@ void do_write_reg_command(FILE *out_fp,
                             (int)req_size,
                             NULL,
                             NULL);
-        fprintf(out_fp, "%s\n", mb_out);
+        mb_out[req_size] = '\n';
+        DWORD written;
+        WriteFile(out_fp, mb_out, (DWORD)(req_size + 1), &written, nullptr);
         free(mb_out);
     } else {
         if (debug) {
@@ -185,7 +187,7 @@ void do_write_reg_command(FILE *out_fp,
 }
 
 void do_write_reg_commands(
-    FILE *out_fp, HKEY hk, unsigned n_values, const wchar_t *full_path, bool debug) {
+    HANDLE out_fp, HKEY hk, unsigned n_values, const wchar_t *full_path, bool debug) {
     size_t data_len;
     DWORD i;
     DWORD reg_type;

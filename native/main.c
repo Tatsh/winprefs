@@ -113,7 +113,7 @@ void write_reg_commands(HKEY hk,
                         const wchar_t *stem,
                         int max_depth,
                         int depth,
-                        FILE *out_fp,
+                        HANDLE out_fp,
                         const wchar_t *prior_stem,
                         bool debug) {
     if (depth >= max_depth) {
@@ -251,7 +251,13 @@ int save_preferences(bool commit,
         }
     }
     full_output_dir[MAX_PATH - 1] = '\0';
-    FILE *out_fp = _wfopen(full_output_dir, L"w+");
+    HANDLE out_fp = CreateFile(full_output_dir,
+                              GENERIC_READ | GENERIC_WRITE,
+                              0,
+                              nullptr,
+                              CREATE_ALWAYS,
+                              FILE_ATTRIBUTE_NORMAL,
+                              nullptr);
     write_reg_commands(hk,
                        nullptr,
                        max_depth,
@@ -265,7 +271,7 @@ int save_preferences(bool commit,
                        hk == HKEY_DYN_DATA       ? L"HKDD" :
                                                    specified_path,
                        debug);
-    fclose(out_fp);
+    CloseHandle(out_fp);
     bool has_git = _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;
     if (commit) {
         if (!has_git) {
