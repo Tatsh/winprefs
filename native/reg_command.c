@@ -137,7 +137,7 @@ bool do_write_reg_command(HANDLE out_fp,
     }
     wchar_t *out = calloc(CMD_MAX_COMMAND_LENGTH, WL);
     if (!out) {
-        return nullptr;
+        return false;
     }
     wmemset(out, L'\0', CMD_MAX_COMMAND_LENGTH);
     int wrote = _snwprintf(out,

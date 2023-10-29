@@ -8,6 +8,10 @@
 #define nullptr (void *)0
 #endif
 
+#ifndef EINVAL // Fix for MingW Clang
+#define EINVAL 22
+#endif
+
 #ifndef _MSC_VER
 #include <stdbool.h>
 #else
