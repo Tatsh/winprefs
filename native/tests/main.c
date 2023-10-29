@@ -1,4 +1,3 @@
-#include "calloc.h"
 #include "cmocka-inc.h"
 
 #include "tests.h"
