@@ -47,21 +47,21 @@ int wmain(int argc, wchar_t *argv[]) {
         case 'K': {
             deploy_key = ARG_VAL();
         }
-        else if (ARG_LONG("commit")) case 'c' : {
+        else if (ARG_LONG("commit")) case 'c': {
             commit = true;
             ARG_FLAG();
         }
-        else if (ARG_LONG("debug")) case 'd' : {
+        else if (ARG_LONG("debug")) case 'd': {
             debug = true;
             ARG_FLAG();
         }
-        else if (ARG_LONG("output-file")) case 'f' : {
+        else if (ARG_LONG("output-file")) case 'f': {
             output_file = ARG_VAL();
         }
-        else if (ARG_LONG("output-dir")) case 'o' : {
+        else if (ARG_LONG("output-dir")) case 'o': {
             output_dir = ARG_VAL();
         }
-        else if (ARG_LONG("max-depth")) case 'm' : {
+        else if (ARG_LONG("max-depth")) case 'm': {
             wchar_t *val = ARG_VAL();
             size_t w_len = wcslen(val);
             char *as_char = malloc(w_len + 1);
