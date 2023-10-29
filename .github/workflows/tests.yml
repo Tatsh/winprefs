@@ -1,0 +1,52 @@
+---
+jobs:
+  build:
+    env:
+      COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: windows-latest
+    steps:
+      - id: fixed_workspace
+        name: Fix path
+        run: |
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            make
+          msystem: ${{matrix.sys.name}}
+          pacboy: >-
+            cmake:p
+            cmocka:p
+            graphviz:p
+            lcov:p
+            ninja:p
+            toolchain:p
+          update: true
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Install tools
+        run: pipx install cpp-coveralls
+      - name: Configure
+        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+        shell: msys2 {0}
+      - name: Build
+        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        shell: msys2 {0}
+      - name: Run tests
+        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests
+        shell: msys2 {0}
+      - name: Generate coverage information
+        run: lcov --capture --directory {{steps.fixed_workspace.outputs.out}}/build --output-file coverage.info
+        shell: msys2 {0}
+      - name: Coveralls
+        run: coveralls
+name: Tests
+'on':
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
