@@ -186,7 +186,7 @@ cmake --build . --config Release --verbose
 ```shell
 mkdir build
 cd build
-cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/i686-w64-mingw32-gcc -Wno-dev ..
+cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -Wno-dev ..
 cmake --build . --config Release --verbose
 ```
 
