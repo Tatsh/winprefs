@@ -31,7 +31,7 @@ HKEY get_top_key(wchar_t *reg_path) {
 static inline bool create_dir_wrapper(wchar_t *folder) {
     if (!CreateDirectory(folder, NULL)) {
         DWORD err = GetLastError();
-        if (err != ERROR_ALREADY_EXISTS) {
+        if (err != ERROR_ALREADY_EXISTS && err != ERROR_ACCESS_DENIED) {
             return false;
         }
     }
