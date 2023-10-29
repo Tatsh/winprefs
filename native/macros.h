@@ -1,11 +1,10 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#if (defined(__STDC__) && defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 202000L))
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ > 201710L)
 #include <stddef.h>
 #else
 #define nullptr (void *)0
-typedef void *nullptr_t;
 #endif
 
 #ifndef _MSC_VER
