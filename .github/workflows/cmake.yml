@@ -69,7 +69,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Configure
-        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DWITH_64BIT=${{matrix.sys.with_64bit}} -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
         shell: msys2 {0}
       - name: Build
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
