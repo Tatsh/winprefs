@@ -98,11 +98,11 @@ jobs:
           # Crashes in Release but not reproducible on Win11
           - { build-type: Release, sys: { name: clang32 } }
         sys:
-          - { env: clang-i686, name: clang32, with_64bit: 'OFF' }
-          - { env: clang-x86_64, name: clang64, with_64bit: 'ON' }
-          - { env: i686, name: mingw32, with_64bit: 'OFF' }
-          - { env: x86_64, name: mingw64, with_64bit: 'ON' }
-          - { env: ucrt-x86_64, name: ucrt64, with_64bit: 'ON' }
+          - { env: clang-i686, name: clang32 }
+          - { env: clang-x86_64, name: clang64 }
+          - { env: i686, name: mingw32 }
+          - { env: x86_64, name: mingw64 }
+          - { env: ucrt-x86_64, name: ucrt64 }
 name: Build
 'on':
   pull_request:
