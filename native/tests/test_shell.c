@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "calloc.h"
 #include "cmocka-inc.h"
 #include "io.h"
