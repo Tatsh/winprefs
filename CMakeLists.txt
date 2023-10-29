@@ -6,8 +6,13 @@ project(
   LANGUAGES C
   VERSION 0.2.1)
 
-option(BUILD_64BIT "Build 64-bit binaries." ON)
+option(BUILD_TESTS "Build and run tests." OFF)
+option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
+
+if(BUILD_TESTS)
+  find_package(cmocka REQUIRED)
+endif()
 
 add_subdirectory(native)
 

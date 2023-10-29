@@ -7,42 +7,42 @@ if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
                               "C:/Program Files/Visual Leak Detector/include" REQUIRED)
 endif()
 
-set(GCC_CLANG_SHARED_C_FLAGS "-fno-builtin;-std=gnu2x")
+set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin -std=gnu2x)
 set(GCC_CLANG_DEBUG_C_FLAGS
-    "-ggdb;\
--O0;\
--pedantic;\
--Wall;\
--Wdeprecated-declarations;\
--Wempty-body;\
--Werror;\
--Werror=conversion;\
--Werror=float-conversion;\
--Werror=implicit-function-declaration;\
--Werror=incompatible-pointer-types;\
--Werror=int-conversion;\
--Werror=return-type;\
--Werror=sign-conversion;\
--Wmissing-braces;\
--Wmissing-field-initializers;\
--Wno-error=unused-value;\
--Wno-missing-prototypes;\
--Wno-strict-prototypes;\
--Wno-trigraphs;\
--Wno-unknown-pragmas;\
--Wno-unused-value;\
--Wparentheses;\
--Wpointer-sign;\
--Wshadow;\
--Wsign-compare;\
--Wswitch;\
--Wuninitialized;\
--Wunknown-pragmas;\
--Wunreachable-code;\
--Wunused-function;\
--Wunused-label;\
--Wunused-parameter;\
--Wunused-variable")
+    -ggdb
+    -O0
+    -pedantic
+    -Wall
+    -Wdeprecated-declarations
+    -Wempty-body
+    -Werror
+    -Werror=conversion
+    -Werror=float-conversion
+    -Werror=implicit-function-declaration
+    -Werror=incompatible-pointer-types
+    -Werror=int-conversion
+    -Werror=return-type
+    -Werror=sign-conversion
+    -Wmissing-braces
+    -Wmissing-field-initializers
+    -Wno-error=unused-value
+    -Wno-missing-prototypes
+    -Wno-strict-prototypes
+    -Wno-trigraphs
+    -Wno-unknown-pragmas
+    -Wno-unused-value
+    -Wparentheses
+    -Wpointer-sign
+    -Wshadow
+    -Wsign-compare
+    -Wswitch
+    -Wuninitialized
+    -Wunknown-pragmas
+    -Wunreachable-code
+    -Wunused-function
+    -Wunused-label
+    -Wunused-parameter
+    -Wunused-variable)
 
 add_executable(
   winprefs
@@ -73,13 +73,14 @@ target_link_libraries(
     $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
 )
 if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
+  get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
   # mingw can do 2000 without extra help. 64-bit requires at least XP.
-  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=$<IF:$<BOOL:${WITH_64BIT}>,0x501,0x0500>)
-  target_compile_options(
-    winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS} $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
-                     $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
+  target_compile_definitions(winprefs
+                             PRIVATE _WIN32_WINNT=$<IF:$<STREQUAL:${IS_64BIT},TRUE>,0x501,0x0500>)
+  target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
+                                          $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
   target_link_libraries(winprefs PRIVATE ole32 shell32)
-  target_link_options(winprefs PRIVATE -municode $<IF:$<BOOL:${WITH_64BIT}>,-m64,>)
+  target_link_options(winprefs PRIVATE -municode)
   if(CMAKE_C_COMPILER MATCHES "/winegcc$")
     target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)
     target_link_libraries(winprefs PRIVATE ucrtbase)
@@ -91,3 +92,7 @@ else() # MSVC gets Vista+
   target_link_options(winprefs PRIVATE /DYNAMICBASE /NXCOMPAT /TLBID:1)
 endif()
 install(TARGETS winprefs DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+if(BUILD_TESTS AND CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
+  add_subdirectory(tests)
+endif()
