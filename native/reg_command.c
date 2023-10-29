@@ -175,7 +175,6 @@ bool do_write_reg_command(HANDLE out_fp,
                             (int)req_size,
                             NULL,
                             NULL);
-        printf("%lld %s\n", req_size, mb_out);
         mb_out[req_size - 1] = '\r';
         mb_out[req_size] = '\n';
         DWORD written = 0;
