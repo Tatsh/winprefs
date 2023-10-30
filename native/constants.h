@@ -13,5 +13,13 @@ extern const size_t MAX_VALUE_NAME;
 //! Alias of `sizeof(wchar_t)`.
 extern const size_t WL;
 extern const wchar_t *AUTOMATIC_COMMIT_MESSAGE_PREFIX;
+extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_BINARY;
+extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_NUMERIC;
+extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_SZ;
+extern const wchar_t *C_SHARP_REGISTRY_SET_VALUE_TEMPLATE;
+extern const wchar_t *KEYWORD_DWORD;
+extern const wchar_t *KEYWORD_QWORD;
+extern const wchar_t *POWERSHELL_NEW_ITEMPROPERTY_TEMPLATE;
+extern const wchar_t *POWERSHELL_NEW_ITEM_TEMPLATE;
 
 #endif // CONSTANTS_H

@@ -48,10 +48,13 @@ hkey
 hklm
 hkpd
 isort
+itemproperty
 iwyu
 lcov
 lpbyte
+lpcvoid
 lpdword
+lsnum
 lstatus
 macprefs
 mainpage
@@ -82,6 +85,7 @@ pwsh
 pylance
 qword
 reflow
+regsetkeyvaluew
 rpath
 sarif
 securestring
