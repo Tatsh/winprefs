@@ -40,6 +40,7 @@ int wmain(int argc, wchar_t *argv[]) {
     int max_depth = 20;
     wchar_t *argv0 = argv[0];
     wchar_t *deploy_key = nullptr;
+    wchar_t *format = nullptr;
     wchar_t *output_dir = nullptr;
     wchar_t *output_file = nullptr;
     ARG_BEGIN {
@@ -60,6 +61,9 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         else if (ARG_LONG("output-dir")) case 'o': {
             output_dir = ARG_VAL();
+        }
+        else if (ARG_LONG("format")) case 'F': {
+            format = ARG_VAL();
         }
         else if (ARG_LONG("max-depth")) case 'm': {
             wchar_t *val = ARG_VAL();
@@ -83,6 +87,7 @@ int wmain(int argc, wchar_t *argv[]) {
             puts("  -m, --max-depth=INT Set maximum depth.");
             puts("  -o, --output-dir    Output directory.");
             puts("  -f, --output-file   Output filename.");
+            puts("  -F, --format=FORMAT Format to output. Options: bat, c, cs, ps1");
             puts("  -h, --help          Display this help and exit.");
             return EXIT_SUCCESS;
         }
@@ -98,6 +103,7 @@ int wmain(int argc, wchar_t *argv[]) {
             }
     }
     ARG_END;
+    (void)format;
     wchar_t *reg_path = *argv;
     if (reg_path) {
         size_t len = wcslen(reg_path);
