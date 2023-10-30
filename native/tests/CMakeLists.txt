@@ -28,9 +28,15 @@ add_executable(
   ../arg.h
   ../constants.c
   ../constants.h
+  ../debug.c
+  ../debug.h
+  ../git.c
+  ../git.h
   ../macros.h
   ../reg_command.c
   ../reg_command.h
+  ../registry.c
+  ../registry.h
   ../shell.c
   ../shell.h
   cmocka-inc.h

@@ -2,6 +2,8 @@
 
 #include "tests.h"
 
+bool debug_print_enabled = false;
+
 const struct CMUnitTest shell_tests[] = {
     cmocka_unit_test(test_escape_returns_null_on_null_input_or_zero_chars),
     cmocka_unit_test(test_escape_handles_special_characters),
