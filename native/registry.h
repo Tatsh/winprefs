@@ -4,6 +4,13 @@
 
 #include <windef.h>
 
+enum OUTPUT_FORMAT {
+    OUTPUT_FORMAT_C,
+    OUTPUT_FORMAT_C_SHARP,
+    OUTPUT_FORMAT_POWERSHELL,
+    OUTPUT_FORMAT_REG,
+};
+
 //! Gets the `HKEY` pointer for the first part of a registry path.
 /*!
  \param reg_path Full registry path.
@@ -20,6 +27,7 @@ HKEY get_top_key(wchar_t *reg_path);
  \param max_depth Maximum depth to traverse.
  \param hk Starting registry key.
  \param specified_path A direct path to a key (and not a value name).
+ \param format Output format.
  \return Pointer to string with branch name. Must be freed on caller side.
  */
 bool save_preferences(bool commit,
@@ -28,12 +36,14 @@ bool save_preferences(bool commit,
                       const wchar_t *output_file,
                       int max_depth,
                       HKEY hk,
-                      const wchar_t *specified_path);
+                      const wchar_t *specified_path,
+                      enum OUTPUT_FORMAT format);
 //! Exports a single registry key to a `reg add` command.
 /*!
  \param reg_path Registry path to a key or a value name.
  \param top_key Handle to the top key (such as `HKEY_CURRENT_USER`).
+ \param format Output format.
  \return `true` if successful, `false` otherwise.
  */
-bool export_single_value(const wchar_t *reg_path, HKEY top_key);
+bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format);
 #endif // REGISTRY_H

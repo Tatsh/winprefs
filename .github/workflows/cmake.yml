@@ -26,7 +26,7 @@ jobs:
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
       - name: Crash test
-        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -d -c
+        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -c -d
       - name: Show Git log of export
         run: |
           cd "${env:APPDATA}/prefs-export"
@@ -85,7 +85,7 @@ jobs:
           git config --global user.email "you@example.com"
           git config --global user.name "Your Name"
       - name: Crash test
-        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -d -c
+        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -c -d
       - name: Show Git log of export
         run: |
           cd "${env:APPDATA}/prefs-export"

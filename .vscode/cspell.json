@@ -58,7 +58,7 @@
     "yaml",
     "yml"
   ],
-  "ignorePaths": ["*.log", ".directory", ".git", ".vscode/extensions.json", "build"],
+  "ignorePaths": ["*.log", ".cache", ".directory", ".git", ".vscode/extensions.json", "build"],
   "language": "en-GB",
   "languageSettings": [
     {

@@ -35,6 +35,8 @@ add_executable(
   ../git.c
   ../git.h
   ../macros.h
+  ../reg_code.c
+  ../reg_code.h
   ../reg_command.c
   ../reg_command.h
   ../registry.c
@@ -53,7 +55,7 @@ target_compile_options(
                          ${GCC_CLANG_SHARED_C_FLAGS})
 target_include_directories(winprefs-tests PRIVATE ${CMAKE_SOURCE_DIR}/native)
 target_link_libraries(winprefs-tests PRIVATE cmocka::cmocka kernel32 shlwapi)
-target_link_options(winprefs-tests PRIVATE -municode)
+target_link_options(winprefs-tests PRIVATE -mconsole -municode)
 if(ENABLE_COVERAGE)
   target_compile_options(winprefs-tests PRIVATE --coverage)
   target_link_options(winprefs-tests PRIVATE --coverage)

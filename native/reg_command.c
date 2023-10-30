@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "macros.h"
 #include "reg_command.h"
+#include "registry.h"
 #include "shell.h"
 
 static wchar_t REG_PARAM_SLASH_VE[] = L"/ve ";
@@ -100,6 +101,43 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     return nullptr;
 }
 
+bool write_output(HANDLE out_fp, wchar_t *out, bool useCRLF) {
+    size_t addend = useCRLF ? 3 : 2;
+    size_t req_size =
+        (size_t)WideCharToMultiByte(CP_UTF8,
+                                    IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
+                                    out,
+                                    -1,
+                                    nullptr,
+                                    0,
+                                    nullptr,
+                                    nullptr);
+    if (req_size == 0) {
+        fwprintf(stdout, L"%ls\n", out);
+    }
+    char *mb_out = malloc(req_size + addend);
+    if (!mb_out) {
+        return false;
+    }
+    memset(mb_out, 0, req_size + addend);
+    WideCharToMultiByte(CP_UTF8,
+                        IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
+                        out,
+                        -1,
+                        mb_out,
+                        (int)req_size,
+                        nullptr,
+                        nullptr);
+    if (useCRLF) {
+        mb_out[req_size - 1] = '\r';
+    }
+    mb_out[req_size] = '\n';
+    DWORD written = 0;
+    bool ret = WriteFile(out_fp, mb_out, (DWORD)req_size, &written, nullptr);
+    free(mb_out);
+    return ret && written > 0;
+}
+
 bool do_write_reg_command(HANDLE out_fp,
                           const wchar_t *full_path,
                           const wchar_t *prop,
@@ -147,42 +185,11 @@ bool do_write_reg_command(HANDLE out_fp,
                            v_param,
                            reg_type,
                            escaped_d ? escaped_d : L" ");
+    bool ret = true;
     if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
         ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == L'f' &&
          out[CMD_MAX_COMMAND_LENGTH - 2] == L'/' && out[CMD_MAX_COMMAND_LENGTH - 3] == L' ')) {
-        size_t req_size =
-            (size_t)WideCharToMultiByte(CP_UTF8,
-                                        IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
-                                        out,
-                                        -1,
-                                        nullptr,
-                                        0,
-                                        nullptr,
-                                        nullptr);
-        if (req_size == 0) {
-            fwprintf(stdout, L"%ls\n", out);
-        }
-        char *mb_out = malloc(req_size + 3);
-        if (!mb_out) {
-            return false;
-        }
-        memset(mb_out, 0, req_size + 3);
-        WideCharToMultiByte(CP_UTF8,
-                            IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
-                            out,
-                            -1,
-                            mb_out,
-                            (int)req_size,
-                            nullptr,
-                            nullptr);
-        mb_out[req_size - 1] = '\r';
-        mb_out[req_size] = '\n';
-        DWORD written = 0;
-        bool ret = WriteFile(out_fp, mb_out, (DWORD)(req_size), &written, nullptr);
-        free(mb_out);
-        if (!ret || written == 0) {
-            return false;
-        }
+        ret = write_output(out_fp, out, true);
     } else {
         debug_print(L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
     }
@@ -194,10 +201,14 @@ bool do_write_reg_command(HANDLE out_fp,
     }
     free(out);
     free(escaped_reg_key);
-    return true;
+    return ret;
 }
 
-bool do_write_reg_commands(HANDLE out_fp, HKEY hk, unsigned n_values, const wchar_t *full_path) {
+bool do_writes(HANDLE out_fp,
+               HKEY hk,
+               unsigned n_values,
+               const wchar_t *full_path,
+               enum OUTPUT_FORMAT format) {
     if (n_values == 0) {
         return true;
     }
@@ -212,6 +223,21 @@ bool do_write_reg_commands(HANDLE out_fp, HKEY hk, unsigned n_values, const wcha
     wchar_t *value = calloc(MAX_VALUE_NAME, WL);
     if (!value) {
         return false;
+    }
+    do_write_callback dwc;
+    switch (format) {
+    case OUTPUT_FORMAT_REG:
+        dwc = do_write_reg_command;
+        break;
+    case OUTPUT_FORMAT_C:
+        dwc = do_write_c_reg_code;
+        break;
+    case OUTPUT_FORMAT_C_SHARP:
+        dwc = do_write_c_sharp_reg_code;
+        break;
+    case OUTPUT_FORMAT_POWERSHELL:
+        dwc = do_write_powershell_reg_code;
+        break;
     }
     int ret = ERROR_SUCCESS;
     char data[8192];
@@ -229,18 +255,21 @@ bool do_write_reg_commands(HANDLE out_fp, HKEY hk, unsigned n_values, const wcha
         if (ret == ERROR_NO_MORE_ITEMS) {
             break;
         }
-        do_write_reg_command(out_fp, full_path, value, data, data_len, reg_type);
+        if (!dwc(out_fp, full_path, value, data, data_len, reg_type)) {
+            return false;
+        }
     }
     free(value);
     return true;
 }
 
-bool write_reg_commands(HKEY hk,
-                        const wchar_t *stem,
-                        int max_depth,
-                        int depth,
-                        HANDLE out_fp,
-                        const wchar_t *prior_stem) {
+bool write_key_filtered_recursive(HKEY hk,
+                                  const wchar_t *stem,
+                                  int max_depth,
+                                  int depth,
+                                  HANDLE out_fp,
+                                  const wchar_t *prior_stem,
+                                  enum OUTPUT_FORMAT format) {
     if (depth >= max_depth) {
         debug_print(L"%ls: Skipping %ls due to depth limit of %d.\n", prior_stem, stem, max_depth);
         return true;
@@ -309,7 +338,10 @@ bool write_reg_commands(HKEY hk,
                 ret_code = RegEnumKeyEx(
                     hk_out, i, ach_key, (LPDWORD)&ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
-                    write_reg_commands(hk_out, ach_key, max_depth, depth + 1, out_fp, full_path);
+                    if (!write_key_filtered_recursive(
+                            hk_out, ach_key, max_depth, depth + 1, out_fp, full_path, format)) {
+                        return false;
+                    }
                 } else {
                     debug_print(L"%ls: Skipping %ls because RegEnumKeyEx() failed.\n",
                                 prior_stem,
@@ -321,7 +353,7 @@ bool write_reg_commands(HKEY hk,
             debug_print(L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
         if (n_values) {
-            if (!do_write_reg_commands(out_fp, hk_out, n_values, full_path)) {
+            if (!do_writes(out_fp, hk_out, n_values, full_path, format)) {
                 return false;
             }
         } else {

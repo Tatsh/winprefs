@@ -60,6 +60,7 @@ macprefs
 mainpage
 makelangid
 mathjax
+mconsole
 mdfile
 memb
 mktemp
@@ -111,6 +112,7 @@ useshowwindow
 usestdhandles
 wchar
 wchdir
+wcsicmp
 wcsnicmp
 wdeprecated
 wempty

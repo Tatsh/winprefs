@@ -18,6 +18,7 @@
 #include "debug.h"
 #include "git.h"
 #include "macros.h"
+#include "reg_code.h"
 #include "reg_command.h"
 #include "registry.h"
 
@@ -81,13 +82,15 @@ int wmain(int argc, wchar_t *argv[]) {
             wprintf(L"\nIf a path to a value name is specified, the output directory argument is "
                     L"ignored and the line is printed to\nstandard output.\n\n");
             puts("Options:");
+            puts("  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, "
+                 "reg. Default: "
+                 "reg.");
             puts("  -K, --deploy-key    Deploy key for committing.");
             puts("  -c, --commit        Commit changes.");
             puts("  -d, --debug         Enable debug logging.");
+            puts("  -f, --output-file   Output filename.");
             puts("  -m, --max-depth=INT Set maximum depth.");
             puts("  -o, --output-dir    Output directory.");
-            puts("  -f, --output-file   Output filename.");
-            puts("  -F, --format=FORMAT Format to output. Options: bat, c, cs, ps1");
             puts("  -h, --help          Display this help and exit.");
             return EXIT_SUCCESS;
         }
@@ -103,8 +106,16 @@ int wmain(int argc, wchar_t *argv[]) {
             }
     }
     ARG_END;
-    (void)format;
     wchar_t *reg_path = *argv;
+    enum OUTPUT_FORMAT output_format_e =
+        (!format || !wcsicmp(L"reg", format))    ? OUTPUT_FORMAT_REG :
+        !wcsicmp(L"c#", format)                  ? OUTPUT_FORMAT_C_SHARP :
+        !wcsicmp(L"csharp", format)              ? OUTPUT_FORMAT_C_SHARP :
+        !wcsicmp(L"powershell", format)          ? OUTPUT_FORMAT_POWERSHELL :
+        !wcsicmp(L"ps", format)                  ? OUTPUT_FORMAT_POWERSHELL :
+        !wcsicmp(L"ps1", format)                 ? OUTPUT_FORMAT_POWERSHELL :
+        (format[0] == L'c' || format[0] == L'C') ? OUTPUT_FORMAT_C :
+                                                   OUTPUT_FORMAT_REG;
     if (reg_path) {
         size_t len = wcslen(reg_path);
         bool top_key_only =
@@ -123,7 +134,8 @@ int wmain(int argc, wchar_t *argv[]) {
             wchar_t *subkey = wcschr(reg_path, L'\\') + 1;
             if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
                 // See if it's a full path to value
-                return export_single_value(reg_path, top_key) ? EXIT_SUCCESS : EXIT_FAILURE;
+                return export_single_value(reg_path, top_key, output_format_e) ? EXIT_SUCCESS :
+                                                                                 EXIT_FAILURE;
             }
         }
     }
@@ -146,7 +158,8 @@ int wmain(int argc, wchar_t *argv[]) {
                                     output_file ? output_file : L"exec-reg.bat",
                                     max_depth,
                                     starting_key,
-                                    reg_path);
+                                    reg_path,
+                                    output_format_e);
     free(output_dir);
     if (!success) {
         fwprintf(stderr, L"Error occurred. Possibilities:\n");

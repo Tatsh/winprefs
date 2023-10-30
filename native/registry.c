@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "debug.h"
 #include "git.h"
+#include "reg_code.h"
 #include "reg_command.h"
 #include "registry.h"
 
@@ -62,13 +63,18 @@ bool save_preferences(bool commit,
                       const wchar_t *output_file,
                       int max_depth,
                       HKEY hk,
-                      const wchar_t *specified_path) {
+                      const wchar_t *specified_path,
+                      enum OUTPUT_FORMAT format) {
     wchar_t full_output_dir[MAX_PATH];
     bool writing_to_stdout = !wcscmp(L"-", output_file);
     if (!_wfullpath(full_output_dir, output_dir, MAX_PATH)) {
         return false;
     }
-    debug_print(L"Output directory: %ls\n", full_output_dir);
+    if (!writing_to_stdout) {
+        debug_print(L"Output directory: %ls\n", full_output_dir);
+    } else {
+        debug_print(L"Writing to standard output.\n");
+    }
     if (!writing_to_stdout && !create_dir_recursive(full_output_dir)) {
         return false;
     }
@@ -85,28 +91,25 @@ bool save_preferences(bool commit,
     if (out_fp == INVALID_HANDLE_VALUE) {
         return false;
     }
-    write_reg_commands(hk,
-                       nullptr,
-                       max_depth,
-                       0,
-                       out_fp,
-                       hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
-                       hk == HKEY_CURRENT_CONFIG ? L"HKCC" :
-                       hk == HKEY_CURRENT_USER   ? L"HKCU" :
-                       hk == HKEY_LOCAL_MACHINE  ? L"HKLM" :
-                       hk == HKEY_USERS          ? L"HKU" :
-                       hk == HKEY_DYN_DATA       ? L"HKDD" :
-                                                   specified_path);
+    bool ret = false;
+    const wchar_t *prior_stem = hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
+                                hk == HKEY_CURRENT_CONFIG ? L"HKCC" :
+                                hk == HKEY_CURRENT_USER   ? L"HKCU" :
+                                hk == HKEY_LOCAL_MACHINE  ? L"HKLM" :
+                                hk == HKEY_USERS          ? L"HKU" :
+                                hk == HKEY_DYN_DATA       ? L"HKDD" :
+                                                            specified_path;
+    ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, out_fp, prior_stem, format);
     if (!writing_to_stdout) {
         CloseHandle(out_fp);
     }
-    if (commit && !writing_to_stdout) {
+    if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
     }
-    return true;
+    return ret;
 }
 
-bool export_single_value(const wchar_t *reg_path, HKEY top_key) {
+bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format) {
     wchar_t *first_backslash = wcschr(reg_path, L'\\');
     if (!first_backslash) {
         return false;
@@ -142,9 +145,16 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key) {
         debug_print(L"Invalid value name '%ls'.\n", value_name);
         return false;
     }
-    if (!do_write_reg_command(
-            GetStdHandle(STD_OUTPUT_HANDLE), reg_path, value_name, data, buf_size, reg_type)) {
-        return false;
+    switch (format) {
+    case OUTPUT_FORMAT_REG:
+        if (!do_write_reg_command(
+                GetStdHandle(STD_OUTPUT_HANDLE), reg_path, value_name, data, buf_size, reg_type)) {
+            return false;
+        }
+    case OUTPUT_FORMAT_C:
+    case OUTPUT_FORMAT_C_SHARP:
+    case OUTPUT_FORMAT_POWERSHELL:
+        break;
     }
     free(data);
     return true;

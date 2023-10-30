@@ -57,6 +57,8 @@ add_executable(
   git.h
   macros.h
   main.c
+  reg_code.c
+  reg_code.h
   reg_command.c
   reg_command.h
   registry.c
@@ -91,7 +93,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES
     winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
                      $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
   target_link_libraries(winprefs PRIVATE shell32)
-  target_link_options(winprefs PRIVATE -municode)
+  target_link_options(winprefs PRIVATE -mconsole -municode)
   if(CMAKE_C_COMPILER MATCHES "/winegcc$")
     target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)
     target_link_libraries(winprefs PRIVATE ucrtbase)

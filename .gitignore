@@ -13,6 +13,7 @@ Thumbs.db
 # Other
 *.db
 *.sqlite
+.cache/
 /.vs/CMake Overview
 /.vs/CMakeWorkspaceSettings.json
 /.vs/ProjectSettings.json
