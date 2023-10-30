@@ -147,12 +147,12 @@ int wmain(int argc, wchar_t *argv[]) {
         DWORD last_win_error = GetLastError();
         wchar_t p_message_buf[8192];
         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                      NULL,
+                      nullptr,
                       last_win_error,
                       MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                       (LPTSTR)&p_message_buf,
                       8192,
-                      NULL);
+                      nullptr);
         fprintf(stderr, "POSIX   (%d): %s\n", errno, strerror(errno));
         fwprintf(stderr, L"Windows (%d): %ls", last_win_error, p_message_buf);
         print_leaks();

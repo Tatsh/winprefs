@@ -29,7 +29,7 @@ HKEY get_top_key(wchar_t *reg_path) {
 }
 
 static inline bool create_dir_wrapper(wchar_t *folder) {
-    if (!CreateDirectory(folder, NULL)) {
+    if (!CreateDirectory(folder, nullptr)) {
         DWORD err = GetLastError();
         if (err != ERROR_ALREADY_EXISTS && err != ERROR_ACCESS_DENIED) {
             return false;
@@ -43,7 +43,7 @@ static inline bool create_dir_recursive(wchar_t *path) {
     wchar_t *end;
     wmemset(folder, L'\0', MAX_PATH);
     end = wcschr(path, L'\\');
-    while (end != NULL) {
+    while (end != nullptr) {
         wcsncpy(folder, path, (size_t)(end - path + 1));
         if (!create_dir_wrapper(folder)) {
             return false;
@@ -131,7 +131,7 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key) {
     char *data = malloc(buf_size);
     DWORD reg_type = REG_NONE;
     LSTATUS ret = RegQueryValueEx(
-        starting_key, value_name, NULL, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);
+        starting_key, value_name, nullptr, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);
     if (ret == ERROR_MORE_DATA) {
         free(data);
         debug_print(L"Value too large (%ls\\%ls).\n", subkey, value_name);

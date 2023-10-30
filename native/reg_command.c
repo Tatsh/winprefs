@@ -155,10 +155,10 @@ bool do_write_reg_command(HANDLE out_fp,
                                         IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
                                         out,
                                         -1,
-                                        NULL,
+                                        nullptr,
                                         0,
-                                        NULL,
-                                        NULL);
+                                        nullptr,
+                                        nullptr);
         if (req_size == 0) {
             fwprintf(stdout, L"%ls\n", out);
         }
@@ -173,8 +173,8 @@ bool do_write_reg_command(HANDLE out_fp,
                             -1,
                             mb_out,
                             (int)req_size,
-                            NULL,
-                            NULL);
+                            nullptr,
+                            nullptr);
         mb_out[req_size - 1] = '\r';
         mb_out[req_size] = '\n';
         DWORD written = 0;
