@@ -2,6 +2,7 @@ enable_testing()
 
 set(mocked_functions
     CloseHandle
+    CreatePipe
     CreateProcessW
     GetDateFormatW
     GetFileAttributes
@@ -10,6 +11,7 @@ set(mocked_functions
     PathAppendW
     PathStripPathW
     PeekNamedPipe
+    ReadFile
     RegCloseKey
     RegEnumKeyExW
     RegEnumValueW
