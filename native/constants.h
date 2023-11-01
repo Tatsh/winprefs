@@ -6,6 +6,8 @@
 
 //! Maximum `cmd.exe` command line length.
 extern const size_t CMD_MAX_COMMAND_LENGTH;
+//! Maximum PowerShell command line length.
+extern const size_t POWERSHELL_MAX_COMMAND_LENGTH;
 //! Maximum length of a registry key.
 extern const size_t MAX_KEY_LENGTH;
 //! Maximum length of the value-name in a `reg add` command.
@@ -19,7 +21,7 @@ extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_SZ;
 extern const wchar_t *C_SHARP_REGISTRY_SET_VALUE_TEMPLATE;
 extern const wchar_t *KEYWORD_DWORD;
 extern const wchar_t *KEYWORD_QWORD;
-extern const wchar_t *POWERSHELL_NEW_ITEMPROPERTY_TEMPLATE;
-extern const wchar_t *POWERSHELL_NEW_ITEM_TEMPLATE;
+// key, key, key, value name, type (String, ExpandString, Binary, DWord, MultiString, Qword), value
+extern const wchar_t *POWERSHELL_CODE_TEMPLATE;
 
 #endif // CONSTANTS_H

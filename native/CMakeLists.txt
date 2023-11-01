@@ -55,8 +55,12 @@ add_executable(
   debug.h
   git.c
   git.h
+  io.c
+  io.h
   macros.h
   main.c
+  powershell.c
+  powershell.h
   reg_code.c
   reg_code.h
   reg_command.c

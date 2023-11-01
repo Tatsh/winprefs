@@ -14,6 +14,7 @@ bool do_write_reg_command(HANDLE out_fp,
                           const char *value,
                           size_t value_len,
                           unsigned long type);
+bool write_output(HANDLE out_fp, wchar_t *out, bool useCRLF);
 bool do_writes(HANDLE out_fp,
                HKEY hk,
                unsigned n_values,

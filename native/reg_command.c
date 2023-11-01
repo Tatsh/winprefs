@@ -78,7 +78,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         if (!out) {
             return nullptr;
         }
-        memset(out, 0, s_size);
+        wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L" /d \"%ls\" ", s);
         free(s);
         return out;
@@ -99,43 +99,6 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     }
     errno = EINVAL;
     return nullptr;
-}
-
-bool write_output(HANDLE out_fp, wchar_t *out, bool useCRLF) {
-    size_t addend = useCRLF ? 3 : 2;
-    size_t req_size =
-        (size_t)WideCharToMultiByte(CP_UTF8,
-                                    IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
-                                    out,
-                                    -1,
-                                    nullptr,
-                                    0,
-                                    nullptr,
-                                    nullptr);
-    if (req_size == 0) {
-        fwprintf(stdout, L"%ls\n", out);
-    }
-    char *mb_out = malloc(req_size + addend);
-    if (!mb_out) {
-        return false;
-    }
-    memset(mb_out, 0, req_size + addend);
-    WideCharToMultiByte(CP_UTF8,
-                        IsWindowsVistaOrGreater() ? _WC_ERR_INVALID_CHARS : 0,
-                        out,
-                        -1,
-                        mb_out,
-                        (int)req_size,
-                        nullptr,
-                        nullptr);
-    if (useCRLF) {
-        mb_out[req_size - 1] = '\r';
-    }
-    mb_out[req_size] = '\n';
-    DWORD written = 0;
-    bool ret = WriteFile(out_fp, mb_out, (DWORD)req_size, &written, nullptr);
-    free(mb_out);
-    return ret && written > 0;
 }
 
 bool do_write_reg_command(HANDLE out_fp,
@@ -173,23 +136,35 @@ bool do_write_reg_command(HANDLE out_fp,
         wcsncpy(reg_type, L"REG_QWORD", 9);
         break;
     }
-    wchar_t *out = calloc(CMD_MAX_COMMAND_LENGTH, WL);
-    if (!out) {
-        return false;
-    }
-    wmemset(out, L'\0', CMD_MAX_COMMAND_LENGTH);
-    int wrote = _snwprintf(out,
-                           CMD_MAX_COMMAND_LENGTH,
-                           L"reg add \"%ls\" %ls/t %ls%ls/f",
-                           escaped_reg_key,
-                           v_param,
-                           reg_type,
-                           escaped_d ? escaped_d : L" ");
+    int req_size = _snwprintf(nullptr,
+                              0,
+                              L"reg add \"%ls\" %ls/t %ls%ls/f",
+                              escaped_reg_key,
+                              v_param,
+                              reg_type,
+                              escaped_d ? escaped_d : L" ");
     bool ret = true;
-    if (((size_t)wrote < CMD_MAX_COMMAND_LENGTH) ||
-        ((size_t)wrote == CMD_MAX_COMMAND_LENGTH && out[CMD_MAX_COMMAND_LENGTH - 1] == L'f' &&
-         out[CMD_MAX_COMMAND_LENGTH - 2] == L'/' && out[CMD_MAX_COMMAND_LENGTH - 3] == L' ')) {
-        ret = write_output(out_fp, out, true);
+    if ((size_t)req_size < CMD_MAX_COMMAND_LENGTH) {
+        size_t total_size = (size_t)req_size + 1;
+        wchar_t *out = calloc(total_size, WL);
+        if (!out) {
+            return false;
+        }
+        wmemset(out, L'\0', total_size);
+        int wrote = _snwprintf(out,
+                               (size_t)req_size,
+                               L"reg add \"%ls\" %ls/t %ls%ls/f",
+                               escaped_reg_key,
+                               v_param,
+                               reg_type,
+                               escaped_d ? escaped_d : L" ");
+
+        if (((size_t)wrote < total_size) ||
+            (wrote == req_size && out[total_size - 1] == L'f' && out[total_size - 2] == L'/' &&
+             out[total_size - 3] == L' ')) {
+            ret = write_output(out_fp, out, true);
+            free(out);
+        }
     } else {
         debug_print(L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
     }
@@ -199,7 +174,6 @@ bool do_write_reg_command(HANDLE out_fp,
     if (v_param && v_heap) {
         free(v_param);
     }
-    free(out);
     free(escaped_reg_key);
     return ret;
 }

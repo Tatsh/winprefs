@@ -145,15 +145,20 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
         debug_print(L"Invalid value name '%ls'.\n", value_name);
         return false;
     }
+    HANDLE h_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
     switch (format) {
     case OUTPUT_FORMAT_REG:
-        if (!do_write_reg_command(
-                GetStdHandle(STD_OUTPUT_HANDLE), reg_path, value_name, data, buf_size, reg_type)) {
+        if (!do_write_reg_command(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
             return false;
         }
+        break;
     case OUTPUT_FORMAT_C:
     case OUTPUT_FORMAT_C_SHARP:
     case OUTPUT_FORMAT_POWERSHELL:
+        if (!do_write_powershell_reg_code(
+                h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+            return false;
+        }
         break;
     }
     free(data);
