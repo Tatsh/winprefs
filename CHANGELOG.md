@@ -10,7 +10,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 
 - Native version written in C
-- Tests
+- New output formats: PowerShell, C, and C# (native version)
+- Start of tests
+- Build/test in CI
 
 ### Changed
 

@@ -162,13 +162,25 @@ Usage is similar to the PowerShell version:
 
 ```plain
 Usage: winprefs.exe [OPTION...] [REG_PATH]
+
+If a path to a value name is specified, the output directory argument is ignored and the line is
+printed to standard output.
+
 Options:
+  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, reg. Default: reg.
   -K, --deploy-key    Deploy key for committing.
   -c, --commit        Commit changes.
   -d, --debug         Enable debug logging.
+  -f, --output-file   Output filename.
   -m, --max-depth=INT Set maximum depth.
+  -o, --output-dir    Output directory.
   -h, --help          Display this help and exit.
 ```
+
+Note the equivalent format names (case-insensitive):
+
+- C#: `cs`, `c#`
+- PowerShell: `ps`, `ps1`, `powershell`
 
 ### Building
 
