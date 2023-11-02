@@ -5,9 +5,6 @@
 
 #include "macros.h"
 
-typedef bool (*do_write_callback)(
-    HANDLE, const wchar_t *, const wchar_t *, const char *, size_t, unsigned long);
-
 bool do_write_c_reg_code(HANDLE out_fp,
                          const wchar_t *full_path,
                          const wchar_t *prop,

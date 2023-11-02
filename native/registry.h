@@ -4,12 +4,7 @@
 
 #include <windef.h>
 
-enum OUTPUT_FORMAT {
-    OUTPUT_FORMAT_C,
-    OUTPUT_FORMAT_C_SHARP,
-    OUTPUT_FORMAT_POWERSHELL,
-    OUTPUT_FORMAT_REG,
-};
+#include "io.h"
 
 //! Gets the `HKEY` pointer for the first part of a registry path.
 /*!

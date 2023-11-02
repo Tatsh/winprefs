@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "debug.h"
 #include "git.h"
+#include "io.h"
 #include "reg_code.h"
 #include "reg_command.h"
 #include "registry.h"
