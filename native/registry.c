@@ -99,6 +99,10 @@ bool save_preferences(bool commit,
                                 hk == HKEY_USERS          ? L"HKU" :
                                 hk == HKEY_DYN_DATA       ? L"HKDD" :
                                                             specified_path;
+    if (format == OUTPUT_FORMAT_C) {
+        DWORD written;
+        WriteFile(out_fp, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written, nullptr);
+    }
     ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, out_fp, prior_stem, format);
     if (!writing_to_stdout) {
         CloseHandle(out_fp);

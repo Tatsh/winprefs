@@ -15,7 +15,10 @@ extern const size_t MAX_VALUE_NAME;
 //! Alias of `sizeof(wchar_t)`.
 extern const size_t WL;
 extern const wchar_t *AUTOMATIC_COMMIT_MESSAGE_PREFIX;
+extern const size_t SIZEOF_C_PREAMBLE;
+extern const char *C_PREAMBLE;
 extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_BINARY;
+extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_NONE;
 extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_NUMERIC;
 extern const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_SZ;
 extern const wchar_t *C_SHARP_REGISTRY_SET_VALUE_TEMPLATE;
