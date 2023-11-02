@@ -286,17 +286,130 @@ bool do_write_c_reg_code(HANDLE out_fp,
     return ret;
 }
 
+static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_t data_len) {
+    if (reg_type == REG_BINARY || reg_type == REG_NONE || reg_type == REG_QWORD ||
+        reg_type == REG_DWORD) {
+        return convert_data_for_c(reg_type, data, data_len);
+    }
+    if (reg_type == REG_SZ || reg_type == REG_EXPAND_SZ) {
+        wchar_t *escaped = convert_data_for_c(reg_type, data, data_len);
+        size_t escaped_len = wcslen(escaped);
+        wchar_t *out = calloc(escaped_len + 3, WL);
+        _snwprintf(out, escaped_len + 2, L"\"%ls\"", escaped);
+        free(escaped);
+        return out;
+    }
+    if (reg_type != REG_MULTI_SZ) {
+        errno = EINVAL;
+        return nullptr;
+    }
+    unsigned i, j;
+    size_t strings_size = 0;
+    wchar_t *w_data = (wchar_t *)data;
+    for (i = 0; i < data_len; i++) {
+        strings_size++;
+        if (w_data[i] == L'"' || w_data[i] == L'\\') {
+            strings_size++;
+        } else if (w_data[i] == L'\0') {
+            strings_size += 4;
+        }
+    }
+    size_t total_size = 5 + strings_size;
+    wchar_t *strings = calloc(strings_size + 1, WL);
+    if (!strings) {
+        return nullptr;
+    }
+    wmemset(strings, L'\0', strings_size + 1);
+    size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
+    strings[0] = L'"';
+    for (i = 0, j = 1; i < w_data_len - 2 && j < strings_size; i++, j++) {
+        if (w_data[i] == L'\0') {
+            strings[j++] = L'"';
+            if (j < (strings_size - 1)) {
+                strings[j++] = L',';
+                strings[j++] = L' ';
+                strings[j] = L'"';
+            }
+            continue;
+        }
+        if (w_data[i] == L'"' || w_data[i] == L'\\') {
+            strings[j++] = L'\\';
+        }
+        strings[j] = w_data[i];
+    }
+    wchar_t *out = calloc(total_size, WL);
+    if (!out) {
+        return nullptr;
+    }
+    _snwprintf(out, total_size - 1, L"{ %ls\" }", strings);
+    return out;
+}
+
 bool do_write_c_sharp_reg_code(HANDLE out_fp,
                                const wchar_t *full_path,
                                const wchar_t *prop,
                                const char *value,
                                size_t data_len,
                                unsigned long type) {
-    (void)full_path;
-    (void)prop;
-    (void)data_len;
-    (void)out_fp;
-    (void)type;
-    (void)value;
+    bool ret = true;
+    wchar_t *subkey = wcschr(full_path, L'\\') + 1;
+    wchar_t *escaped_key = escape_for_c(subkey, wcslen(subkey), false);
+    wchar_t *escaped_d = convert_data_for_c_sharp(type, value, data_len);
+    wchar_t *escaped_prop = escape_for_c(prop, wcslen(prop), false);
+    wchar_t *top_key_s = get_top_key_string(full_path);
+    wchar_t *out;
+    wchar_t reg_type[33];
+    memset(reg_type, 0, sizeof(reg_type));
+    switch (type) {
+    case REG_NONE:
+        wcsncpy(reg_type, L", RegistryValueKind.None", 24);
+        break;
+    case REG_BINARY:
+        wcsncpy(reg_type, L", RegistryValueKind.Binary", 26);
+        break;
+    case REG_EXPAND_SZ:
+        wcsncpy(reg_type, L", RegistryValueKind.ExpandString", 32);
+        break;
+    case REG_SZ:
+    case REG_MULTI_SZ:
+        reg_type[0] = L'\0';
+        break;
+    case REG_DWORD:
+        wcsncpy(reg_type, L", RegistryValueKind.DWord", 25);
+        break;
+    case REG_QWORD:
+        wcsncpy(reg_type, L", RegistryValueKind.QWord", 25);
+        break;
+    }
+    int req_size = _snwprintf(nullptr,
+                              0,
+                              C_SHARP_REGISTRY_SET_VALUE_TEMPLATE,
+                              top_key_s,
+                              escaped_key,
+                              escaped_prop,
+                              escaped_d,
+                              reg_type);
+    out = calloc((size_t)req_size + 1, WL);
+    if (!out) {
+        return false;
+    }
+    wmemset(out, L'\0', (size_t)req_size + 1);
+    _snwprintf(out,
+               (size_t)req_size,
+               C_SHARP_REGISTRY_SET_VALUE_TEMPLATE,
+               top_key_s,
+               escaped_key,
+               escaped_prop,
+               escaped_d,
+               reg_type);
+    ret = write_output(out_fp, out, false);
+    free(out);
+    free(escaped_key);
+    free(escaped_d);
+    free(escaped_prop);
+    if (top_key_s) {
+        free(top_key_s);
+    }
+    return ret;
     return false;
 }

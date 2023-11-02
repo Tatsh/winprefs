@@ -12,7 +12,7 @@ const wchar_t *POWERSHELL_CODE_TEMPLATE =
     L"-LiteralPath '%ls' -Name '%ls' -PropertyType %ls -Force -Value %ls";
 
 const wchar_t *C_SHARP_REGISTRY_SET_VALUE_TEMPLATE =
-    L"Registry.SetValue(\"%ls\", \"%ls\", \"%ls\", %ls)";
+    L"Registry.SetValue(\"%ls\\\\%ls\", \"%ls\", %ls%ls);";
 
 const size_t SIZEOF_C_PREAMBLE = 44;
 const char *C_PREAMBLE = "DWORD dnum;\nQWORD qnum;\nunsigned char data;\n";
