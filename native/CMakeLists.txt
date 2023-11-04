@@ -1,15 +1,13 @@
 include(GNUInstallDirs)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
-  find_library(
-    VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64"
-                  "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
-  find_path(VLD_H vld.h
-            HINTS "C:/Program Files (x86)/Visual Leak Detector/include"
-                  "C:/Program Files/Visual Leak Detector/include" REQUIRED)
+  find_library(VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64"
+                             "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
+  find_path(VLD_H vld.h HINTS "C:/Program Files (x86)/Visual Leak Detector/include"
+                              "C:/Program Files/Visual Leak Detector/include" REQUIRED)
 endif()
 
-set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin -std=gnu2x)
+set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin)
 set(GCC_CLANG_DEBUG_C_FLAGS
     -ggdb
     -O0
@@ -69,7 +67,7 @@ add_executable(
   registry.h
   shell.c
   shell.h)
-target_compile_definitions(winprefs PRIVATE UNICODE _UNICODE)
+target_precompile_headers(winprefs PRIVATE pch.h)
 target_link_libraries(winprefs PRIVATE shlwapi)
 target_compile_definitions(
   winprefs
@@ -86,16 +84,17 @@ target_link_libraries(
   PRIVATE
     $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
 )
-if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES
-                                              "/winegcc$")
+if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
   get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
   # mingw can do 2000 without extra help. 64-bit requires at least XP.
-  target_compile_definitions(
-    winprefs
-    PRIVATE _WIN32_WINNT=$<IF:$<STREQUAL:${IS_64BIT},TRUE>,0x501,0x0500>)
-  target_compile_options(
-    winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
-                     $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+  if(IS_64BIT AND NOT TARGET_VERSION MATCHES "^(0x501|0x6)")
+    message(
+      FATAL_ERROR
+        "Invalid version for 64-bit. Must be XP (0x501) or higher. Version: ${TARGET_VERSION}")
+  endif()
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=${TARGET_VERSION})
+  target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
+                                          $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
   target_link_libraries(winprefs PRIVATE shell32)
   target_link_options(winprefs PRIVATE -mconsole -municode)
   if(CMAKE_C_COMPILER MATCHES "/winegcc$")
@@ -103,8 +102,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES
     target_link_libraries(winprefs PRIVATE ucrtbase)
   endif()
 else() # MSVC gets Vista+
-  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=0x600)
-  target_compile_options(winprefs PRIVATE /Zc:wchar_t /Zc:forScope /Zc:inline)
+  target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=${TARGET_VERSION})
+  target_compile_options(winprefs PRIVATE /Zc:forScope /Zc:inline /Zc:wchar_t /external:W0 /utf-8)
   target_link_libraries(winprefs PRIVATE kernel32)
   target_link_options(winprefs PRIVATE /DYNAMICBASE /NXCOMPAT /TLBID:1)
 endif()

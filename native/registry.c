@@ -1,17 +1,14 @@
-#include <wchar.h>
-
-#include <shlwapi.h>
-#include <windows.h>
-
+#include "registry.h"
 #include "constants.h"
-#include "debug.h"
 #include "git.h"
 #include "io.h"
 #include "reg_code.h"
 #include "reg_command.h"
-#include "registry.h"
 
 HKEY get_top_key(wchar_t *reg_path) {
+    if (!_wcsnicmp(reg_path, L"HKCU", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_USER", 17)) {
+        return HKEY_CURRENT_USER;
+    }
     if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
         return HKEY_CLASSES_ROOT;
     }
@@ -158,7 +155,15 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
         }
         break;
     case OUTPUT_FORMAT_C:
+        if (!do_write_c_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+            return false;
+        }
+        break;
     case OUTPUT_FORMAT_C_SHARP:
+        if (!do_write_c_sharp_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+            return false;
+        }
+        break;
     case OUTPUT_FORMAT_POWERSHELL:
         if (!do_write_powershell_reg_code(
                 h_stdout, reg_path, value_name, data, buf_size, reg_type)) {

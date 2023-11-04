@@ -47,19 +47,17 @@ add_executable(
   ../registry.h
   ../shell.c
   ../shell.h
-  cmocka-inc.h
   main.c
   test_shell.c
   tests.h)
 target_compile_definitions(winprefs-tests PRIVATE UNICODE _UNICODE)
-get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 target_compile_definitions(winprefs-tests PRIVATE _WIN32_WINNT=0x600)
-target_compile_options(
-  winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
-                         ${GCC_CLANG_SHARED_C_FLAGS})
+target_compile_options(winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
+                                              ${GCC_CLANG_SHARED_C_FLAGS})
 target_include_directories(winprefs-tests PRIVATE ${CMAKE_SOURCE_DIR}/native)
 target_link_libraries(winprefs-tests PRIVATE cmocka::cmocka kernel32 shlwapi)
 target_link_options(winprefs-tests PRIVATE -mconsole -municode)
+target_precompile_headers(winprefs-tests PRIVATE ../pch.h pch.h)
 if(ENABLE_COVERAGE)
   target_compile_options(winprefs-tests PRIVATE --coverage)
   target_link_options(winprefs-tests PRIVATE --coverage)

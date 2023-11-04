@@ -2,8 +2,6 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-#include <stddef.h>
-
 //! Escapes a string for a batch file.
 /*!
  \param input Input string.

@@ -1,12 +1,5 @@
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
-
-#include "constants.h"
-#include "macros.h"
 #include "shell.h"
+#include "constants.h"
 
 wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
     if (input == nullptr || n_chars == 0) {

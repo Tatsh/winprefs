@@ -35,6 +35,7 @@ repos:
     rev: v0.6.13
     hooks:
       - id: cmake-format
+        args: [--check, -c, .cmake-format]
       # - id: cmake-lint
   - repo: https://github.com/streetsidesoftware/cspell-cli
     rev: v7.3.2

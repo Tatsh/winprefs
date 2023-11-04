@@ -1,18 +1,5 @@
-#include <stdio.h>
-#include <wchar.h>
-
-#include <windows.h>
-// Has to come after
-#ifndef __WINE__
-#include <versionhelpers.h>
-#else
-#define IsWindowsVistaOrGreater() 0
-#endif
-
-#include "constants.h"
-#include "debug.h"
-#include "macros.h"
 #include "reg_command.h"
+#include "constants.h"
 #include "registry.h"
 #include "shell.h"
 

@@ -1,13 +1,5 @@
-#include <process.h>
-#include <stdio.h>
-#include <wchar.h>
-
-#include <windows.h>
-
-#include "constants.h"
-#include "debug.h"
 #include "git.h"
-#include "macros.h"
+#include "constants.h"
 
 static inline bool has_git() {
     return _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;

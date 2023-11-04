@@ -1,24 +1,12 @@
 /** \file */
-#include <crtdbg.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <wchar.h>
-
-#include <process.h>
-#include <shlobj.h>
-#include <shlwapi.h>
-#include <windows.h>
-
 #ifdef ENABLE_VLD
 #include <vld.h>
 #endif
 
 #include "arg.h"
 #include "constants.h"
-#include "debug.h"
 #include "git.h"
 #include "io.h"
-#include "macros.h"
 #include "reg_code.h"
 #include "reg_command.h"
 #include "registry.h"
@@ -109,14 +97,14 @@ int wmain(int argc, wchar_t *argv[]) {
     ARG_END;
     wchar_t *reg_path = *argv;
     enum OUTPUT_FORMAT output_format_e =
-        (!format || !wcsicmp(L"reg", format))    ? OUTPUT_FORMAT_REG :
-        !wcsicmp(L"c#", format)                  ? OUTPUT_FORMAT_C_SHARP :
-        !wcsicmp(L"csharp", format)              ? OUTPUT_FORMAT_C_SHARP :
-        !wcsicmp(L"powershell", format)          ? OUTPUT_FORMAT_POWERSHELL :
-        !wcsicmp(L"ps", format)                  ? OUTPUT_FORMAT_POWERSHELL :
-        !wcsicmp(L"ps1", format)                 ? OUTPUT_FORMAT_POWERSHELL :
-        (format[0] == L'c' || format[0] == L'C') ? OUTPUT_FORMAT_C :
-                                                   OUTPUT_FORMAT_REG;
+        (!format || !wcsicmp(L"reg", format))              ? OUTPUT_FORMAT_REG :
+        !wcsicmp(L"c#", format) || !wcsicmp(L"cs", format) ? OUTPUT_FORMAT_C_SHARP :
+        !wcsicmp(L"csharp", format)                        ? OUTPUT_FORMAT_C_SHARP :
+        !wcsicmp(L"powershell", format)                    ? OUTPUT_FORMAT_POWERSHELL :
+        !wcsicmp(L"ps", format)                            ? OUTPUT_FORMAT_POWERSHELL :
+        !wcsicmp(L"ps1", format)                           ? OUTPUT_FORMAT_POWERSHELL :
+        (format[0] == L'c' || format[0] == L'C')           ? OUTPUT_FORMAT_C :
+                                                             OUTPUT_FORMAT_REG;
     if (reg_path) {
         size_t len = wcslen(reg_path);
         bool top_key_only =

@@ -1,5 +1,3 @@
-#include "constants.h"
-
 const size_t CMD_MAX_COMMAND_LENGTH = 8191;
 const size_t POWERSHELL_MAX_COMMAND_LENGTH = 32764;
 const size_t MAX_KEY_LENGTH = 255;

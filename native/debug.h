@@ -2,8 +2,6 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "macros.h"
-
 extern bool debug_print_enabled;
 
 //! Print only when debug logging is enabled.

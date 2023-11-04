@@ -1,9 +1,6 @@
-#include <wchar.h>
-
-#include "constants.h"
-#include "debug.h"
-#include "io.h"
 #include "powershell.h"
+#include "constants.h"
+#include "io.h"
 
 static wchar_t *escape_for_powershell(const wchar_t *input, size_t n_chars) {
     if (input == nullptr || n_chars == 0) {

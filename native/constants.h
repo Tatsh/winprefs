@@ -2,8 +2,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <stddef.h>
-
 //! Maximum `cmd.exe` command line length.
 extern const size_t CMD_MAX_COMMAND_LENGTH;
 //! Maximum PowerShell command line length.

@@ -2,9 +2,6 @@
 #ifndef REG_COMMAND_H
 #define REG_COMMAND_H
 
-#include <windef.h>
-
-#include "macros.h"
 #include "reg_code.h"
 #include "registry.h"
 

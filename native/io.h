@@ -1,10 +1,6 @@
 #ifndef IO_H
 #define IO_H
 
-#include <windef.h>
-
-#include "macros.h"
-
 enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_C,
     OUTPUT_FORMAT_C_SHARP,

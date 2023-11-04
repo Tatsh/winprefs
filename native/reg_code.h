@@ -1,10 +1,6 @@
 #ifndef REG_CODE_H
 #define REG_CODE_H
 
-#include <windows.h>
-
-#include "macros.h"
-
 bool do_write_c_reg_code(HANDLE out_fp,
                          const wchar_t *full_path,
                          const wchar_t *prop,

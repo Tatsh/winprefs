@@ -2,8 +2,6 @@
 #ifndef REGISTRY_H
 #define REGISTRY_H
 
-#include <windef.h>
-
 #include "io.h"
 
 //! Gets the `HKEY` pointer for the first part of a registry path.

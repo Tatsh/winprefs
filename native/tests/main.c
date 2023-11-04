@@ -1,5 +1,3 @@
-#include "cmocka-inc.h"
-
 #include "tests.h"
 
 bool debug_print_enabled = false;

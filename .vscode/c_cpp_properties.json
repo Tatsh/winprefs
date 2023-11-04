@@ -5,20 +5,7 @@
       "compilerPath": "/usr/bin/gcc",
       "configurationProvider": "ms-vscode.cmake-tools",
       "cppStandard": "gnu++23",
-      "defines": ["UNICODE", "_UNICODE"],
-      "forcedInclude": [
-        "${workspaceFolder}/types.h",
-        "/usr/include/wine-staging-8.13/wine/msvcrt/stdio.h",
-        "/usr/include/wine-staging-8.13/wine/windows/excpt.h",
-        "/usr/include/wine-staging-8.13/wine/windows/objbase.h",
-        "/usr/include/wine-staging-8.13/wine/windows/rpc.h",
-        "/usr/include/wine-staging-8.13/wine/windows/windows.h"
-      ],
-      "includePath": [
-        "/usr/include/wine-staging-8.13/wine/msvcrt",
-        "/usr/include/wine-staging-8.13/wine/windows"
-      ],
-      "name": "Linux"
+      "name": "Default"
     }
   ],
   "version": 4

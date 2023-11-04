@@ -1,6 +1,3 @@
-#include <stdlib.h>
-
-#include "cmocka-inc.h"
 #include "io.h"
 #include "shell.h"
 #include "tests.h"

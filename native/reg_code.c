@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <wchar.h>
-
-#include "constants.h"
-#include "debug.h"
 #include "reg_code.h"
+#include "constants.h"
 #include "reg_command.h"
 #include "registry.h"
 

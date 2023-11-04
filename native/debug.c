@@ -1,8 +1,3 @@
-#include <stdarg.h>
-#include <stdio.h>
-
-#include "debug.h"
-
 void debug_print(const wchar_t *format, ...) {
     if (debug_print_enabled) {
         va_list args;
