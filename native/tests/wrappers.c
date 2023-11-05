@@ -55,7 +55,7 @@ BOOL __wrap_CreateProcess(LPCWSTR lpApplicationName,
                           DWORD dwCreationFlags,
                           LPVOID lpEnvironment,
                           LPCWSTR lpCurrentDirectory,
-                          LPSTARTUPINFOW lpStartupInfo,
+                          LPSTARTUPINFO lpStartupInfo,
                           LPPROCESS_INFORMATION lpProcessInformation) {
     return mock_type(BOOL);
 }
@@ -199,7 +199,9 @@ BOOL __wrap_CreateDirectory(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurity
 
 BOOL __wrap_PathAppend(LPWSTR pszPath, LPCWSTR pszMore) {
     LPCWSTR newPszPath = mock_ptr_type(LPWSTR);
-    wmemcpy(pszPath, newPszPath, wcslen(newPszPath));
+    if (newPszPath) {
+        wmemcpy(pszPath, newPszPath, wcslen(newPszPath));
+    }
     return mock_type(BOOL);
 }
 

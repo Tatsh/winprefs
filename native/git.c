@@ -187,10 +187,10 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         free(result);
         return nullptr;
     }
-    STARTUPINFOW si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
-                       .hStdOutput = pipe_write,
-                       .hStdError = pipe_write,
-                       .wShowWindow = SW_HIDE};
+    STARTUPINFO si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
+                      .hStdOutput = pipe_write,
+                      .hStdError = pipe_write,
+                      .wShowWindow = SW_HIDE};
     PROCESS_INFORMATION pi = {0};
     size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 30;
     wchar_t *cmd = calloc(cmd_len, WL);
@@ -201,7 +201,8 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         return nullptr;
     }
     wmemset(cmd, L'\0', cmd_len);
-    _snwprintf(cmd, cmd_len, L"git.exe %ls %ls branch --show-current", git_dir_arg, work_tree_arg);
+    _snwprintf(
+        cmd, cmd_len, TEXT("git.exe %ls %ls branch --show-current"), git_dir_arg, work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
     BOOL ret = CreateProcess(
         nullptr, cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);

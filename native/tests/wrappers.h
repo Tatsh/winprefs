@@ -39,7 +39,7 @@ typedef struct _SECURITY_ATTRIBUTES {
     LPVOID lpSecurityDescriptor;
     BOOL bInheritHandle;
 } SECURITY_ATTRIBUTES, *LPSECURITY_ATTRIBUTES;
-typedef struct _STARTUPINFOW {
+typedef struct _STARTUPINFO {
     DWORD cb;
     LPWSTR lpReserved;
     LPWSTR lpDesktop;
@@ -58,7 +58,7 @@ typedef struct _STARTUPINFOW {
     HANDLE hStdInput;
     HANDLE hStdOutput;
     HANDLE hStdError;
-} STARTUPINFOW, *LPSTARTUPINFOW;
+} STARTUPINFO, *LPSTARTUPINFO;
 typedef struct _PROCESS_INFORMATION {
     HANDLE hProcess;
     HANDLE hThread;
@@ -106,7 +106,7 @@ const enum REG_TYPES {
 #define HKEY_LOCAL_MACHINE (HKEY)3
 #define HKEY_USERS (HKEY)5
 #define INVALID_FILE_ATTRIBUTES 1 << 2
-#define INVALID_HANDLE_VALUE (void *)0
+#define INVALID_HANDLE_VALUE (void *)3
 #define IsWindowsVistaOrGreater() 0
 #define KEY_READ 0
 #define LOCALE_USER_DEFAULT 0
@@ -123,6 +123,9 @@ const enum REG_TYPES {
 
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef TEXT
+#define TEXT(quote) L##quote
 #endif
 
 DWORD GetFileAttributes(wchar_t *path);
@@ -178,7 +181,7 @@ BOOL CreateProcess(LPCWSTR lpApplicationName,
                    DWORD dwCreationFlags,
                    LPVOID lpEnvironment,
                    LPCWSTR lpCurrentDirectory,
-                   LPSTARTUPINFOW lpStartupInfo,
+                   LPSTARTUPINFO lpStartupInfo,
                    LPPROCESS_INFORMATION lpProcessInformation);
 BOOL WriteFile(HANDLE hFile,
                LPCVOID lpBuffer,

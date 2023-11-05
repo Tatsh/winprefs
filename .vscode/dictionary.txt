@@ -66,6 +66,7 @@ lpft
 lpoverlapped
 lpprocess
 lpsecurity
+lpstartupinfo
 lpstartupinfow
 lpstr
 lpwstr
@@ -117,6 +118,7 @@ shlwapi
 snwprintf
 softprops
 startf
+startupinfo
 startupinfow
 stdbool
 stddef
