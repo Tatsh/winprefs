@@ -6,7 +6,7 @@ static inline bool has_git() {
 }
 
 static inline bool dir_exists(wchar_t *path) {
-    DWORD attrib = GetFileAttributes(path);
+    DWORD attrib = wGetFileAttributes(path);
     return attrib != INVALID_FILE_ATTRIBUTES && (attrib & FILE_ATTRIBUTE_DIRECTORY);
 }
 
@@ -63,21 +63,23 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
         return false;
     }
     size_t time_needed_size =
-        (size_t)GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
+        (size_t)wGetTimeFormatW(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
     if (!time_needed_size) {
         return false;
     }
     wchar_t *time_buf = calloc(time_needed_size, WL);
-    if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, (int)time_needed_size)) {
+    if (!wGetTimeFormatW(
+            LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, (int)time_needed_size)) {
         return false;
     }
     size_t date_needed_size =
-        (size_t)GetDateFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
+        (size_t)wGetDateFormatW(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
     if (!date_needed_size) {
         return false;
     }
     wchar_t *date_buf = calloc(date_needed_size, WL);
-    if (!GetDateFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, date_buf, (int)date_needed_size)) {
+    if (!wGetDateFormatW(
+            LOCALE_USER_DEFAULT, 0, nullptr, nullptr, date_buf, (int)date_needed_size)) {
         return false;
     }
     size_t needed_size =
@@ -183,7 +185,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                                        TRUE, // Pipe handles are inherited by child process.
                                    .nLength = sizeof(SECURITY_ATTRIBUTES)};
     // Create a pipe to get results from child's stdout.
-    if (!CreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
+    if (!wCreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
         free(result);
         return nullptr;
     }
@@ -196,18 +198,18 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     wchar_t *cmd = calloc(cmd_len, WL);
     if (!cmd) {
         free(result);
-        CloseHandle(pipe_write);
-        CloseHandle(pipe_read);
+        wCloseHandle(pipe_write);
+        wCloseHandle(pipe_read);
         return nullptr;
     }
     wmemset(cmd, L'\0', cmd_len);
     _snwprintf(cmd, cmd_len, L"git.exe %ls %ls branch --show-current", git_dir_arg, work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
-    BOOL ret = CreateProcess(
+    BOOL ret = wCreateProcessW(
         nullptr, cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);
     if (!ret) {
-        CloseHandle(pipe_write);
-        CloseHandle(pipe_read);
+        wCloseHandle(pipe_write);
+        wCloseHandle(pipe_read);
         free(result);
         return nullptr;
     }
@@ -215,7 +217,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     bool proc_ended = false;
     for (; !proc_ended;) {
         // Give some time slice (50 ms), so we won't waste 100% CPU.
-        proc_ended = WaitForSingleObject(pi.hProcess, 50) == WAIT_OBJECT_0;
+        proc_ended = wWaitForSingleObject(pi.hProcess, 50) == WAIT_OBJECT_0;
         // Even if process exited - we continue reading, if
         // there is some data available over pipe.
         for (;;) {
@@ -223,13 +225,13 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
             memset(buf, L'\0', 255);
             DWORD read = 0;
             DWORD avail = 0;
-            if (!PeekNamedPipe(pipe_read, nullptr, 0, nullptr, &avail, nullptr)) {
+            if (!wPeekNamedPipe(pipe_read, nullptr, 0, nullptr, &avail, nullptr)) {
                 break;
             }
             if (!avail) { // No data available, return
                 break;
             }
-            if (!ReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, nullptr) || !read) {
+            if (!wReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, nullptr) || !read) {
                 // Error, the child process might have ended
                 break;
             }
@@ -239,17 +241,17 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
             }
         }
     }
-    CloseHandle(pipe_write);
-    CloseHandle(pipe_read);
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+    wCloseHandle(pipe_write);
+    wCloseHandle(pipe_read);
+    wCloseHandle(pi.hProcess);
+    wCloseHandle(pi.hThread);
     size_t res_len = strlen(result);
-    int w_len = MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, nullptr, 0);
+    int w_len = wMultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, nullptr, 0);
     wchar_t *w_result = calloc((size_t)w_len + 1, WL);
     if (!w_result) {
         return nullptr;
     }
-    MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
+    wMultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
     w_result[w_len] = L'\0';
     free(result);
     return w_result;

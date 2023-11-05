@@ -6,12 +6,14 @@
 #if HAVE_STDBOOL
 #include <stdbool.h>
 #endif
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <wchar.h>
 
+#if !defined(TESTING) || !TESTING
 #include <crtdbg.h>
 #include <process.h>
 #include <shlobj.h>
@@ -19,6 +21,11 @@
 #include <windows.h>
 // Must come after windows.h
 #include <versionhelpers.h>
+
+#include "wrappers.h"
+#else
+#include "tests/wrappers.h"
+#endif
 
 #include "debug.h"
 #include "macros.h"

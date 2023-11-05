@@ -13,7 +13,7 @@ typedef bool (*do_write_callback)(
 bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf);
 bool do_writes(HANDLE out_fp,
                HKEY hk,
-               unsigned n_values,
+               long unsigned int n_values,
                const wchar_t *prior_stem,
                enum OUTPUT_FORMAT format);
 //! Starts the registry exporting process.

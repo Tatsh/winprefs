@@ -20,11 +20,16 @@ set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 
 option(BUILD_DOCS "Build documentation." OFF)
 option(BUILD_TESTS "Build and run tests." OFF)
+option(BUILD_TESTS_ONLY "Build and run tests on another platform." OFF)
 option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 set(TARGET_VERSION
     $<IF:$<BOOL:MSVC>,0x600,0x501>
     CACHE STRING "Version of Windows to target in 0x format.")
+
+if(BUILD_TESTS_ONLY)
+  set(BUILD_TESTS ON)
+endif()
 
 if(BUILD_TESTS)
   find_package(cmocka REQUIRED)

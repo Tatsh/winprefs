@@ -12,7 +12,7 @@ HKEY get_top_key(wchar_t *reg_path) {
     if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
         return HKEY_CLASSES_ROOT;
     }
-    if (!_wcsnicmp(reg_path, L"HKLM", 4) || !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
+    if (!_wcsnicmp(reg_path, L"HKLM", 4) || !_wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
         return HKEY_LOCAL_MACHINE;
     }
     if (!_wcsnicmp(reg_path, L"HKCC", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
@@ -28,8 +28,8 @@ HKEY get_top_key(wchar_t *reg_path) {
 }
 
 static inline bool create_dir_wrapper(wchar_t *folder) {
-    if (!CreateDirectory(folder, nullptr)) {
-        DWORD err = GetLastError();
+    if (!wCreateDirectoryW(folder, nullptr)) {
+        DWORD err = wGetLastError();
         if (err != ERROR_ALREADY_EXISTS && err != ERROR_ACCESS_DENIED) {
             return false;
         }
@@ -76,16 +76,16 @@ bool save_preferences(bool commit,
     if (!writing_to_stdout && !create_dir_recursive(full_output_dir)) {
         return false;
     }
-    PathAppend(full_output_dir, output_file);
+    wPathAppendW(full_output_dir, output_file);
     full_output_dir[MAX_PATH - 1] = L'\0';
-    HANDLE out_fp = !writing_to_stdout ? CreateFile(full_output_dir,
-                                                    GENERIC_READ | GENERIC_WRITE,
-                                                    0,
-                                                    nullptr,
-                                                    CREATE_ALWAYS,
-                                                    FILE_ATTRIBUTE_NORMAL,
-                                                    nullptr) :
-                                         GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE out_fp = !writing_to_stdout ? wCreateFileW(full_output_dir,
+                                                      GENERIC_READ | GENERIC_WRITE,
+                                                      0,
+                                                      nullptr,
+                                                      CREATE_ALWAYS,
+                                                      FILE_ATTRIBUTE_NORMAL,
+                                                      nullptr) :
+                                         wGetStdHandle(STD_OUTPUT_HANDLE);
     if (out_fp == INVALID_HANDLE_VALUE) {
         return false;
     }
@@ -99,11 +99,11 @@ bool save_preferences(bool commit,
                                                             specified_path;
     if (format == OUTPUT_FORMAT_C) {
         DWORD written;
-        WriteFile(out_fp, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written, nullptr);
+        wWriteFile(out_fp, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written, nullptr);
     }
     ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, out_fp, prior_stem, format);
     if (!writing_to_stdout) {
-        CloseHandle(out_fp);
+        wCloseHandle(out_fp);
     }
     if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
@@ -127,7 +127,7 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     }
     wmemcpy(value_name, value_name_p, value_name_len);
     *last_backslash = L'\0';
-    if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
+    if (wRegOpenKeyExW(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
         free(value_name);
         debug_print(L"Invalid subkey: '%ls'.\n", subkey);
         return false;
@@ -135,7 +135,7 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     size_t buf_size = 8192;
     char *data = malloc(buf_size);
     DWORD reg_type = REG_NONE;
-    LSTATUS ret = RegQueryValueEx(
+    LSTATUS ret = wRegQueryValueExW(
         starting_key, value_name, nullptr, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);
     if (ret == ERROR_MORE_DATA) {
         free(data);
@@ -147,7 +147,7 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
         debug_print(L"Invalid value name '%ls'.\n", value_name);
         return false;
     }
-    HANDLE h_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE h_stdout = wGetStdHandle(STD_OUTPUT_HANDLE);
     switch (format) {
     case OUTPUT_FORMAT_REG:
         if (!do_write_reg_command(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {

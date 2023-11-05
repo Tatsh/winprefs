@@ -16,11 +16,11 @@
 #define IsWindowsVistaOrGreater() 0
 #endif
 
-#if !HAVE_WC_ERR_INVALID_CHARS
+#if !HAVE_WC_ERR_INVALID_CHARS || TESTING
 //! Fallback for pre-Vista. Same value as `WC_ERR_INVALID_CHARS`.
 #define WC_ERR_INVALID_CHARS
 #endif
 
-#define wc_err_invalid_chars IsWindowsVistaOrGreater() ? WC_ERR_INVALID_CHARS : 0
+#define wc_err_invalid_chars (DWORD)(IsWindowsVistaOrGreater() ? WC_ERR_INVALID_CHARS : 0)
 
 #endif // MACROS_H

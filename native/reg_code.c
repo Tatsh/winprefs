@@ -10,7 +10,8 @@ static wchar_t *get_top_key_string(const wchar_t *reg_path) {
         wmemcpy(out, L"HKEY_CURRENT_USER", 17);
     } else if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
         wmemcpy(out, L"HKEY_CLASSES_ROOT", 17);
-    } else if (!_wcsnicmp(reg_path, L"HKLM", 4) || !wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
+    } else if (!_wcsnicmp(reg_path, L"HKLM", 4) ||
+               !_wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
         wmemcpy(out, L"HKEY_LOCAL_MACHINE", 18);
     } else if (!_wcsnicmp(reg_path, L"HKCC", 4) ||
                !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
@@ -128,13 +129,13 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         return out;
     }
     if (reg_type == REG_QWORD) {
-        int req_size = _snwprintf(nullptr, 0, L"%llu", *(unsigned __int64 *)data);
+        int req_size = _snwprintf(nullptr, 0, L"%llu", *(UINT64 *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
         if (!out) {
             return nullptr;
         }
         wmemset(out, 0, (size_t)req_size);
-        _snwprintf(out, (size_t)req_size, L"%llu", *(unsigned __int64 *)data);
+        _snwprintf(out, (size_t)req_size, L"%llu", *(UINT64 *)data);
         return out;
     }
     errno = EINVAL;

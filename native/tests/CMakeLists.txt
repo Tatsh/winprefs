@@ -1,26 +1,35 @@
 enable_testing()
 
 set(mocked_functions
-    CloseHandle
-    CreatePipe
-    CreateProcessW
-    GetDateFormatW
-    GetFileAttributes
-    GetTimeFormatW
-    MultiByteToWideChar
-    PathAppendW
-    PathStripPathW
-    PeekNamedPipe
-    ReadFile
-    RegCloseKey
-    RegEnumKeyExW
-    RegEnumValueW
-    RegOpenKeyExW
-    RegQueryValueExW
-    WaitForSingleObject
-    WideCharToMultiByte
+    _snwprintf
+    _wchdir
+    _wfullpath
+    _wgetcwd
     _wspawnlp
-    _wfullpath)
+    wCloseHandle
+    wCreateDirectoryW
+    wCreateFileW
+    wCreatePipe
+    wCreateProcessW
+    wGetDateFormatW
+    wGetFileAttributes
+    wGetLastError
+    wGetStdHandle
+    wGetTimeFormatW
+    wMultiByteToWideChar
+    wPathAppendW
+    wPathStripPathW
+    wPeekNamedPipe
+    wReadFile
+    wRegCloseKey
+    wRegEnumKeyExW
+    wRegEnumValueW
+    wRegOpenKeyExW
+    wRegQueryInfoKeyW
+    wRegQueryValueExW
+    wWaitForSingleObject
+    wWideCharToMultiByte
+    wWriteFile)
 foreach(func ${mocked_functions})
   list(APPEND test_flags "-Wl,--wrap,${func}")
 endforeach()
@@ -50,13 +59,16 @@ add_executable(
   main.c
   test_shell.c
   tests.h)
-target_compile_definitions(winprefs-tests PRIVATE UNICODE _UNICODE)
+target_compile_definitions(winprefs-tests PRIVATE TESTING=1)
 target_compile_definitions(winprefs-tests PRIVATE _WIN32_WINNT=0x600)
-target_compile_options(winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
-                                              ${GCC_CLANG_SHARED_C_FLAGS})
+target_compile_options(
+  winprefs-tests PRIVATE $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}> ${GCC_CLANG_SHARED_C_FLAGS}
+                         -Wno-error=unused-parameter -Wno-unused-parameter)
 target_include_directories(winprefs-tests PRIVATE ${CMAKE_SOURCE_DIR}/native)
-target_link_libraries(winprefs-tests PRIVATE cmocka::cmocka kernel32 shlwapi)
-target_link_options(winprefs-tests PRIVATE -mconsole -municode)
+target_link_libraries(winprefs-tests PRIVATE cmocka)
+if(WIN32)
+  target_link_options(winprefs-tests PRIVATE -mconsole)
+endif()
 target_precompile_headers(winprefs-tests PRIVATE ../pch.h pch.h)
 if(ENABLE_COVERAGE)
   target_compile_options(winprefs-tests PRIVATE --coverage)

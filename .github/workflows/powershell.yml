@@ -1,6 +1,6 @@
 ---
 jobs:
-  build:
+  analysis:
     name: PSScriptAnalyzer
     permissions:
       actions: read

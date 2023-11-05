@@ -80,7 +80,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         if (reg_type == REG_DWORD) {
             _snwprintf(out, s_size, L" /d %lu ", *(DWORD *)data);
         } else {
-            _snwprintf(out, s_size, L" /d %llu ", *(unsigned __int64 *)data);
+            _snwprintf(out, s_size, L" /d %llu ", *(UINT64 *)data);
         }
         return out;
     }

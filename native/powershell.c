@@ -110,13 +110,13 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         return out;
     }
     if (reg_type == REG_QWORD) {
-        int req_size = _snwprintf(nullptr, 0, L"%llu", *(unsigned __int64 *)data);
+        int req_size = _snwprintf(nullptr, 0, L"%llu", *(UINT64 *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
         if (!out) {
             return nullptr;
         }
         wmemset(out, 0, (size_t)req_size);
-        _snwprintf(out, (size_t)req_size, L"%llu", *(unsigned __int64 *)data);
+        _snwprintf(out, (size_t)req_size, L"%llu", *(UINT64 *)data);
         return out;
     }
     errno = EINVAL;
