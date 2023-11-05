@@ -44,7 +44,7 @@ set(GCC_CLANG_DEBUG_C_FLAGS
     -Wunused-parameter
     -Wunused-variable)
 
-if(NOT BUILD_TESTS_ONLY)
+if(WIN32)
   add_executable(
     winprefs
     arg.h
@@ -112,6 +112,6 @@ if(NOT BUILD_TESTS_ONLY)
   install(TARGETS winprefs DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
-if(BUILD_TESTS AND CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
+if(BUILD_TESTS)
   add_subdirectory(tests)
 endif()

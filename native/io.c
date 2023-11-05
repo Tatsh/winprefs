@@ -5,7 +5,7 @@
 
 bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
     size_t addend = use_crlf ? 1 : 0;
-    size_t req_size = (size_t)wWideCharToMultiByte(
+    size_t req_size = (size_t)WideCharToMultiByte(
         CP_UTF8, wc_err_invalid_chars, out, -1, nullptr, 0, nullptr, nullptr);
     if (req_size == 0) {
         return false;
@@ -16,14 +16,14 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
         return false;
     }
     memset(mb_out, 0, total_size);
-    wWideCharToMultiByte(
+    WideCharToMultiByte(
         CP_UTF8, wc_err_invalid_chars, out, -1, mb_out, (int)req_size, nullptr, nullptr);
     if (use_crlf) {
         mb_out[total_size - 2] = '\r';
     }
     mb_out[total_size - 1] = '\n';
     DWORD written = 0;
-    bool ret = wWriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
+    bool ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
     free(mb_out);
     return ret && written > 0;
 }
@@ -71,7 +71,7 @@ bool do_writes(HANDLE out_fp,
         memset(data, 0, 8192);
         value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
-        ret = wRegEnumValueW(
+        ret = RegEnumValue(
             hk, i, value, (LPDWORD)&value_len, 0, &reg_type, (LPBYTE)data, (LPDWORD)&data_len);
         if (ret == ERROR_MORE_DATA) {
             continue;
@@ -134,21 +134,21 @@ bool write_key_filtered_recursive(HKEY hk,
         free(full_path);
         return true;
     }
-    if (wRegOpenKeyExW(hk, stem, 0, KEY_READ, &hk_out) == ERROR_SUCCESS) {
+    if (RegOpenKeyEx(hk, stem, 0, KEY_READ, &hk_out) == ERROR_SUCCESS) {
         DWORD n_sub_keys = 0;
         DWORD n_values = 0;
-        LSTATUS ret_code = wRegQueryInfoKeyW(hk_out,
-                                             nullptr,
-                                             nullptr,
-                                             nullptr,
-                                             &n_sub_keys,
-                                             nullptr,
-                                             nullptr,
-                                             &n_values,
-                                             nullptr,
-                                             nullptr,
-                                             nullptr,
-                                             nullptr);
+        LSTATUS ret_code = RegQueryInfoKey(hk_out,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr,
+                                           &n_sub_keys,
+                                           nullptr,
+                                           nullptr,
+                                           &n_values,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr,
+                                           nullptr);
         if (n_sub_keys) {
             size_t ach_key_len = 0;
             wchar_t *ach_key = calloc(MAX_KEY_LENGTH, WL);
@@ -159,7 +159,7 @@ bool write_key_filtered_recursive(HKEY hk,
             for (i = 0; i < n_sub_keys; i++) {
                 ach_key_len = MAX_KEY_LENGTH;
                 wmemset(ach_key, L'\0', MAX_KEY_LENGTH);
-                ret_code = wRegEnumKeyExW(
+                ret_code = RegEnumKeyEx(
                     hk_out, i, ach_key, (LPDWORD)&ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
                     if (!write_key_filtered_recursive(
@@ -183,7 +183,7 @@ bool write_key_filtered_recursive(HKEY hk,
         } else {
             debug_print(L"%ls: No values in %ls.\n", prior_stem, stem);
         }
-        wRegCloseKey(hk_out);
+        RegCloseKey(hk_out);
     } else {
         debug_print(L"%ls: Skipping %ls. Does the location exist?\n", prior_stem, stem);
     }

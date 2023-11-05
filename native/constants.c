@@ -15,12 +15,12 @@ const wchar_t *C_SHARP_REGISTRY_SET_VALUE_TEMPLATE =
 const size_t SIZEOF_C_PREAMBLE = 44;
 const char *C_PREAMBLE = "DWORD dnum;\nQWORD qnum;\nunsigned char data;\n";
 const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_SZ =
-    L"RegSetKeyValueW(%ls, L\"%ls\", L\"%ls\", %ls, L\"%ls\", %ld);";
+    L"RegSetKeyValue(%ls, L\"%ls\", L\"%ls\", %ls, L\"%ls\", %ld);";
 const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_BINARY =
-    L"data = %ls; RegSetKeyValueW(%ls, L\"%ls\", L\"%ls\", REG_BINARY, (LPCVOID)&data, %ld);";
+    L"data = %ls; RegSetKeyValue(%ls, L\"%ls\", L\"%ls\", REG_BINARY, (LPCVOID)&data, %ld);";
 const wchar_t *KEYWORD_DWORD = L"DWORD";
 const wchar_t *KEYWORD_QWORD = L"QWORD";
 const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_NUMERIC =
-    L"%lsnum = %ls; RegSetKeyValueW(%ls, L\"%ls\", L\"%ls\", %ls, (LPCVOID)&num, sizeof(%ls));";
+    L"%lsnum = %ls; RegSetKeyValue(%ls, L\"%ls\", L\"%ls\", %ls, (LPCVOID)&num, sizeof(%ls));";
 const wchar_t *C_REGSETKEYVALUEW_TEMPLATE_NONE =
-    L"RegSetKeyValueW(%ls, L\"%ls\", L\"%ls\", REG_NONE, NULL, 0);";
+    L"RegSetKeyValue(%ls, L\"%ls\", L\"%ls\", REG_NONE, NULL, 0);";

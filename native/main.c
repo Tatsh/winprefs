@@ -93,7 +93,7 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         else if (ARG_LONG("help")) case 'h':
         case '?': {
-            wPathStripPathW(argv0);
+            PathStripPath(argv0);
             wprintf(L"Usage: %ls [OPTION...] [REG_PATH]\n", argv0);
             wprintf(L"\nIf a path to a value name is specified, the output directory argument is "
                     L"ignored and the line is printed to\nstandard output.\n\n");
@@ -148,7 +148,7 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         if (!top_key_only) {
             wchar_t *subkey = wcschr(reg_path, L'\\') + 1;
-            if (wRegOpenKeyExW(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
+            if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
                 // See if it's a full path to value
                 return export_single_value(reg_path, top_key, output_format_e) ? EXIT_SUCCESS :
                                                                                  EXIT_FAILURE;
@@ -162,8 +162,8 @@ int wmain(int argc, wchar_t *argv[]) {
             return EXIT_FAILURE;
         }
         wmemset(output_dir, L'\0', MAX_PATH);
-        if (SUCCEEDED(wSHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, output_dir))) {
-            wPathAppendW(output_dir, L"prefs-export");
+        if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA, nullptr, 0, output_dir))) {
+            PathAppend(output_dir, L"prefs-export");
         }
         output_dir[MAX_PATH - 1] = L'\0';
     }
@@ -179,15 +179,15 @@ int wmain(int argc, wchar_t *argv[]) {
     free(output_dir);
     if (!success) {
         fwprintf(stderr, L"Error occurred. Possibilities:\n");
-        DWORD last_win_error = wGetLastError();
+        DWORD last_win_error = GetLastError();
         wchar_t p_message_buf[8192];
-        wFormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                        nullptr,
-                        last_win_error,
-                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                        (LPTSTR)&p_message_buf,
-                        8192,
-                        nullptr);
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                      nullptr,
+                      last_win_error,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPTSTR)&p_message_buf,
+                      8192,
+                      nullptr);
         fprintf(stderr, "POSIX   (%d): %s\n", errno, strerror(errno));
         fwprintf(stderr, L"Windows (%d): %ls", last_win_error, p_message_buf);
         print_leaks();

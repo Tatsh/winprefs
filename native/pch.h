@@ -22,8 +22,6 @@
 #include <windows.h>
 // Must come after windows.h
 #include <versionhelpers.h>
-
-#include "wrappers.h"
 #else
 #include <cmocka.h>
 
