@@ -35,8 +35,19 @@ void test_main_invalid_option(void **state) {
 }
 
 void test_main_wfullpath_error(void **state) {
+    wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
+    wmemset(app_data_folder, L'\0', 30);
+    wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
+    will_return(__wrap_wSHGetFolderPathW, app_data_folder);
     will_return(__wrap_wSHGetFolderPathW, 0);
+    wchar_t *prefs_export_path = calloc(43, sizeof(wchar_t));
+    wmemset(prefs_export_path, L'\0', 43);
+    wmemcpy(prefs_export_path, app_data_folder, 29);
+    wcsncat(prefs_export_path, L"prefs-export", 12);
+    will_return(__wrap_wPathAppendW, prefs_export_path);
+    will_return(__wrap_wPathAppendW, TRUE);
     will_return(__wrap__wfullpath, (void *)0);
+    will_return(__wrap__wfullpath, FALSE);
     will_return(__wrap_wGetLastError, 0);
     will_return(__wrap_wFormatMessageW, 10);
 

@@ -29,7 +29,9 @@ int __wrap_wGetDateFormatW(LCID Locale,
 wchar_t *__wrap__wfullpath(wchar_t *absPath, const wchar_t *relPath, size_t maxLength) {
     wchar_t *absPathRet = mock_ptr_type(wchar_t *);
     wmemset(absPath, L'\0', maxLength);
-    wmemcpy(absPath, absPathRet, wcslen(absPathRet));
+    if (absPathRet) {
+        wmemcpy(absPath, absPathRet, wcslen(absPathRet));
+    }
     return mock_ptr_type(wchar_t *);
 }
 
