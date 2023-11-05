@@ -2,7 +2,6 @@ enable_testing()
 
 set(mocked_functions
     _CrtDumpMemoryLeaks
-    _snwprintf
     _wchdir
     _wfullpath
     _wgetcwd

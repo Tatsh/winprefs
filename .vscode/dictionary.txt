@@ -124,6 +124,7 @@ strequal
 struct
 structs
 sublang
+swprintf
 tatsh
 testlist
 tlbid

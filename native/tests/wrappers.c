@@ -4,10 +4,6 @@ LSTATUS __wrap_wRegCloseKey(HKEY hKey) {
     return mock_type(LSTATUS);
 }
 
-int __wrap__snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
-    return mock_type(int);
-}
-
 intptr_t __wrap__wspawnlp(int mode, const wchar_t *cmd, const wchar_t *arg_list, ...) {
     return mock_type(intptr_t);
 }

@@ -1,7 +1,12 @@
 #ifndef TESTS_WRAPPERS_H
 #define TESTS_WRAPPERS_H
 
+#if !HAVE_SNWPRINTF
+#define _snwprintf swprintf
+#endif
+#if !HAVE_WCSNICMP
 #define _wcsnicmp wcsncmp
+#endif
 
 #define UINT64 uint64_t
 typedef short WORD;
