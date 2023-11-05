@@ -66,6 +66,7 @@ typedef struct _FILETIME {
     DWORD dwHighDateTime;
 } FILETIME;
 typedef struct _FILETIME *PFILETIME;
+typedef WCHAR *LPTSTR;
 const enum REG_TYPES {
     REG_BINARY,
     REG_DWORD,
@@ -80,13 +81,17 @@ const enum REG_TYPES {
 #define CP_UTF8 0
 #define CREATE_ALWAYS 2
 #define CREATE_NEW_CONSOLE 0
+#define CSIDL_APPDATA 0
 #define ERROR_ACCESS_DENIED 802
 #define ERROR_ALREADY_EXISTS 803
 #define ERROR_MORE_DATA 800
 #define ERROR_NO_MORE_ITEMS 801
 #define ERROR_SUCCESS 0
+#define FALSE 0
 #define FILE_ATTRIBUTE_DIRECTORY 0
 #define FILE_ATTRIBUTE_NORMAL 2
+#define FORMAT_MESSAGE_FROM_SYSTEM 2
+#define FORMAT_MESSAGE_IGNORE_INSERTS 1
 #define GENERIC_READ 0
 #define GENERIC_WRITE 1
 #define HKEY_CLASSES_ROOT (HKEY)2
@@ -100,14 +105,17 @@ const enum REG_TYPES {
 #define IsWindowsVistaOrGreater() 0
 #define KEY_READ 0
 #define LOCALE_USER_DEFAULT 0
+#define MAKELANGID(x, y) 0
 #define MAX_PATH 260
 #define P_WAIT 0
 #define STARTF_USESHOWWINDOW 1
 #define STARTF_USESTDHANDLES 2
 #define STD_OUTPUT_HANDLE 0
+#define SUCCEEDED(x) x == 0
 #define SW_HIDE 0
 #define TRUE 1
 #define WAIT_OBJECT_0 0
+
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
@@ -220,18 +228,20 @@ LSTATUS wRegQueryValueExW(HKEY hKey,
                           LPDWORD lpType,
                           LPBYTE lpData,
                           LPDWORD lpcbData);
-HRESULT
-wSHGetFolderPathW(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath);
-wFormatMessageW(DWORD dwFlags,
-                LPCVOID lpSource,
-                DWORD dwMessageId,
-                DWORD dwLanguageId,
-                LPWSTR lpBuffer,
-                DWORD nSize,
-                va_list *Arguments);
+HRESULT wSHGetFolderPathW(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath);
 wchar_t *_wfullpath(wchar_t *absPath, const wchar_t *relPath, size_t maxLength);
 intptr_t _wspawnlp(int mode, const wchar_t *cmd, const wchar_t *_ArgList, ...);
 wchar_t *_wgetcwd(wchar_t *buffer, int maxlen);
 int _wchdir(const wchar_t *dirname);
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
+int wcsicmp(const wchar_t *a, const wchar_t *b);
+BOOL _CrtDumpMemoryLeaks();
+DWORD wFormatMessageW(DWORD dwFlags,
+                      LPCVOID lpSource,
+                      DWORD dwMessageId,
+                      DWORD dwLanguageId,
+                      LPWSTR lpBuffer,
+                      DWORD nSize,
+                      va_list *Arguments);
+
 #endif // TESTS_WRAPPERS_H

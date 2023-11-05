@@ -4,12 +4,6 @@
 
 #include "io.h"
 
-//! Gets the `HKEY` pointer for the first part of a registry path.
-/*!
- \param reg_path Full registry path.
- \return Pointer to root key handle.
- */
-HKEY get_top_key(wchar_t *reg_path);
 //! Starts the registry exporting process.
 /*!
  \param commit If the changes should be commited with Git. Does not apply if output directory is `-`

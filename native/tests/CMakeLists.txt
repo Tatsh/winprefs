@@ -1,16 +1,20 @@
 enable_testing()
 
 set(mocked_functions
+    _CrtDumpMemoryLeaks
     _snwprintf
     _wchdir
     _wfullpath
     _wgetcwd
     _wspawnlp
+    wcsicmp
     wCloseHandle
     wCreateDirectoryW
     wCreateFileW
     wCreatePipe
     wCreateProcessW
+    wFormatMessageW
+    wSHGetFolderPathW
     wGetDateFormatW
     wGetFileAttributes
     wGetLastError
@@ -46,6 +50,7 @@ add_executable(
   ../io.c
   ../io.h
   ../macros.h
+  ../main.c
   ../powershell.c
   ../powershell.h
   ../reg_code.c
@@ -57,8 +62,11 @@ add_executable(
   ../shell.c
   ../shell.h
   main.c
+  test_main.c
   test_shell.c
-  tests.h)
+  tests.h
+  wrappers.c
+  wrappers.h)
 target_compile_definitions(winprefs-tests PRIVATE TESTING=1)
 target_compile_definitions(winprefs-tests PRIVATE _WIN32_WINNT=0x600)
 target_compile_options(
@@ -69,7 +77,7 @@ target_link_libraries(winprefs-tests PRIVATE cmocka)
 if(WIN32)
   target_link_options(winprefs-tests PRIVATE -mconsole)
 endif()
-target_precompile_headers(winprefs-tests PRIVATE ../pch.h pch.h)
+target_precompile_headers(winprefs-tests PRIVATE ../pch.h)
 if(ENABLE_COVERAGE)
   target_compile_options(winprefs-tests PRIVATE --coverage)
   target_link_options(winprefs-tests PRIVATE --coverage)

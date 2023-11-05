@@ -1,5 +1,5 @@
-#ifndef WIN_H
-#define WIN_H
+#ifndef PCH_H
+#define PCH_H
 
 #include <errno.h>
 #include <setjmp.h>
@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
 
@@ -24,10 +25,12 @@
 
 #include "wrappers.h"
 #else
+#include <cmocka.h>
+
 #include "tests/wrappers.h"
 #endif
 
 #include "debug.h"
 #include "macros.h"
 
-#endif // WIN_H
+#endif // PCH_H

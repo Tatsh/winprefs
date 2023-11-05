@@ -5,28 +5,6 @@
 #include "reg_code.h"
 #include "reg_command.h"
 
-HKEY get_top_key(wchar_t *reg_path) {
-    if (!_wcsnicmp(reg_path, L"HKCU", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_USER", 17)) {
-        return HKEY_CURRENT_USER;
-    }
-    if (!_wcsnicmp(reg_path, L"HKCR", 4) || !_wcsnicmp(reg_path, L"HKEY_CLASSES_ROOT", 17)) {
-        return HKEY_CLASSES_ROOT;
-    }
-    if (!_wcsnicmp(reg_path, L"HKLM", 4) || !_wcsnicmp(reg_path, L"HKEY_LOCAL_MACHINE", 18)) {
-        return HKEY_LOCAL_MACHINE;
-    }
-    if (!_wcsnicmp(reg_path, L"HKCC", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_CONFIG", 19)) {
-        return HKEY_CURRENT_CONFIG;
-    }
-    if (!_wcsnicmp(reg_path, L"HKU", 3) || !_wcsnicmp(reg_path, L"HKEY_USERS", 10)) {
-        return HKEY_USERS;
-    }
-    if (!_wcsnicmp(reg_path, L"HKDD", 4) || !_wcsnicmp(reg_path, L"HKEY_DYN_DATA", 13)) {
-        return HKEY_DYN_DATA;
-    }
-    return nullptr;
-}
-
 static inline bool create_dir_wrapper(wchar_t *folder) {
     if (!wCreateDirectoryW(folder, nullptr)) {
         DWORD err = wGetLastError();
