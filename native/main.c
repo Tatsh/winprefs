@@ -98,9 +98,8 @@ int wmain(int argc, wchar_t *argv[]) {
             wprintf(L"\nIf a path to a value name is specified, the output directory argument is "
                     L"ignored and the line is printed to\nstandard output.\n\n");
             puts("Options:");
-            puts("  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, "
-                 "reg. Default: "
-                 "reg.");
+            puts("  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, "
+                 "powershell, reg. Default: reg.");
             puts("  -K, --deploy-key    Deploy key for committing.");
             puts("  -c, --commit        Commit changes.");
             puts("  -d, --debug         Enable debug logging.");
