@@ -1,8 +1,6 @@
-#include "tests.h"
-
 int wmain(int argc, wchar_t *argv[]);
 
-void test_main_help(void **state) {
+static void test_main_help(void **state) {
     wchar_t **buf = calloc(2, sizeof(wchar_t *));
     buf[0] = calloc(8, sizeof(wchar_t));
     buf[1] = calloc(10, sizeof(wchar_t));
@@ -18,7 +16,7 @@ void test_main_help(void **state) {
     assert_int_equal(ret, EXIT_SUCCESS);
 }
 
-void test_main_invalid_option(void **state) {
+static void test_main_invalid_option(void **state) {
     wchar_t **buf = calloc(2, sizeof(wchar_t *));
     buf[0] = calloc(8, sizeof(wchar_t));
     buf[1] = calloc(16, sizeof(wchar_t));
@@ -34,7 +32,7 @@ void test_main_invalid_option(void **state) {
     assert_int_equal(EXIT_FAILURE, ret);
 }
 
-void test_main_wfullpath_error(void **state) {
+static void test_main_wfullpath_error(void **state) {
     wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
     wmemset(app_data_folder, L'\0', 30);
     wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
@@ -62,7 +60,7 @@ void test_main_wfullpath_error(void **state) {
     assert_return_code(ret, EXIT_FAILURE);
 }
 
-void test_main_fail_to_create_storage_dir(void **state) {
+static void test_main_fail_to_create_storage_dir(void **state) {
     wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
     wmemset(app_data_folder, L'\0', 30);
     wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
@@ -94,7 +92,7 @@ void test_main_fail_to_create_storage_dir(void **state) {
     free(prefs_export_path);
 }
 
-void test_main_fail_to_create_storage_dir_alt(void **state) {
+static void test_main_fail_to_create_storage_dir_alt(void **state) {
     wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
     wmemset(app_data_folder, L'\0', 30);
     wmemcpy(app_data_folder, L"c:\\users\\name\\AppData\\Roaming", 29);
@@ -131,7 +129,7 @@ void test_main_fail_to_create_storage_dir_alt(void **state) {
     free(prefs_export_path);
 }
 
-void test_main_CreateFile_returns_invalid_handle(void **state) {
+static void test_main_CreateFile_returns_invalid_handle(void **state) {
     wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
     wmemset(app_data_folder, L'\0', 30);
     wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
@@ -207,4 +205,58 @@ void test_main_GetStdHandle_returns_invalid_handle(void **state) {
     free(buf);
     free(app_data_folder);
     free(prefs_export_path);
+}
+
+static void test_main_reg_path_invalid(void **state) {
+    wchar_t **buf = calloc(3, sizeof(wchar_t *));
+    buf[0] = calloc(8, sizeof(wchar_t));
+    buf[1] = calloc(8, sizeof(wchar_t));
+    buf[2] = nullptr;
+    wmemset(buf[0], L'\0', 8);
+    wmemcpy(buf[0], L"winprefs", 7);
+    wmemset(buf[1], L'\0', 7);
+    wmemcpy(buf[1], L"ZZZZ:\\", 7);
+    int ret = wmain(2, buf);
+
+    assert_return_code(ret, EXIT_FAILURE);
+
+    free(buf[1]);
+    free(buf[0]);
+    free(buf);
+}
+
+static void test_main_reg_path_invalid_alt(void **state) {
+    wchar_t **buf = calloc(3, sizeof(wchar_t *));
+    buf[0] = calloc(8, sizeof(wchar_t));
+    buf[1] = calloc(6, sizeof(wchar_t));
+    buf[2] = nullptr;
+    wmemset(buf[0], L'\0', 8);
+    wmemcpy(buf[0], L"winprefs", 7);
+    wmemset(buf[1], L'\0', 6);
+    wmemcpy(buf[1], L"ZZZZ:", 5);
+    int ret = wmain(2, buf);
+
+    assert_return_code(ret, EXIT_FAILURE);
+
+    free(buf[1]);
+    free(buf[0]);
+    free(buf);
+}
+
+const struct CMUnitTest main_tests[] = {
+    cmocka_unit_test(test_main_CreateFile_returns_invalid_handle),
+    cmocka_unit_test(test_main_GetStdHandle_returns_invalid_handle),
+    cmocka_unit_test(test_main_fail_to_create_storage_dir),
+    cmocka_unit_test(test_main_fail_to_create_storage_dir_alt),
+    cmocka_unit_test(test_main_help),
+    cmocka_unit_test(test_main_invalid_option),
+    cmocka_unit_test(test_main_reg_path_invalid),
+    cmocka_unit_test(test_main_reg_path_invalid_alt),
+    cmocka_unit_test(test_main_wfullpath_error),
+};
+
+int main(int argc, char *argv[]) {
+    (void)argc;
+    (void)argv;
+    return cmocka_run_group_tests(main_tests, nullptr, nullptr);
 }
