@@ -35,7 +35,7 @@ jobs:
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
         shell: msys2 {0}
       - name: Run tests
-        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests
+        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests --verbose
         shell: msys2 {0}
       - name: Generate coverage information
         run: lcov --capture --directory ${{steps.fixed_workspace.outputs.out}}/build --output-file coverage.info
