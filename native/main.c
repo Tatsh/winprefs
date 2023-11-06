@@ -192,8 +192,6 @@ int wmain(int argc, wchar_t *argv[]) {
         print_leaks();
         return EXIT_FAILURE;
     }
-#ifndef ENABLE_VLD
     print_leaks();
-#endif
     return EXIT_SUCCESS;
 }
