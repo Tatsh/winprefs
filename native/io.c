@@ -48,7 +48,7 @@ bool do_writes(HANDLE out_fp,
     if (!value) {
         return false;
     }
-    do_write_callback dwc;
+    do_write_callback dwc = nullptr;
     switch (format) {
     case OUTPUT_FORMAT_REG:
         dwc = do_write_reg_command;
@@ -62,6 +62,12 @@ bool do_writes(HANDLE out_fp,
     case OUTPUT_FORMAT_POWERSHELL:
         dwc = do_write_powershell_reg_code;
         break;
+    default:
+        break;
+    }
+    if (!dwc) {
+        free(value);
+        return false;
     }
     LSTATUS ret = ERROR_SUCCESS;
     char data[8192];

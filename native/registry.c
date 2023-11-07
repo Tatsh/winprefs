@@ -148,6 +148,8 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
             return false;
         }
         break;
+    default:
+        break;
     }
     free(data);
     return true;

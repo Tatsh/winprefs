@@ -6,6 +6,7 @@ enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_C_SHARP,
     OUTPUT_FORMAT_POWERSHELL,
     OUTPUT_FORMAT_REG,
+    OUTPUT_FORMAT_UNKNOWN
 };
 typedef bool (*do_write_callback)(
     HANDLE, const wchar_t *, const wchar_t *, const char *, size_t, unsigned long);
