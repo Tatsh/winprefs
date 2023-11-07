@@ -60,6 +60,7 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *format = nullptr;
     wchar_t *output_dir = nullptr;
     wchar_t *output_file = nullptr;
+    bool output_dir_specified = false;
     ARG_BEGIN {
         if (ARG_LONG("deploy-key"))
         case 'K': {
@@ -78,6 +79,7 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         else if (ARG_LONG("output-dir")) case 'o': {
             output_dir = ARG_VAL();
+            output_dir_specified = true;
         }
         else if (ARG_LONG("format")) case 'F': {
             format = ARG_VAL();
@@ -123,14 +125,18 @@ int wmain(int argc, wchar_t *argv[]) {
     ARG_END;
     wchar_t *reg_path = *argv;
     enum OUTPUT_FORMAT output_format_e =
-        (!format || !wcsicmp(L"reg", format))              ? OUTPUT_FORMAT_REG :
-        !wcsicmp(L"c#", format) || !wcsicmp(L"cs", format) ? OUTPUT_FORMAT_C_SHARP :
-        !wcsicmp(L"csharp", format)                        ? OUTPUT_FORMAT_C_SHARP :
-        !wcsicmp(L"powershell", format)                    ? OUTPUT_FORMAT_POWERSHELL :
-        !wcsicmp(L"ps", format)                            ? OUTPUT_FORMAT_POWERSHELL :
-        !wcsicmp(L"ps1", format)                           ? OUTPUT_FORMAT_POWERSHELL :
-        (format[0] == L'c' || format[0] == L'C')           ? OUTPUT_FORMAT_C :
-                                                             OUTPUT_FORMAT_REG;
+        (!format || !_wcsicmp(L"reg", format)) ? OUTPUT_FORMAT_REG :
+        (!_wcsicmp(L"c#", format) || !_wcsicmp(L"cs", format) || !_wcsicmp(L"csharp", format)) ?
+                                                 OUTPUT_FORMAT_C_SHARP :
+        (!_wcsicmp(L"powershell", format) || !_wcsicmp(L"ps", format) ||
+         !_wcsicmp(L"ps1", format)) ?
+                                                 OUTPUT_FORMAT_POWERSHELL :
+        (format[0] == L'c' || format[0] == L'C') ? OUTPUT_FORMAT_C :
+                                                   OUTPUT_FORMAT_UNKNOWN;
+    if (output_format_e == OUTPUT_FORMAT_UNKNOWN) {
+        fwprintf(stderr, L"Unknown format specified: %ls\n", format);
+        return EXIT_FAILURE;
+    }
     if (reg_path) {
         size_t len = wcslen(reg_path);
         bool top_key_only =
@@ -175,7 +181,9 @@ int wmain(int argc, wchar_t *argv[]) {
                                     starting_key,
                                     reg_path,
                                     output_format_e);
-    free(output_dir);
+    if (!output_dir_specified) {
+        free(output_dir);
+    }
     if (!success) {
         fwprintf(stderr, L"Error occurred. Possibilities:\n");
         DWORD last_win_error = GetLastError();
