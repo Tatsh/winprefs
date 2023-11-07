@@ -1,12 +1,7 @@
 #ifndef TESTS_WRAPPERS_H
 #define TESTS_WRAPPERS_H
 
-#if !HAVE_SNWPRINTF
-#define _snwprintf swprintf
-#endif
-#if !HAVE_WCSNICMP
-#define _wcsnicmp wcsncmp
-#endif
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 #define UINT64 uint64_t
 typedef short WORD;
@@ -242,7 +237,7 @@ intptr_t _wspawnlp(int mode, const wchar_t *cmd, const wchar_t *_ArgList, ...);
 wchar_t *_wgetcwd(wchar_t *buffer, int maxlen);
 int _wchdir(const wchar_t *dirname);
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
-int wcsicmp(const wchar_t *a, const wchar_t *b);
+int _wcsicmp(const wchar_t *a, const wchar_t *b);
 BOOL _CrtDumpMemoryLeaks();
 DWORD FormatMessage(DWORD dwFlags,
                     LPCVOID lpSource,

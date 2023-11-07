@@ -1,4 +1,31 @@
 #include "wrappers.h"
+#include "io.h"
+
+bool __wrap_save_preferences(bool commit,
+                             const wchar_t *deploy_key,
+                             const wchar_t *output_dir,
+                             const wchar_t *output_file,
+                             int max_depth,
+                             HKEY hk,
+                             const wchar_t *specified_path,
+                             enum OUTPUT_FORMAT format) {
+    check_expected(commit);
+    check_expected(format);
+    check_expected(max_depth);
+    check_expected_ptr(deploy_key);
+    check_expected_ptr(hk);
+    check_expected_ptr(output_dir);
+    check_expected_ptr(output_file);
+    check_expected_ptr(specified_path);
+    return mock_type(bool);
+}
+
+bool __wrap_export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format) {
+    check_expected(format);
+    check_expected_ptr(reg_path);
+    check_expected_ptr(top_key);
+    return mock_type(bool);
+}
 
 LSTATUS __wrap_RegCloseKey(HKEY hKey) {
     return mock_type(LSTATUS);
@@ -203,10 +230,6 @@ BOOL __wrap_PathAppend(LPWSTR pszPath, LPCWSTR pszMore) {
         wmemcpy(pszPath, newPszPath, wcslen(newPszPath));
     }
     return mock_type(BOOL);
-}
-
-int __wrap_wcsicmp(wchar_t *a, wchar_t *b) {
-    return mock_type(int);
 }
 
 DWORD __wrap_FormatMessage(DWORD dwFlags,
