@@ -94,10 +94,12 @@ if(WIN32)
           "Invalid version for 64-bit. Must be XP (0x501) or higher. Version: ${TARGET_VERSION}")
     endif()
     target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=${TARGET_VERSION})
-    target_compile_options(winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
-                                            $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+    target_compile_options(
+      winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS} $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
+                       $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
     target_link_libraries(winprefs PRIVATE shell32)
-    target_link_options(winprefs PRIVATE -mconsole -municode)
+    target_link_options(winprefs PRIVATE -mconsole -municode
+                        $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
     if(CMAKE_C_COMPILER MATCHES "/winegcc$")
       target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)
       target_link_libraries(winprefs PRIVATE ucrtbase)
