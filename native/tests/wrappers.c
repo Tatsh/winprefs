@@ -70,29 +70,29 @@ int __wrap__wchdir(const wchar_t *dirname) {
     return mock_type(int);
 }
 
-BOOL __wrap_CloseHandle(HANDLE hObject) {
-    return mock_type(BOOL);
+bool __wrap_CloseHandle(HANDLE hObject) {
+    return mock_type(bool);
 }
 
-BOOL __wrap_CreateProcess(LPCWSTR lpApplicationName,
+bool __wrap_CreateProcess(LPCWSTR lpApplicationName,
                           LPWSTR lpCommandLine,
                           LPSECURITY_ATTRIBUTES lpProcessAttributes,
                           LPSECURITY_ATTRIBUTES lpThreadAttributes,
-                          BOOL bInheritHandles,
+                          bool bInheritHandles,
                           DWORD dwCreationFlags,
                           LPVOID lpEnvironment,
                           LPCWSTR lpCurrentDirectory,
                           LPSTARTUPINFO lpStartupInfo,
                           LPPROCESS_INFORMATION lpProcessInformation) {
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
-BOOL __wrap_WriteFile(HANDLE hFile,
+bool __wrap_WriteFile(HANDLE hFile,
                       LPCVOID lpBuffer,
                       DWORD nNumberOfBytesToWrite,
                       LPDWORD lpNumberOfBytesWritten,
                       LPOVERLAPPED lpOverlapped) {
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
 HANDLE __wrap_GetStdHandle(DWORD nStdHandle) {
@@ -115,7 +115,7 @@ int __wrap_WideCharToMultiByte(UINT CodePage,
                                LPSTR lpMultiByteStr,
                                int cbMultiByte,
                                LPCCH lpDefaultChar,
-                               LPBOOL lpUsedDefaultChar) {
+                               bool *lpUsedDefaultChar) {
     return mock_type(int);
 }
 
@@ -137,21 +137,21 @@ DWORD __wrap_WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds) {
     return mock_type(DWORD);
 }
 
-BOOL __wrap_PeekNamedPipe(HANDLE hNamedPipe,
+bool __wrap_PeekNamedPipe(HANDLE hNamedPipe,
                           LPVOID lpBuffer,
                           DWORD nBufferSize,
                           LPDWORD lpBytesRead,
                           LPDWORD lpTotalBytesAvail,
                           LPDWORD lpBytesLeftThisMessage) {
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
-BOOL __wrap_ReadFile(HANDLE hFile,
+bool __wrap_ReadFile(HANDLE hFile,
                      LPVOID lpBuffer,
                      DWORD nNumberOfBytesToRead,
                      LPDWORD lpNumberOfBytesRead,
                      LPOVERLAPPED lpOverlapped) {
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
 HANDLE __wrap_CreateFile(LPCWSTR lpFileName,
@@ -203,11 +203,11 @@ DWORD __wrap_GetFileAttributes(wchar_t *path) {
     return mock_type(DWORD);
 }
 
-BOOL __wrap_CreatePipe(PHANDLE hReadPipe,
+bool __wrap_CreatePipe(PHANDLE hReadPipe,
                        PHANDLE hWritePipe,
                        LPSECURITY_ATTRIBUTES lpPipeAttributes,
                        DWORD nSize) {
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
 wchar_t *__wrap__wgetcwd(wchar_t *buffer, int maxlen) {
@@ -220,16 +220,16 @@ __wrap_RegOpenKeyEx(
     return mock_type(LSTATUS);
 }
 
-BOOL __wrap_CreateDirectory(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes) {
-    return mock_type(BOOL);
+bool __wrap_CreateDirectory(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes) {
+    return mock_type(bool);
 }
 
-BOOL __wrap_PathAppend(LPWSTR pszPath, LPCWSTR pszMore) {
+bool __wrap_PathAppend(LPWSTR pszPath, LPCWSTR pszMore) {
     LPCWSTR newPszPath = mock_ptr_type(LPWSTR);
     if (newPszPath) {
         wmemcpy(pszPath, newPszPath, wcslen(newPszPath));
     }
-    return mock_type(BOOL);
+    return mock_type(bool);
 }
 
 DWORD __wrap_FormatMessage(DWORD dwFlags,
@@ -243,8 +243,8 @@ DWORD __wrap_FormatMessage(DWORD dwFlags,
     return mock_type(DWORD);
 }
 
-BOOL __wrap__CrtDumpMemoryLeaks() {
-    return FALSE;
+bool __wrap__CrtDumpMemoryLeaks() {
+    return false;
 }
 
 HRESULT

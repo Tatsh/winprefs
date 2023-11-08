@@ -25,14 +25,13 @@ typedef wchar_t WCHAR;
 typedef WCHAR *LPWSTR;
 typedef const WCHAR *LPCWSTR;
 typedef const WCHAR *LPCWCH, *PCWCH, *LMCSTR, *LPCWSTR, *PCWSTR;
-typedef bool BOOL, *LPBOOL;
 typedef unsigned int UINT;
 typedef void *HANDLE, *PHANDLE, *LPVOID, *LPOVERLAPPED, *HWND;
 typedef const void *LPCVOID;
 typedef struct _SECURITY_ATTRIBUTES {
     DWORD nLength;
     LPVOID lpSecurityDescriptor;
-    BOOL bInheritHandle;
+    bool bInheritHandle;
 } SECURITY_ATTRIBUTES, *LPSECURITY_ATTRIBUTES;
 typedef struct _STARTUPINFO {
     DWORD cb;
@@ -77,7 +76,6 @@ const enum REG_TYPES {
     REG_SZ,
 };
 
-#define BOOL bool
 #define CP_UTF8 0
 #define CREATE_ALWAYS 2
 #define CREATE_NEW_CONSOLE 0
@@ -87,7 +85,7 @@ const enum REG_TYPES {
 #define ERROR_MORE_DATA 800
 #define ERROR_NO_MORE_ITEMS 801
 #define ERROR_SUCCESS 0
-#define FALSE 0
+
 #define FILE_ATTRIBUTE_DIRECTORY 0
 #define FILE_ATTRIBUTE_NORMAL 2
 #define FORMAT_MESSAGE_FROM_SYSTEM 2
@@ -113,7 +111,6 @@ const enum REG_TYPES {
 #define STD_OUTPUT_HANDLE 0
 #define SUCCEEDED(x) x == 0
 #define SW_HIDE 0
-#define TRUE 1
 #define WAIT_OBJECT_0 0
 
 #ifndef min
@@ -136,19 +133,19 @@ int GetDateFormat(LCID Locale,
                   LPCWSTR lpFormat,
                   LPWSTR lpDateStr,
                   int cchDate);
-BOOL CreatePipe(PHANDLE hReadPipe,
+bool CreatePipe(PHANDLE hReadPipe,
                 PHANDLE hWritePipe,
                 LPSECURITY_ATTRIBUTES lpPipeAttributes,
                 DWORD nSize);
-BOOL CloseHandle(HANDLE hObject);
+bool CloseHandle(HANDLE hObject);
 DWORD WaitForSingleObject(HANDLE hHandle, DWORD dwMilliseconds);
-BOOL PeekNamedPipe(HANDLE hNamedPipe,
+bool PeekNamedPipe(HANDLE hNamedPipe,
                    LPVOID lpBuffer,
                    DWORD nBufferSize,
                    LPDWORD lpBytesRead,
                    LPDWORD lpTotalBytesAvail,
                    LPDWORD lpBytesLeftThisMessage);
-BOOL ReadFile(HANDLE hFile,
+bool ReadFile(HANDLE hFile,
               LPVOID lpBuffer,
               DWORD nNumberOfBytesToRead,
               LPDWORD lpNumberOfBytesRead,
@@ -166,19 +163,19 @@ int WideCharToMultiByte(UINT CodePage,
                         LPSTR lpMultiByteStr,
                         int cbMultiByte,
                         LPCCH lpDefaultChar,
-                        LPBOOL lpUsedDefaultChar);
+                        bool *lpUsedDefaultChar);
 void PathStripPath(LPWSTR pszPath);
-BOOL CreateProcess(LPCWSTR lpApplicationName,
+bool CreateProcess(LPCWSTR lpApplicationName,
                    LPWSTR lpCommandLine,
-                   LPSECURITY_ATTRIBUTES lpProcessAttributes,
-                   LPSECURITY_ATTRIBUTES lpThreadAttributes,
-                   BOOL bInheritHandles,
+                   SECURITY_ATTRIBUTES *lpProcessAttributes,
+                   SECURITY_ATTRIBUTES *lpThreadAttributes,
+                   bool bInheritHandles,
                    DWORD dwCreationFlags,
-                   LPVOID lpEnvironment,
+                   void *lpEnvironment,
                    LPCWSTR lpCurrentDirectory,
                    LPSTARTUPINFO lpStartupInfo,
                    LPPROCESS_INFORMATION lpProcessInformation);
-BOOL WriteFile(HANDLE hFile,
+bool WriteFile(HANDLE hFile,
                LPCVOID lpBuffer,
                DWORD nNumberOfBytesToWrite,
                LPDWORD lpNumberOfBytesWritten,
@@ -192,8 +189,8 @@ LSTATUS RegEnumValue(HKEY hKey,
                      LPBYTE lpData,
                      LPDWORD lpcbData);
 DWORD GetLastError();
-BOOL CreateDirectory(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
-BOOL PathAppend(LPWSTR pszPath, LPCWSTR pszMore);
+bool CreateDirectory(LPCWSTR lpPathName, LPSECURITY_ATTRIBUTES lpSecurityAttributes);
+bool PathAppend(LPWSTR pszPath, LPCWSTR pszMore);
 HANDLE GetStdHandle(DWORD nStdHandle);
 LSTATUS
 RegOpenKeyEx(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
@@ -238,7 +235,7 @@ wchar_t *_wgetcwd(wchar_t *buffer, int maxlen);
 int _wchdir(const wchar_t *dirname);
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
 int _wcsicmp(const wchar_t *a, const wchar_t *b);
-BOOL _CrtDumpMemoryLeaks();
+bool _CrtDumpMemoryLeaks();
 DWORD FormatMessage(DWORD dwFlags,
                     LPCVOID lpSource,
                     DWORD dwMessageId,

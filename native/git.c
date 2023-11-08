@@ -180,7 +180,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     HANDLE pipe_read, pipe_write;
     SECURITY_ATTRIBUTES sa_attr = {.lpSecurityDescriptor = nullptr,
                                    .bInheritHandle =
-                                       TRUE, // Pipe handles are inherited by child process.
+                                       true, // Pipe handles are inherited by child process.
                                    .nLength = sizeof(SECURITY_ATTRIBUTES)};
     // Create a pipe to get results from child's stdout.
     if (!CreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
@@ -204,8 +204,8 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     _snwprintf(
         cmd, cmd_len, TEXT("git.exe %ls %ls branch --show-current"), git_dir_arg, work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
-    BOOL ret = CreateProcess(
-        nullptr, cmd, nullptr, nullptr, TRUE, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);
+    bool ret = CreateProcess(
+        nullptr, cmd, nullptr, nullptr, true, CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);
     if (!ret) {
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
