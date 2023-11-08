@@ -30,5 +30,6 @@
 
 #include "debug.h"
 #include "macros.h"
+#include "utils.h"
 
 #endif // PCH_H
