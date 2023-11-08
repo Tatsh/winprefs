@@ -81,7 +81,7 @@ static void test_main_max_depth_conversion(void **state) {
     wmemcpy(prefs_export_path, app_data_folder, 29);
     wcsncat(prefs_export_path, L"prefs-export", 12);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_value(__wrap_save_preferences, max_depth, 50);
     expect_any(__wrap_save_preferences, commit);
@@ -112,6 +112,8 @@ static void test_main_max_depth_conversion(void **state) {
     free(buf[1]);
     free(buf[2]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static void test_main_commit_arg(void **state) {
@@ -125,7 +127,7 @@ static void test_main_commit_arg(void **state) {
     wmemcpy(prefs_export_path, app_data_folder, 29);
     wcsncat(prefs_export_path, L"prefs-export", 12);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_value(__wrap_save_preferences, commit, true);
@@ -152,6 +154,8 @@ static void test_main_commit_arg(void **state) {
     free(buf[0]);
     free(buf[1]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static void test_main_output_dir_arg(void **state) {
@@ -197,7 +201,7 @@ static void test_main_debug_arg(void **state) {
     wmemcpy(prefs_export_path, app_data_folder, 29);
     wcsncat(prefs_export_path, L"prefs-export", 12);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_any(__wrap_save_preferences, commit);
@@ -227,6 +231,8 @@ static void test_main_debug_arg(void **state) {
     free(buf[0]);
     free(buf[1]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static const wchar_t *C_SHARP_FORMAT_NAMES[] = {L"cs", L"c#", L"csharp"};
@@ -263,7 +269,7 @@ static void test_main_format_arg_c_sharp(void **state) {
         will_return(__wrap_SHGetFolderPath, app_data_folder);
         will_return(__wrap_SHGetFolderPath, 0);
         will_return(__wrap_PathAppend, prefs_export_path);
-        will_return(__wrap_PathAppend, TRUE);
+        will_return(__wrap_PathAppend, true);
 
         expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C_SHARP);
         wmemset(buf[2], L'\0', 7);
@@ -276,6 +282,8 @@ static void test_main_format_arg_c_sharp(void **state) {
     free(buf[1]);
     free(buf[2]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static void test_main_format_arg_invalid(void **state) {
@@ -354,7 +362,7 @@ static void test_main_format_arg_reg(void **state) {
     will_return(__wrap_SHGetFolderPath, app_data_folder);
     will_return(__wrap_SHGetFolderPath, 0);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
@@ -385,6 +393,8 @@ static void test_main_format_arg_reg(void **state) {
     free(buf[1]);
     free(buf[2]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static void test_main_format_arg_default(void **state) {
@@ -398,7 +408,7 @@ static void test_main_format_arg_default(void **state) {
     will_return(__wrap_SHGetFolderPath, app_data_folder);
     will_return(__wrap_SHGetFolderPath, 0);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
@@ -421,6 +431,8 @@ static void test_main_format_arg_default(void **state) {
 
     free(buf[0]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static void test_main_save_prefs_failed(void **state) {
@@ -434,7 +446,7 @@ static void test_main_save_prefs_failed(void **state) {
     will_return(__wrap_SHGetFolderPath, app_data_folder);
     will_return(__wrap_SHGetFolderPath, 0);
     will_return(__wrap_PathAppend, prefs_export_path);
-    will_return(__wrap_PathAppend, TRUE);
+    will_return(__wrap_PathAppend, true);
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
@@ -460,6 +472,8 @@ static void test_main_save_prefs_failed(void **state) {
 
     free(buf[0]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static const wchar_t *POWERSHELL_FORMAT_NAMES[] = {L"powershell", L"ps", L"ps1"};
@@ -496,7 +510,7 @@ static void test_main_format_arg_powershell(void **state) {
         will_return(__wrap_SHGetFolderPath, app_data_folder);
         will_return(__wrap_SHGetFolderPath, 0);
         will_return(__wrap_PathAppend, prefs_export_path);
-        will_return(__wrap_PathAppend, TRUE);
+        will_return(__wrap_PathAppend, true);
 
         expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_POWERSHELL);
         wmemset(buf[2], L'\0', 11);
@@ -509,6 +523,8 @@ static void test_main_format_arg_powershell(void **state) {
     free(buf[1]);
     free(buf[2]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 static const wchar_t *C_FORMAT_NAMES[] = {L"c", L"C"};
@@ -545,7 +561,7 @@ static void test_main_format_arg_c(void **state) {
         will_return(__wrap_SHGetFolderPath, app_data_folder);
         will_return(__wrap_SHGetFolderPath, 0);
         will_return(__wrap_PathAppend, prefs_export_path);
-        will_return(__wrap_PathAppend, TRUE);
+        will_return(__wrap_PathAppend, true);
 
         expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C);
         wmemset(buf[2], L'\0', 7);
@@ -558,6 +574,8 @@ static void test_main_format_arg_c(void **state) {
     free(buf[1]);
     free(buf[2]);
     free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
 }
 
 const struct CMUnitTest main_tests[] = {
