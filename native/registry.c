@@ -100,9 +100,9 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     wchar_t *value_name_p = last_backslash + 1;
     size_t value_name_len = wcslen(value_name_p);
     wchar_t *value_name = calloc(value_name_len, WL);
-    if (!value_name) {
+    if (!value_name) { // LCOV_EXCL_START
         return false;
-    }
+    } // LCOV_EXCL_STOP
     wmemcpy(value_name, value_name_p, value_name_len);
     *last_backslash = L'\0';
     if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
@@ -112,6 +112,9 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     }
     size_t buf_size = 8192;
     char *data = malloc(buf_size);
+    if (!data) { // LCOV_EXCL_START
+        return false;
+    } // LCOV_EXCL_END
     DWORD reg_type = REG_NONE;
     LSTATUS ret = RegQueryValueEx(
         starting_key, value_name, nullptr, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);

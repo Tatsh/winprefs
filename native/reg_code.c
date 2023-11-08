@@ -5,6 +5,9 @@
 
 static wchar_t *get_top_key_string(const wchar_t *reg_path) {
     wchar_t *out = calloc(20, WL);
+    if (!out) { // LCOV_EXCL_START
+        return nullptr;
+    } // LCOV_EXCL_STOP
     wmemset(out, L'\0', 20);
     if (!_wcsnicmp(reg_path, L"HKCU", 4) || !_wcsnicmp(reg_path, L"HKEY_CURRENT_USER", 17)) {
         wmemcpy(out, L"HKEY_CURRENT_USER", 17);
@@ -41,9 +44,9 @@ static wchar_t *escape_for_c(const wchar_t *input, size_t n_chars, bool escape_n
         }
     }
     wchar_t *out = calloc(new_n_chars + 1, WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(out, L'\0', new_n_chars + 1);
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);
@@ -65,9 +68,9 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         size_t n_bin_chars = 7 * data_len;
         size_t new_len = n_bin_chars + 1;
         wchar_t *bin = calloc(new_len, WL);
-        if (!bin) {
+        if (!bin) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(bin, L'\0', new_len);
         for (i = 0, j = 0; i < data_len; i++) {
             if (i < (data_len - 1)) {
@@ -86,9 +89,9 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         }
         size_t s_size = new_len + 4;
         wchar_t *out = calloc(s_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L"{ %ls }", bin);
         free(bin);
@@ -98,9 +101,15 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ) {
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
         wchar_t *escaped = escape_for_c((wchar_t *)data, data_len == 0 ? 0 : w_data_len, false);
+        if (!escaped) {
+            return nullptr;
+        }
         size_t escaped_len = wcslen(escaped);
         size_t total_size = escaped_len + 1;
         wchar_t *out = calloc(total_size, WL);
+        if (!out) { // LCOV_EXCL_START
+            return nullptr;
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
         _snwprintf(out, escaped_len, L"%ls", escaped);
         return out;
@@ -111,7 +120,13 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         if (w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2) {
             size_t total_size = 4 + w_data_len;
             wchar_t *escaped = escape_for_c((wchar_t *)data, w_data_len, true);
+            if (!escaped) {
+                return nullptr;
+            }
             wchar_t *out = calloc(total_size, WL);
+            if (!out) { // LCOV_EXCL_START
+                return nullptr;
+            } // LCOV_EXCL_STOP
             _snwprintf(out, total_size, L"%ls\\0", escaped);
             return out;
         }
@@ -121,9 +136,9 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
     if (reg_type == REG_DWORD) {
         int req_size = _snwprintf(nullptr, 0, L"%lu", *(DWORD *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, 0, (size_t)req_size);
         _snwprintf(out, (size_t)req_size, L"%lu", *(DWORD *)data);
         return out;
@@ -131,9 +146,9 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
     if (reg_type == REG_QWORD) {
         int req_size = _snwprintf(nullptr, 0, L"%llu", *(UINT64 *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, 0, (size_t)req_size);
         _snwprintf(out, (size_t)req_size, L"%llu", *(UINT64 *)data);
         return out;
@@ -154,6 +169,11 @@ bool do_write_c_reg_code(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_c(type, value, data_len);
     wchar_t *escaped_prop = escape_for_c(prop, wcslen(prop), false);
     wchar_t *top_key_s = get_top_key_string(full_path);
+
+    if (!escaped_key || !escaped_d || !top_key_s) {
+        return false;
+    }
+
     wchar_t *out = nullptr;
     wchar_t reg_type[14];
     memset(reg_type, 0, sizeof(reg_type));
@@ -192,9 +212,9 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   reg_type,
                                   type == REG_DWORD ? KEYWORD_DWORD : KEYWORD_QWORD);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
                    (size_t)req_size,
@@ -217,9 +237,9 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_d,
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
                    (size_t)req_size,
@@ -234,9 +254,9 @@ bool do_write_c_reg_code(HANDLE out_fp,
         int req_size = _snwprintf(
             nullptr, 0, C_REGSETKEYVALUEW_TEMPLATE_NONE, top_key_s, escaped_key, escaped_prop);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
                    (size_t)req_size,
@@ -254,9 +274,9 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_prop,
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
                    (size_t)req_size,
@@ -292,6 +312,9 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
         wchar_t *escaped = convert_data_for_c(reg_type, data, data_len);
         size_t escaped_len = wcslen(escaped);
         wchar_t *out = calloc(escaped_len + 3, WL);
+        if (!out) { // LCOV_EXCL_START
+            return nullptr;
+        } // LCOV_EXCL_STOP
         _snwprintf(out, escaped_len + 2, L"\"%ls\"", escaped);
         free(escaped);
         return out;
@@ -313,9 +336,9 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
     }
     size_t total_size = 5 + strings_size;
     wchar_t *strings = calloc(strings_size + 1, WL);
-    if (!strings) {
+    if (!strings) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(strings, L'\0', strings_size + 1);
     size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
     strings[0] = L'"';
@@ -335,9 +358,9 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
         strings[j] = w_data[i];
     }
     wchar_t *out = calloc(total_size, WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     _snwprintf(out, total_size - 1, L"{ %ls\" }", strings);
     return out;
 }
@@ -387,9 +410,9 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                               escaped_d,
                               reg_type);
     out = calloc((size_t)req_size + 1, WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return false;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(out, L'\0', (size_t)req_size + 1);
     _snwprintf(out,
                (size_t)req_size,

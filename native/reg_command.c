@@ -20,9 +20,9 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
     }
     size_t escaped_len = (7 + wcslen(escaped)) * WL;
     wchar_t *out = calloc(7 + wcslen(escaped), WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     memset(out, 0, escaped_len);
     _snwprintf(out, escaped_len, L"/v \"%ls\" ", escaped);
     free(escaped);
@@ -35,9 +35,9 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         size_t n_bin_chars = 2 * data_len;
         size_t new_len = n_bin_chars + 1;
         wchar_t *bin = calloc(new_len, WL);
-        if (!bin) {
+        if (!bin) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(bin, L'\0', new_len);
         for (i = 0; i < data_len; i++) {
             wchar_t conv[3];
@@ -47,9 +47,9 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         }
         size_t s_size = new_len + 5;
         wchar_t *out = calloc(s_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L" /d %ls ", bin);
         free(bin);
@@ -62,9 +62,9 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         }
         size_t s_size = (wcslen(s) + 8);
         wchar_t *out = calloc(s_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L" /d \"%ls\" ", s);
         free(s);
@@ -73,9 +73,9 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     if (reg_type == REG_DWORD || reg_type == REG_QWORD) {
         size_t s_size = 128;
         wchar_t *out = calloc(s_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         memset(out, 0, s_size);
         if (reg_type == REG_DWORD) {
             _snwprintf(out, s_size, L" /d %lu ", *(DWORD *)data);
@@ -134,9 +134,9 @@ bool do_write_reg_command(HANDLE out_fp,
     if ((size_t)req_size < CMD_MAX_COMMAND_LENGTH) {
         size_t total_size = (size_t)req_size + 1;
         wchar_t *out = calloc(total_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
         int wrote = _snwprintf(out,
                                (size_t)req_size,

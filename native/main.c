@@ -88,6 +88,10 @@ int wmain(int argc, wchar_t *argv[]) {
             wchar_t *val = ARG_VAL();
             size_t w_len = wcslen(val);
             char *as_char = malloc(w_len + 1);
+            if (!as_char) {
+                fprintf(stderr, "Memory error.\n");
+                return EXIT_FAILURE;
+            }
             memset(as_char, 0, w_len + 1);
             wcstombs(as_char, val, w_len);
             max_depth = atoi(as_char);
@@ -162,10 +166,10 @@ int wmain(int argc, wchar_t *argv[]) {
     }
     if (!output_dir) {
         output_dir = calloc(MAX_PATH, WL);
-        if (!output_dir) {
+        if (!output_dir) { // LCOV_EXCL_START
             fprintf(stderr, "Failed to allocate memory.\n");
             return EXIT_FAILURE;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(output_dir, L'\0', MAX_PATH);
         if (SUCCEEDED(SHGetFolderPath(nullptr, CSIDL_APPDATA, nullptr, 0, output_dir))) {
             PathAppend(output_dir, L"prefs-export");

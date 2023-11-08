@@ -17,9 +17,9 @@ wchar_t *escape_for_batch(const wchar_t *input, size_t n_chars) {
         }
     }
     wchar_t *out = calloc(new_n_chars + 1, WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(out, L'\0', new_n_chars + 1);
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);

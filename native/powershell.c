@@ -17,9 +17,9 @@ static wchar_t *escape_for_powershell(const wchar_t *input, size_t n_chars) {
         }
     }
     wchar_t *out = calloc(new_n_chars + 1, WL);
-    if (!out) {
+    if (!out) { // LCOV_EXCL_START
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(out, L'\0', new_n_chars + 1);
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);
@@ -41,9 +41,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         size_t n_bin_chars = 5 * data_len;
         size_t new_len = n_bin_chars + 1;
         wchar_t *bin = calloc(new_len, WL);
-        if (!bin) {
+        if (!bin) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(bin, L'\0', new_len);
         for (i = 0, j = 0; i < data_len; i++) {
             if (i < (data_len - 1)) {
@@ -62,9 +62,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         }
         size_t s_size = new_len + 10;
         wchar_t *out = calloc(s_size, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L"(byte[]](%ls))", bin);
         free(bin);
@@ -76,6 +76,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         size_t escaped_len = wcslen(escaped);
         size_t total_size = escaped_len + 3;
         wchar_t *out = calloc(total_size, WL);
+        if (!out) { // LCOV_EXCL_START
+            return nullptr;
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
         _snwprintf(out, escaped_len + 2, L"'%ls'", escaped);
         return out;
@@ -86,8 +89,14 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         if (w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2) {
             size_t total_size = 9 + w_data_len;
             wchar_t *out = calloc(total_size, WL);
+            if (!out) { // LCOV_EXCL_START
+                return nullptr;
+            } // LCOV_EXCL_STOP
             wmemset(out, L'\0', total_size);
             wchar_t *strings_nl = calloc(w_data_len, WL);
+            if (!strings_nl) { // LCOV_EXCL_START
+                return nullptr;
+            } // LCOV_EXCL_STOP
             wmemset(strings_nl, L'\0', w_data_len);
             size_t i;
             for (i = 0; i < w_data_len - 2; i++) {
@@ -102,9 +111,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     if (reg_type == REG_DWORD) {
         int req_size = _snwprintf(nullptr, 0, L"%lu", *(DWORD *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, 0, (size_t)req_size);
         _snwprintf(out, (size_t)req_size, L"%lu", *(DWORD *)data);
         return out;
@@ -112,9 +121,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     if (reg_type == REG_QWORD) {
         int req_size = _snwprintf(nullptr, 0, L"%llu", *(UINT64 *)data);
         wchar_t *out = calloc((size_t)(req_size + 1), WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, 0, (size_t)req_size);
         _snwprintf(out, (size_t)req_size, L"%llu", *(UINT64 *)data);
         return out;
@@ -126,10 +135,17 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
 static wchar_t *add_colon_if_required(const wchar_t *path) {
     size_t full_path_len = wcslen(path) + 2;
     wchar_t *full_path_ps = calloc(full_path_len, WL);
+    if (!full_path_ps) { // LCOV_EXCL_START
+        return nullptr;
+    } // LCOV_EXCL_STOP
     wmemset(full_path_ps, L'\0', full_path_len);
     wchar_t *first_backslash = wcschr(path, '\\');
     size_t top_key_len = (size_t)((first_backslash - path) + 1);
     wchar_t *top_key = calloc(top_key_len, WL);
+    if (!top_key) { // LCOV_EXCL_START
+        free(full_path_ps);
+        return nullptr;
+    } // LCOV_EXCL_STOP
     wmemset(top_key, L'\0', top_key_len);
     wmemcpy(top_key, path, top_key_len - 1);
     _snwprintf(full_path_ps, full_path_len - 1, L"%ls:%ls", top_key, first_backslash);
@@ -185,9 +201,9 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
     bool ret = true;
     if ((size_t)req_size < POWERSHELL_MAX_COMMAND_LENGTH) {
         wchar_t *out = calloc((size_t)req_size + 1, WL);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             return false;
-        }
+        } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
                    (size_t)req_size,

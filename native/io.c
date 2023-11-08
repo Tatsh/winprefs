@@ -12,9 +12,9 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
     }
     size_t total_size = req_size + addend;
     char *mb_out = malloc(total_size);
-    if (!mb_out) {
+    if (!mb_out) { // LCOV_EXCL_START
         return false;
-    }
+    } // LCOV_EXCL_STOP
     memset(mb_out, 0, total_size);
     WideCharToMultiByte(
         CP_UTF8, wc_err_invalid_chars, out, -1, mb_out, (int)req_size, nullptr, nullptr);
@@ -45,9 +45,9 @@ bool do_writes(HANDLE out_fp,
     DWORD reg_type;
     size_t value_len;
     wchar_t *value = calloc(MAX_VALUE_NAME, WL);
-    if (!value) {
+    if (!value) { // LCOV_EXCL_START
         return false;
-    }
+    } // LCOV_EXCL_STOP
     do_write_callback dwc = nullptr;
     switch (format) {
     case OUTPUT_FORMAT_REG:
@@ -107,9 +107,9 @@ bool write_key_filtered_recursive(HKEY hk,
     HKEY hk_out;
     size_t full_path_len = WL * MAX_KEY_LENGTH;
     wchar_t *full_path = calloc(MAX_KEY_LENGTH, WL);
-    if (!full_path) {
+    if (!full_path) { // LCOV_EXCL_START
         return false;
-    }
+    } // LCOV_EXCL_STOP
     wmemset(full_path, L'\0', MAX_KEY_LENGTH);
     size_t prior_stem_len = wcslen(prior_stem) * WL;
     size_t stem_len = stem ? wcslen(stem) : 0;
@@ -158,9 +158,9 @@ bool write_key_filtered_recursive(HKEY hk,
         if (n_sub_keys) {
             size_t ach_key_len = 0;
             wchar_t *ach_key = calloc(MAX_KEY_LENGTH, WL);
-            if (!ach_key) {
+            if (!ach_key) { // LCOV_EXCL_START
                 return false;
-            }
+            } // LCOV_EXCL_STOP
             unsigned i;
             for (i = 0; i < n_sub_keys; i++) {
                 ach_key_len = MAX_KEY_LENGTH;
