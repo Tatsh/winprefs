@@ -51,10 +51,12 @@ static inline HKEY get_top_key(wchar_t *reg_path) {
 //! Entry point.
 int wmain(int argc, wchar_t *argv[]) {
     (void)argc;
+    int ret = EXIT_SUCCESS;
     HKEY starting_key = HKEY_CURRENT_USER;
     bool commit = false;
     bool debug = false;
     int max_depth = 20;
+    char *as_char = nullptr;
     wchar_t *argv0 = argv[0];
     wchar_t *deploy_key = nullptr;
     wchar_t *format = nullptr;
@@ -87,15 +89,14 @@ int wmain(int argc, wchar_t *argv[]) {
         else if (ARG_LONG("max-depth")) case 'm': {
             wchar_t *val = ARG_VAL();
             size_t w_len = wcslen(val);
-            char *as_char = malloc(w_len + 1);
-            if (!as_char) {
+            as_char = malloc(w_len + 1);
+            if (!as_char) { // LCOV_EXCL_START
                 fprintf(stderr, "Memory error.\n");
-                return EXIT_FAILURE;
-            }
+                goto fail;
+            } // LCOV_EXCL_STOP
             memset(as_char, 0, w_len + 1);
             wcstombs(as_char, val, w_len);
             max_depth = atoi(as_char);
-            free(as_char);
         }
         else if (ARG_LONG("help")) case 'h':
         case '?': {
@@ -123,7 +124,7 @@ int wmain(int argc, wchar_t *argv[]) {
                          argv0,
                          *argv,
                          argv0);
-                return EXIT_FAILURE;
+                goto fail;
             }
     }
     ARG_END;
@@ -139,7 +140,7 @@ int wmain(int argc, wchar_t *argv[]) {
                                                    OUTPUT_FORMAT_UNKNOWN;
     if (output_format_e == OUTPUT_FORMAT_UNKNOWN) {
         fwprintf(stderr, L"Unknown format specified: %ls\n", format);
-        return EXIT_FAILURE;
+        goto fail;
     }
     if (reg_path) {
         size_t len = wcslen(reg_path);
@@ -153,14 +154,15 @@ int wmain(int argc, wchar_t *argv[]) {
         HKEY top_key = get_top_key(reg_path);
         if (!top_key) {
             fwprintf(stderr, L"Invalid top-level key in '%ls'.\n", reg_path);
-            return EXIT_FAILURE;
+            goto fail;
         }
         if (!top_key_only) {
             wchar_t *subkey = wcschr(reg_path, L'\\') + 1;
             if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
                 // See if it's a full path to value
-                return export_single_value(reg_path, top_key, output_format_e) ? EXIT_SUCCESS :
-                                                                                 EXIT_FAILURE;
+                ret = export_single_value(reg_path, top_key, output_format_e) ? EXIT_SUCCESS :
+                                                                                EXIT_FAILURE;
+                goto cleanup;
             }
         }
     }
@@ -177,17 +179,19 @@ int wmain(int argc, wchar_t *argv[]) {
         output_dir[MAX_PATH - 1] = L'\0';
     }
     debug_print_enabled = debug;
-    bool success = save_preferences(commit,
-                                    deploy_key,
-                                    output_dir,
-                                    output_file ? output_file : L"exec-reg.bat",
-                                    max_depth,
-                                    starting_key,
-                                    reg_path,
-                                    output_format_e);
-    if (!output_dir_specified) {
-        free(output_dir);
-    }
+    bool success = save_preferences(
+        commit,
+        deploy_key,
+        output_dir,
+        output_file ? output_file :
+                      (output_format_e == OUTPUT_FORMAT_C          ? L"exec-reg.c" :
+                       output_format_e == OUTPUT_FORMAT_POWERSHELL ? L"exec-reg.ps1" :
+                       output_format_e == OUTPUT_FORMAT_C_SHARP    ? L"exec-reg.cs" :
+                                                                     L"exec-reg.bat"),
+        max_depth,
+        starting_key,
+        reg_path,
+        output_format_e);
     if (!success) {
         fwprintf(stderr, L"Error occurred. Possibilities:\n");
         DWORD last_win_error = GetLastError();
@@ -201,9 +205,16 @@ int wmain(int argc, wchar_t *argv[]) {
                       nullptr);
         fprintf(stderr, "POSIX   (%d): %s\n", errno, strerror(errno));
         fwprintf(stderr, L"Windows (%d): %ls", last_win_error, p_message_buf);
-        print_leaks();
-        return EXIT_FAILURE;
+        goto fail;
+    }
+    goto cleanup;
+fail:
+    ret = EXIT_FAILURE;
+cleanup:
+    free_if_not_null(as_char);
+    if (!output_dir_specified) {
+        free_if_not_null(output_dir);
     }
     print_leaks();
-    return EXIT_SUCCESS;
+    return ret;
 }

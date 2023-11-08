@@ -41,10 +41,11 @@ bool save_preferences(bool commit,
                       HKEY hk,
                       const wchar_t *specified_path,
                       enum OUTPUT_FORMAT format) {
+    bool ret = true;
     wchar_t full_output_dir[MAX_PATH];
     bool writing_to_stdout = !wcscmp(L"-", output_file);
     if (!_wfullpath(full_output_dir, output_dir, MAX_PATH)) {
-        return false;
+        goto fail;
     }
     if (!writing_to_stdout) {
         debug_print(L"Output directory: %ls\n", full_output_dir);
@@ -52,7 +53,7 @@ bool save_preferences(bool commit,
         debug_print(L"Writing to standard output.\n");
     }
     if (!writing_to_stdout && !create_dir_recursive(full_output_dir)) {
-        return false;
+        goto fail;
     }
     PathAppend(full_output_dir, output_file);
     full_output_dir[MAX_PATH - 1] = L'\0';
@@ -65,9 +66,8 @@ bool save_preferences(bool commit,
                                                     nullptr) :
                                          GetStdHandle(STD_OUTPUT_HANDLE);
     if (out_fp == INVALID_HANDLE_VALUE) {
-        return false;
+        goto fail;
     }
-    bool ret = false;
     const wchar_t *prior_stem = hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
                                 hk == HKEY_CURRENT_CONFIG ? L"HKCC" :
                                 hk == HKEY_CURRENT_USER   ? L"HKCU" :
@@ -86,74 +86,83 @@ bool save_preferences(bool commit,
     if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
     }
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
     return ret;
 }
 
 bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format) {
+    bool ret = true;
+    wchar_t *value_name = nullptr;
+    char *data = nullptr;
     wchar_t *first_backslash = wcschr(reg_path, L'\\');
     if (!first_backslash) {
-        return false;
+        goto fail;
     }
     wchar_t *subkey = first_backslash + 1;
     HKEY starting_key = HKEY_CURRENT_USER;
     wchar_t *last_backslash = wcsrchr(reg_path, '\\');
     wchar_t *value_name_p = last_backslash + 1;
     size_t value_name_len = wcslen(value_name_p);
-    wchar_t *value_name = calloc(value_name_len, WL);
+    value_name = calloc(value_name_len, WL);
     if (!value_name) { // LCOV_EXCL_START
-        return false;
+        goto fail;
     } // LCOV_EXCL_STOP
     wmemcpy(value_name, value_name_p, value_name_len);
     *last_backslash = L'\0';
     if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
-        free(value_name);
         debug_print(L"Invalid subkey: '%ls'.\n", subkey);
-        return false;
+        goto fail;
     }
     size_t buf_size = 8192;
-    char *data = malloc(buf_size);
+    data = malloc(buf_size);
     if (!data) { // LCOV_EXCL_START
-        return false;
-    } // LCOV_EXCL_END
+        goto fail;
+    } // LCOV_EXCL_STOP
     DWORD reg_type = REG_NONE;
-    LSTATUS ret = RegQueryValueEx(
+    LSTATUS reg_query_value_ret = RegQueryValueEx(
         starting_key, value_name, nullptr, &reg_type, (LPBYTE)data, (LPDWORD)&buf_size);
-    if (ret == ERROR_MORE_DATA) {
-        free(data);
+    if (reg_query_value_ret == ERROR_MORE_DATA) {
         debug_print(L"Value too large (%ls\\%ls).\n", subkey, value_name);
-        return false;
+        goto fail;
     }
-    if (ret != ERROR_SUCCESS) {
-        free(data);
+    if (reg_query_value_ret != ERROR_SUCCESS) {
         debug_print(L"Invalid value name '%ls'.\n", value_name);
-        return false;
+        goto fail;
     }
     HANDLE h_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
     switch (format) {
     case OUTPUT_FORMAT_REG:
         if (!do_write_reg_command(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
-            return false;
+            goto fail;
         }
         break;
     case OUTPUT_FORMAT_C:
         if (!do_write_c_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
-            return false;
+            goto fail;
         }
         break;
     case OUTPUT_FORMAT_C_SHARP:
         if (!do_write_c_sharp_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
-            return false;
+            goto fail;
         }
         break;
     case OUTPUT_FORMAT_POWERSHELL:
         if (!do_write_powershell_reg_code(
                 h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
-            return false;
+            goto fail;
         }
         break;
     default:
         break;
     }
-    free(data);
-    return true;
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(value_name);
+    free_if_not_null(data);
+    return ret;
 }

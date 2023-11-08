@@ -4,27 +4,33 @@
 #include "reg_command.h"
 
 bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
+    bool ret = true;
+    char *mb_out = nullptr;
+    DWORD written = 0;
     size_t addend = use_crlf ? 1 : 0;
-    size_t req_size = (size_t)WideCharToMultiByte(
-        CP_UTF8, wc_err_invalid_chars, out, -1, nullptr, 0, nullptr, nullptr);
+    size_t req_size =
+        (size_t)WideCharToMultiByte(CP_UTF8, 0, out, -1, nullptr, 0, nullptr, nullptr);
     if (req_size == 0) {
-        return false;
+        goto cleanup;
     }
     size_t total_size = req_size + addend;
-    char *mb_out = malloc(total_size);
+    mb_out = malloc(total_size);
     if (!mb_out) { // LCOV_EXCL_START
-        return false;
+        goto fail;
     } // LCOV_EXCL_STOP
     memset(mb_out, 0, total_size);
-    WideCharToMultiByte(
-        CP_UTF8, wc_err_invalid_chars, out, -1, mb_out, (int)req_size, nullptr, nullptr);
+    WideCharToMultiByte(CP_UTF8, 0, out, -1, mb_out, (int)req_size, nullptr, nullptr);
     if (use_crlf) {
         mb_out[total_size - 2] = '\r';
     }
     mb_out[total_size - 1] = '\n';
-    DWORD written = 0;
-    bool ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
-    free(mb_out);
+
+    ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(mb_out);
     return ret && written > 0;
 }
 
@@ -33,18 +39,20 @@ bool do_writes(HANDLE out_fp,
                long unsigned n_values,
                const wchar_t *full_path,
                enum OUTPUT_FORMAT format) {
+    bool ret = true;
+    wchar_t *value = nullptr;
     if (n_values == 0) {
-        return true;
+        goto cleanup;
     }
     if (!out_fp || !full_path) {
         errno = EINVAL;
-        return false;
+        goto fail;
     }
     size_t data_len;
     DWORD i;
     DWORD reg_type;
     size_t value_len;
-    wchar_t *value = calloc(MAX_VALUE_NAME, WL);
+    value = calloc(MAX_VALUE_NAME, WL);
     if (!value) { // LCOV_EXCL_START
         return false;
     } // LCOV_EXCL_STOP
@@ -66,10 +74,9 @@ bool do_writes(HANDLE out_fp,
         break;
     }
     if (!dwc) {
-        free(value);
-        return false;
+        goto fail;
     }
-    LSTATUS ret = ERROR_SUCCESS;
+    LSTATUS enum_value_ret = ERROR_SUCCESS;
     char data[8192];
     for (i = 0; i < n_values; i++) {
         data_len = sizeof(data);
@@ -77,20 +84,24 @@ bool do_writes(HANDLE out_fp,
         memset(data, 0, 8192);
         value_len = MAX_VALUE_NAME * WL;
         reg_type = REG_NONE;
-        ret = RegEnumValue(
+        enum_value_ret = RegEnumValue(
             hk, i, value, (LPDWORD)&value_len, 0, &reg_type, (LPBYTE)data, (LPDWORD)&data_len);
-        if (ret == ERROR_MORE_DATA) {
+        if (enum_value_ret == ERROR_MORE_DATA) {
             continue;
         }
-        if (ret == ERROR_NO_MORE_ITEMS) {
+        if (enum_value_ret == ERROR_NO_MORE_ITEMS) {
             break;
         }
         if (!dwc(out_fp, full_path, value, data, data_len, reg_type)) {
-            return false;
+            goto fail;
         }
     }
-    free(value);
-    return true;
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(value);
+    return ret;
 }
 
 bool write_key_filtered_recursive(HKEY hk,
@@ -100,23 +111,25 @@ bool write_key_filtered_recursive(HKEY hk,
                                   HANDLE out_fp,
                                   const wchar_t *prior_stem,
                                   enum OUTPUT_FORMAT format) {
+    bool ret = true;
+    wchar_t *ach_key, *full_path;
+    ach_key = full_path = nullptr;
     if (depth >= max_depth) {
         debug_print(L"%ls: Skipping %ls due to depth limit of %d.\n", prior_stem, stem, max_depth);
-        return true;
+        goto cleanup;
     }
     HKEY hk_out;
     size_t full_path_len = WL * MAX_KEY_LENGTH;
-    wchar_t *full_path = calloc(MAX_KEY_LENGTH, WL);
+    full_path = calloc(MAX_KEY_LENGTH, WL);
     if (!full_path) { // LCOV_EXCL_START
-        return false;
+        goto fail;
     } // LCOV_EXCL_STOP
     wmemset(full_path, L'\0', MAX_KEY_LENGTH);
     size_t prior_stem_len = wcslen(prior_stem) * WL;
     size_t stem_len = stem ? wcslen(stem) : 0;
     if ((prior_stem_len + (stem_len * WL) + 2) > (full_path_len - 2)) {
         debug_print(L"%ls: Skipping %ls because of length limitation.\n", prior_stem, stem);
-        free(full_path);
-        return true;
+        goto cleanup;
     }
     memcpy(full_path, prior_stem, prior_stem_len);
     if (stem) {
@@ -137,8 +150,7 @@ bool write_key_filtered_recursive(HKEY hk,
         wcsstr(full_path, L"Windows\\Shell\\BagMRU") ||
         wcsstr(full_path, L"Windows\\Shell\\MuiCache")) {
         debug_print(L"%ls: Skipping %ls due to filter.\n", prior_stem, stem);
-        free(full_path);
-        return true;
+        goto cleanup;
     }
     if (RegOpenKeyEx(hk, stem, 0, KEY_READ, &hk_out) == ERROR_SUCCESS) {
         DWORD n_sub_keys = 0;
@@ -157,9 +169,9 @@ bool write_key_filtered_recursive(HKEY hk,
                                            nullptr);
         if (n_sub_keys) {
             size_t ach_key_len = 0;
-            wchar_t *ach_key = calloc(MAX_KEY_LENGTH, WL);
+            ach_key = calloc(MAX_KEY_LENGTH, WL);
             if (!ach_key) { // LCOV_EXCL_START
-                return false;
+                goto fail;
             } // LCOV_EXCL_STOP
             unsigned i;
             for (i = 0; i < n_sub_keys; i++) {
@@ -170,7 +182,7 @@ bool write_key_filtered_recursive(HKEY hk,
                 if (ret_code == ERROR_SUCCESS) {
                     if (!write_key_filtered_recursive(
                             hk_out, ach_key, max_depth, depth + 1, out_fp, full_path, format)) {
-                        return false;
+                        goto fail;
                     }
                 } else {
                     debug_print(L"%ls: Skipping %ls because RegEnumKeyEx() failed.\n",
@@ -178,13 +190,12 @@ bool write_key_filtered_recursive(HKEY hk,
                                 full_path);
                 }
             }
-            free(ach_key);
         } else {
             debug_print(L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
         if (n_values) {
             if (!do_writes(out_fp, hk_out, n_values, full_path, format)) {
-                return false;
+                goto fail;
             }
         } else {
             debug_print(L"%ls: No values in %ls.\n", prior_stem, stem);
@@ -193,6 +204,11 @@ bool write_key_filtered_recursive(HKEY hk,
     } else {
         debug_print(L"%ls: Skipping %ls. Does the location exist?\n", prior_stem, stem);
     }
-    free(full_path);
-    return true;
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(ach_key);
+    free_if_not_null(full_path);
+    return ret;
 }

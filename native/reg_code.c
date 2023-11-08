@@ -90,13 +90,13 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         size_t s_size = new_len + 4;
         wchar_t *out = calloc(s_size, WL);
         if (!out) { // LCOV_EXCL_START
+            free(bin);
             return nullptr;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L"{ %ls }", bin);
         free(bin);
         return out;
-        return nullptr;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ) {
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
@@ -111,7 +111,7 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
             return nullptr;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
-        _snwprintf(out, escaped_len, L"%ls", escaped);
+        _snwprintf(out, escaped_len, L"%ls", escaped ? escaped : L"NULL");
         return out;
     }
     if (reg_type == REG_MULTI_SZ) {
@@ -164,17 +164,20 @@ bool do_write_c_reg_code(HANDLE out_fp,
                          size_t data_len,
                          unsigned long type) {
     bool ret = true;
-    wchar_t *subkey = wcschr(full_path, L'\\') + 1;
-    wchar_t *escaped_key = escape_for_c(subkey, wcslen(subkey), false);
-    wchar_t *escaped_d = convert_data_for_c(type, value, data_len);
-    wchar_t *escaped_prop = escape_for_c(prop, wcslen(prop), false);
-    wchar_t *top_key_s = get_top_key_string(full_path);
-
-    if (!escaped_key || !escaped_d || !top_key_s) {
-        return false;
+    wchar_t *escaped_key, *escaped_d, *escaped_prop, *top_key_s, *out;
+    escaped_key = escaped_d = escaped_prop = top_key_s = out = nullptr;
+    wchar_t *first_backslash = wcschr(full_path, L'\\');
+    if (!first_backslash) {
+        goto fail;
     }
-
-    wchar_t *out = nullptr;
+    wchar_t *subkey = first_backslash + 1;
+    escaped_key = escape_for_c(subkey, wcslen(subkey), false);
+    escaped_d = convert_data_for_c(type, value, data_len);
+    escaped_prop = escape_for_c(prop, wcslen(prop), false);
+    top_key_s = get_top_key_string(full_path);
+    if (!escaped_key || !top_key_s) {
+        goto fail;
+    }
     wchar_t reg_type[14];
     memset(reg_type, 0, sizeof(reg_type));
     switch (type) {
@@ -208,7 +211,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_d,
                                   top_key_s,
                                   escaped_key,
-                                  escaped_prop,
+                                  escaped_prop ? escaped_prop : L"",
                                   reg_type,
                                   type == REG_DWORD ? KEYWORD_DWORD : KEYWORD_QWORD);
         out = calloc((size_t)req_size + 1, WL);
@@ -220,10 +223,10 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    (size_t)req_size,
                    C_REGSETKEYVALUEW_TEMPLATE_NUMERIC,
                    type == REG_DWORD ? L"d" : L"q",
-                   escaped_d,
+                   escaped_d ? escaped_d : L"",
                    top_key_s,
                    escaped_key,
-                   escaped_prop,
+                   escaped_prop ? escaped_prop : L"",
                    reg_type,
                    type == REG_DWORD ? KEYWORD_DWORD : KEYWORD_QWORD);
     } else if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ) {
@@ -232,13 +235,13 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   C_REGSETKEYVALUEW_TEMPLATE_SZ,
                                   top_key_s,
                                   escaped_key,
-                                  escaped_prop,
+                                  escaped_prop ? escaped_prop : L"",
                                   reg_type,
                                   escaped_d,
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
         if (!out) { // LCOV_EXCL_START
-            return false;
+            goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
@@ -246,16 +249,20 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    C_REGSETKEYVALUEW_TEMPLATE_SZ,
                    top_key_s,
                    escaped_key,
-                   escaped_prop,
+                   escaped_prop ? escaped_prop : L"",
                    reg_type,
                    escaped_d,
                    data_len);
     } else if (type == REG_NONE) {
-        int req_size = _snwprintf(
-            nullptr, 0, C_REGSETKEYVALUEW_TEMPLATE_NONE, top_key_s, escaped_key, escaped_prop);
+        int req_size = _snwprintf(nullptr,
+                                  0,
+                                  C_REGSETKEYVALUEW_TEMPLATE_NONE,
+                                  top_key_s,
+                                  escaped_key,
+                                  escaped_prop ? escaped_prop : L"");
         out = calloc((size_t)req_size + 1, WL);
         if (!out) { // LCOV_EXCL_START
-            return false;
+            goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
@@ -263,7 +270,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    C_REGSETKEYVALUEW_TEMPLATE_NONE,
                    top_key_s,
                    escaped_key,
-                   escaped_prop);
+                   escaped_prop ? escaped_prop : L"");
     } else if (type == REG_BINARY) {
         int req_size = _snwprintf(nullptr,
                                   0,
@@ -271,11 +278,11 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_d,
                                   top_key_s,
                                   escaped_key,
-                                  escaped_prop,
+                                  escaped_prop ? escaped_prop : L"",
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
         if (!out) { // LCOV_EXCL_START
-            return false;
+            goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
@@ -284,7 +291,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    escaped_d,
                    top_key_s,
                    escaped_key,
-                   escaped_prop,
+                   escaped_prop ? escaped_prop : L"",
                    data_len);
     } else {
         errno = EINVAL;
@@ -292,36 +299,46 @@ bool do_write_c_reg_code(HANDLE out_fp,
     }
     if (ret && out) {
         ret = write_output(out_fp, out, false);
-        free(out);
     }
-    free(escaped_key);
-    free(escaped_d);
-    free(escaped_prop);
-    if (top_key_s) {
-        free(top_key_s);
-    }
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(escaped_key);
+    free_if_not_null(escaped_d);
+    free_if_not_null(escaped_prop);
+    free_if_not_null(top_key_s);
+    free_if_not_null(out);
     return ret;
 }
 
 static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_t data_len) {
+    wchar_t *out, *escaped, *strings;
+    out = escaped = strings = nullptr;
     if (reg_type == REG_BINARY || reg_type == REG_NONE || reg_type == REG_QWORD ||
         reg_type == REG_DWORD) {
-        return convert_data_for_c(reg_type, data, data_len);
+        out = convert_data_for_c(reg_type, data, data_len);
+        if (!out) {
+            goto fail;
+        }
+        goto cleanup;
     }
     if (reg_type == REG_SZ || reg_type == REG_EXPAND_SZ) {
-        wchar_t *escaped = convert_data_for_c(reg_type, data, data_len);
+        escaped = convert_data_for_c(reg_type, data, data_len);
+        if (!escaped) {
+            goto fail;
+        }
         size_t escaped_len = wcslen(escaped);
-        wchar_t *out = calloc(escaped_len + 3, WL);
+        out = calloc(escaped_len + 3, WL);
         if (!out) { // LCOV_EXCL_START
-            return nullptr;
+            goto fail;
         } // LCOV_EXCL_STOP
         _snwprintf(out, escaped_len + 2, L"\"%ls\"", escaped);
-        free(escaped);
-        return out;
+        goto cleanup;
     }
     if (reg_type != REG_MULTI_SZ) {
         errno = EINVAL;
-        return nullptr;
+        goto fail;
     }
     unsigned i, j;
     size_t strings_size = 0;
@@ -335,9 +352,9 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
         }
     }
     size_t total_size = 5 + strings_size;
-    wchar_t *strings = calloc(strings_size + 1, WL);
+    strings = calloc(strings_size + 1, WL);
     if (!strings) { // LCOV_EXCL_START
-        return nullptr;
+        goto fail;
     } // LCOV_EXCL_STOP
     wmemset(strings, L'\0', strings_size + 1);
     size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
@@ -357,11 +374,17 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
         }
         strings[j] = w_data[i];
     }
-    wchar_t *out = calloc(total_size, WL);
+    out = calloc(total_size, WL);
     if (!out) { // LCOV_EXCL_START
-        return nullptr;
+        goto fail;
     } // LCOV_EXCL_STOP
     _snwprintf(out, total_size - 1, L"{ %ls\" }", strings);
+    goto cleanup;
+fail:
+    out = nullptr;
+cleanup:
+    free_if_not_null(escaped);
+    free_if_not_null(strings);
     return out;
 }
 
@@ -372,12 +395,20 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                                size_t data_len,
                                unsigned long type) {
     bool ret = true;
-    wchar_t *subkey = wcschr(full_path, L'\\') + 1;
-    wchar_t *escaped_key = escape_for_c(subkey, wcslen(subkey), false);
-    wchar_t *escaped_d = convert_data_for_c_sharp(type, value, data_len);
-    wchar_t *escaped_prop = escape_for_c(prop, wcslen(prop), false);
-    wchar_t *top_key_s = get_top_key_string(full_path);
-    wchar_t *out;
+    wchar_t *out, *escaped_key, *escaped_d, *escaped_prop, *top_key_s;
+    out = escaped_key = escaped_d = escaped_prop = top_key_s = nullptr;
+    wchar_t *first_backslash = wcschr(full_path, L'\\');
+    if (!first_backslash) {
+        goto fail;
+    }
+    wchar_t *subkey = first_backslash + 1;
+    escaped_key = escape_for_c(subkey, wcslen(subkey), false);
+    escaped_d = convert_data_for_c_sharp(type, value, data_len);
+    escaped_prop = escape_for_c(prop, wcslen(prop), false);
+    top_key_s = get_top_key_string(full_path);
+    if (!escaped_key || !top_key_s) {
+        goto fail;
+    }
     wchar_t reg_type[33];
     memset(reg_type, 0, sizeof(reg_type));
     switch (type) {
@@ -406,12 +437,12 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                               C_SHARP_REGISTRY_SET_VALUE_TEMPLATE,
                               top_key_s,
                               escaped_key,
-                              escaped_prop,
+                              escaped_prop ? escaped_prop : L"",
                               escaped_d,
                               reg_type);
     out = calloc((size_t)req_size + 1, WL);
     if (!out) { // LCOV_EXCL_START
-        return false;
+        goto fail;
     } // LCOV_EXCL_STOP
     wmemset(out, L'\0', (size_t)req_size + 1);
     _snwprintf(out,
@@ -419,17 +450,18 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                C_SHARP_REGISTRY_SET_VALUE_TEMPLATE,
                top_key_s,
                escaped_key,
-               escaped_prop,
+               escaped_prop ? escaped_prop : L"",
                escaped_d,
                reg_type);
     ret = write_output(out_fp, out, false);
-    free(out);
-    free(escaped_key);
-    free(escaped_d);
-    free(escaped_prop);
-    if (top_key_s) {
-        free(top_key_s);
-    }
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(escaped_d);
+    free_if_not_null(escaped_key);
+    free_if_not_null(escaped_prop);
+    free_if_not_null(out);
+    free_if_not_null(top_key_s);
     return ret;
-    return false;
 }

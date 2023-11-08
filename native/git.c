@@ -11,81 +11,89 @@ static inline bool dir_exists(wchar_t *path) {
 }
 
 bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
+    bool ret = true;
+    wchar_t *cwd, *date_buf, *git_dir, *git_dir_arg, *message_buf, *time_buf, *work_tree_arg;
+    cwd = date_buf = git_dir = git_dir_arg = message_buf = time_buf = work_tree_arg = nullptr;
     if (!has_git()) {
         debug_print(L"Wanted to commit but git.exe is not in PATH or failed to run.\n");
-        return false;
+        goto fail;
     }
     debug_print(L"Committing changes.\n");
     size_t work_tree_arg_len = wcslen(output_dir) + wcslen(L"--work-tree=") + 1;
-    wchar_t *work_tree_arg = calloc(work_tree_arg_len, WL);
-    if (!work_tree_arg) {
-        return false;
-    }
+    work_tree_arg = calloc(work_tree_arg_len, WL);
+    if (!work_tree_arg) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     wmemset(work_tree_arg, L'\0', work_tree_arg_len);
     _snwprintf(work_tree_arg, work_tree_arg_len, L"--work-tree=%ls", output_dir);
     size_t git_dir_len = wcslen(output_dir) + wcslen(L"\\.git") + 1;
-    wchar_t *git_dir = calloc(git_dir_len, WL);
-    if (!git_dir) {
-        return false;
-    }
+    git_dir = calloc(git_dir_len, WL);
+    if (!git_dir) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     _snwprintf(git_dir, git_dir_len, L"%ls\\.git", output_dir);
     git_dir[git_dir_len - 1] = L'\0';
     if (!dir_exists(git_dir)) {
-        wchar_t *cwd = calloc(MAX_PATH, WL);
-        if (!cwd) {
-            return false;
-        }
+        cwd = calloc(MAX_PATH, WL);
+        if (!cwd) { // LCOV_EXCL_START
+            goto fail;
+        } // LCOV_EXCL_STOP
         wmemset(cwd, L'\0', MAX_PATH);
         if (!_wgetcwd(cwd, MAX_PATH)) {
-            return false;
+            goto fail;
         }
         if (_wchdir(output_dir) != 0) {
-            return false;
+            goto fail;
         }
         if (_wspawnlp(P_WAIT, L"git.exe", L"git", L"init", L"--quiet", nullptr) != 0) {
-            return false;
+            goto fail;
         }
         if (_wchdir(cwd) != 0) {
-            return false;
+            goto fail;
         }
     }
     size_t git_dir_arg_len = git_dir_len + wcslen(L"--git-dir=") + 1;
-    wchar_t *git_dir_arg = calloc(git_dir_arg_len, WL);
-    if (!git_dir_arg) {
-        return false;
-    }
+    git_dir_arg = calloc(git_dir_arg_len, WL);
+    if (!git_dir_arg) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     wmemset(git_dir_arg, L'\0', git_dir_arg_len);
     _snwprintf(git_dir_arg, git_dir_arg_len, L"--git-dir=%ls", git_dir);
-    free(git_dir);
     git_dir_arg[git_dir_arg_len - 1] = L'\0';
     if (_wspawnlp(P_WAIT, L"git.exe", L"git", git_dir_arg, work_tree_arg, L"add", L".", nullptr) !=
         0) {
-        return false;
+        goto fail;
     }
     size_t time_needed_size =
         (size_t)GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
     if (!time_needed_size) {
-        return false;
+        goto fail;
     }
-    wchar_t *time_buf = calloc(time_needed_size, WL);
+    time_buf = calloc(time_needed_size, WL);
+    if (!time_buf) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     if (!GetTimeFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, time_buf, (int)time_needed_size)) {
-        return false;
+        goto fail;
     }
     size_t date_needed_size =
         (size_t)GetDateFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, nullptr, 0);
     if (!date_needed_size) {
-        return false;
+        goto fail;
     }
-    wchar_t *date_buf = calloc(date_needed_size, WL);
+    date_buf = calloc(date_needed_size, WL);
+    if (!date_buf) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     if (!GetDateFormat(LOCALE_USER_DEFAULT, 0, nullptr, nullptr, date_buf, (int)date_needed_size)) {
-        return false;
+        goto fail;
     }
     size_t needed_size =
         wcslen(AUTOMATIC_COMMIT_MESSAGE_PREFIX) + 3 + time_needed_size + date_needed_size;
-    wchar_t *message_buf = calloc(needed_size, WL);
-    if (!message_buf) {
-        return false;
-    }
+    message_buf = calloc(needed_size, WL);
+    if (!message_buf) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     wmemset(message_buf, L'\0', needed_size);
     _snwprintf(message_buf,
                needed_size,
@@ -93,8 +101,6 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                AUTOMATIC_COMMIT_MESSAGE_PREFIX,
                date_buf,
                time_buf);
-    free(date_buf);
-    free(time_buf);
     if (_wspawnlp(P_WAIT,
                   L"git.exe",
                   L"git",
@@ -108,20 +114,19 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                   L"-m",
                   message_buf,
                   nullptr) != 0) {
-        return false;
+        goto fail;
     }
-    free(message_buf);
     if (deploy_key) {
         wchar_t full_deploy_key_path[MAX_PATH];
         if (!_wfullpath(full_deploy_key_path, deploy_key, MAX_PATH)) {
-            return false;
+            goto fail;
         }
         debug_print(L"Deploy key: %ls\n", full_deploy_key_path);
         size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
         wchar_t *ssh_command = calloc(ssh_command_len, WL);
-        if (!ssh_command) {
-            return false;
-        }
+        if (!ssh_command) { // LCOV_EXCL_START
+            goto fail;
+        } // LCOV_EXCL_STOP
         wmemset(ssh_command, L'\0', ssh_command_len);
         _snwprintf(ssh_command,
                    ssh_command_len,
@@ -136,7 +141,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                       L"core.sshCommand",
                       ssh_command,
                       nullptr) != 0) {
-            return false;
+            goto fail;
         }
         wchar_t *branch_arg =
             get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
@@ -157,14 +162,21 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                       L"origin",
                       branch_arg,
                       nullptr) != 0) {
-            return false;
+            goto fail;
         }
-        free(ssh_command);
-        free(branch_arg);
     }
-    free(git_dir_arg);
-    free(work_tree_arg);
-    return true;
+    goto cleanup;
+fail:
+    ret = false;
+cleanup:
+    free_if_not_null(cwd);
+    free_if_not_null(date_buf);
+    free_if_not_null(git_dir);
+    free_if_not_null(git_dir_arg);
+    free_if_not_null(message_buf);
+    free_if_not_null(time_buf);
+    free_if_not_null(work_tree_arg);
+    return ret;
 }
 
 // Based on https://stackoverflow.com/a/35658917/374110
@@ -173,9 +185,11 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                         const wchar_t *work_tree_arg,
                         size_t work_tree_arg_len) {
     char *result = malloc(255);
-    if (!result) {
-        return nullptr;
-    }
+    wchar_t *cmd, *w_result;
+    cmd = w_result = nullptr;
+    if (!result) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     memset(result, 0, 255);
     HANDLE pipe_read, pipe_write;
     SECURITY_ATTRIBUTES sa_attr = {.lpSecurityDescriptor = nullptr,
@@ -184,8 +198,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                                    .nLength = sizeof(SECURITY_ATTRIBUTES)};
     // Create a pipe to get results from child's stdout.
     if (!CreatePipe(&pipe_read, &pipe_write, &sa_attr, 0)) {
-        free(result);
-        return nullptr;
+        goto fail;
     }
     STARTUPINFO si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
                       .hStdOutput = pipe_write,
@@ -193,13 +206,12 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                       .wShowWindow = SW_HIDE};
     PROCESS_INFORMATION pi = {0};
     size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 30;
-    wchar_t *cmd = calloc(cmd_len, WL);
-    if (!cmd) {
-        free(result);
+    cmd = calloc(cmd_len, WL);
+    if (!cmd) { // LCOV_EXCL_START
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
-        return nullptr;
-    }
+        goto fail;
+    } // LCOV_EXCL_STOP
     wmemset(cmd, L'\0', cmd_len);
     _snwprintf(
         cmd, cmd_len, TEXT("git.exe %ls %ls branch --show-current"), git_dir_arg, work_tree_arg);
@@ -209,8 +221,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     if (!ret) {
         CloseHandle(pipe_write);
         CloseHandle(pipe_read);
-        free(result);
-        return nullptr;
+        goto fail;
     }
     free(cmd);
     bool proc_ended = false;
@@ -246,12 +257,17 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     CloseHandle(pi.hThread);
     size_t res_len = strlen(result);
     int w_len = MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, nullptr, 0);
-    wchar_t *w_result = calloc((size_t)w_len + 1, WL);
-    if (!w_result) {
-        return nullptr;
-    }
+    w_result = calloc((size_t)w_len + 1, WL);
+    if (!w_result) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
     w_result[w_len] = L'\0';
-    free(result);
+    goto cleanup;
+fail:
+    w_result = nullptr;
+cleanup:
+    free_if_not_null(cmd);
+    free_if_not_null(result);
     return w_result;
 }
