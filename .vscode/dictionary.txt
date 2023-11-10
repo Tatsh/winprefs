@@ -137,6 +137,7 @@ undoc
 userprofile
 useshowwindow
 usestdhandles
+vfwprintf
 wchar
 wchdir
 wcsicmp

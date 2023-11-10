@@ -105,6 +105,11 @@ int __wrap_MultiByteToWideChar(UINT CodePage,
                                int cbMultiByte,
                                LPWSTR lpWideCharStr,
                                int cchWideChar) {
+    check_expected(cchWideChar);
+    wchar_t *wc_ret = mock_ptr_type(wchar_t *);
+    if (lpWideCharStr && wc_ret) {
+        wmemcpy(lpWideCharStr, wc_ret, (size_t)cchWideChar);
+    }
     return mock_type(int);
 }
 
@@ -143,6 +148,7 @@ bool __wrap_PeekNamedPipe(HANDLE hNamedPipe,
                           LPDWORD lpBytesRead,
                           LPDWORD lpTotalBytesAvail,
                           LPDWORD lpBytesLeftThisMessage) {
+    *lpTotalBytesAvail = mock_type(DWORD);
     return mock_type(bool);
 }
 
@@ -151,6 +157,8 @@ bool __wrap_ReadFile(HANDLE hFile,
                      DWORD nNumberOfBytesToRead,
                      LPDWORD lpNumberOfBytesRead,
                      LPOVERLAPPED lpOverlapped) {
+    lpBuffer = mock_ptr_type(char *);
+    *lpNumberOfBytesRead = mock_type(DWORD);
     return mock_type(bool);
 }
 
@@ -252,4 +260,9 @@ __wrap_SHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWST
     LPWSTR newPszPath = mock_ptr_type(LPWSTR);
     wmemcpy(pszPath, newPszPath, wcslen(newPszPath));
     return mock_type(HRESULT);
+}
+
+int __wrap_vfwprintf(FILE *stream, const wchar_t *format, va_list args) {
+    function_called();
+    return mock_type(int);
 }

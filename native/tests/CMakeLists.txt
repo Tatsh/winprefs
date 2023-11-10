@@ -80,7 +80,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   target_link_options(tests PRIVATE ${test_linker_flags})
   target_precompile_headers(tests PRIVATE ${test_pch})
 
-  set(test_categories main save_prefs shell)
+  set(test_categories debug git main save_prefs shell)
   foreach(category ${test_categories})
     add_executable(test-${category} test_${category}.c)
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
@@ -95,6 +95,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     if(category STREQUAL "main")
       target_link_options(test-${category} PRIVATE -Wl,--wrap,save_preferences
                           -Wl,--wrap,export_single_value)
+    elseif(category STREQUAL "debug")
+      target_link_options(test-${category} PRIVATE -Wl,--wrap,vfwprintf)
     endif()
 
     add_test(NAME "${category} tests" COMMAND test-${category})
