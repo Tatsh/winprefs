@@ -1,4 +1,4 @@
-#include "git.h"
+#include "git_branch.h"
 
 void test_get_git_branch_CreatePipe_fails(void **state) {
     will_return(__wrap_CreatePipe, false);
@@ -46,12 +46,12 @@ void test_get_git_branch(void **state) {
     free(w_master);
 }
 
-const struct CMUnitTest git_tests[] = {
+const struct CMUnitTest get_git_branch_tests[] = {
+    cmocka_unit_test(test_get_git_branch),
     cmocka_unit_test(test_get_git_branch_CreatePipe_fails),
     cmocka_unit_test(test_get_git_branch_CreateProcess_fails),
-    cmocka_unit_test(test_get_git_branch),
 };
 
 int main(int argc, char *argv[]) {
-    return cmocka_run_group_tests(git_tests, nullptr, nullptr);
+    return cmocka_run_group_tests(get_git_branch_tests, nullptr, nullptr);
 }

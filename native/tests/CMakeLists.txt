@@ -58,6 +58,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     ../debug.h
     ../git.c
     ../git.h
+    ../git_branch.c
+    ../git_branch.h
     ../io.c
     ../io.h
     ../macros.h
@@ -80,7 +82,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   target_link_options(tests PRIVATE ${test_linker_flags})
   target_precompile_headers(tests PRIVATE ${test_pch})
 
-  set(test_categories debug git main save_prefs shell)
+  set(test_categories get_git_branch git_commit main save_prefs shell)
   foreach(category ${test_categories})
     add_executable(test-${category} test_${category}.c)
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
@@ -88,16 +90,15 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     target_include_directories(test-${category} PRIVATE ${test_include_dirs})
     target_link_libraries(test-${category}
                           PRIVATE tests $<IF:$<TARGET_EXISTS:cmocka::cmocka>,cmocka::cmocka,cmocka>)
-    target_link_options(test-${category} PRIVATE ${test_linker_flags}
-                        $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
+    target_link_options(
+      test-${category}
+      PRIVATE
+      ${test_linker_flags}
+      $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>
+      $<$<STREQUAL:git_commit,${category}>:-Wl,--wrap,get_git_branch>
+      $<$<STREQUAL:main,${category}>:-Wl,--wrap,save_preferences
+      -Wl,--wrap,export_single_value>)
     target_precompile_headers(test-${category} PRIVATE ${test_pch})
-
-    if(category STREQUAL "main")
-      target_link_options(test-${category} PRIVATE -Wl,--wrap,save_preferences
-                          -Wl,--wrap,export_single_value)
-    elseif(category STREQUAL "debug")
-      target_link_options(test-${category} PRIVATE -Wl,--wrap,vfwprintf)
-    endif()
 
     add_test(NAME "${category} tests" COMMAND test-${category})
   endforeach()

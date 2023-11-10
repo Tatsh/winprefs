@@ -27,6 +27,13 @@ bool __wrap_export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTP
     return mock_type(bool);
 }
 
+wchar_t *__wrap_get_git_branch(const wchar_t *git_dir_arg,
+                               size_t git_dir_arg_len,
+                               const wchar_t *work_tree_arg,
+                               size_t work_tree_arg_len) {
+    return mock_ptr_type(wchar_t *);
+}
+
 LSTATUS __wrap_RegCloseKey(HKEY hKey) {
     return mock_type(LSTATUS);
 }

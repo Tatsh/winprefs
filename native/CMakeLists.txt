@@ -54,6 +54,8 @@ if(WIN32)
     debug.h
     git.c
     git.h
+    git_branch.c
+    git_branch.h
     io.c
     io.h
     macros.h
