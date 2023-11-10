@@ -13,8 +13,10 @@ static inline bool dir_exists(wchar_t *path) {
 
 bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
     bool ret = true;
-    wchar_t *cwd, *date_buf, *git_dir, *git_dir_arg, *message_buf, *time_buf, *work_tree_arg;
-    cwd = date_buf = git_dir = git_dir_arg = message_buf = time_buf = work_tree_arg = nullptr;
+    wchar_t *cwd, *date_buf, *git_dir, *git_dir_arg, *message_buf, *ssh_command, *time_buf,
+        *work_tree_arg;
+    cwd = date_buf = git_dir = git_dir_arg = message_buf = ssh_command = time_buf = work_tree_arg =
+        nullptr;
     if (!has_git()) {
         debug_print(L"Wanted to commit but git.exe is not in PATH or failed to run.\n");
         goto cleanup;
@@ -117,7 +119,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
         }
         debug_print(L"Deploy key: %ls\n", full_deploy_key_path);
         size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
-        wchar_t *ssh_command = calloc(ssh_command_len, WL);
+        ssh_command = calloc(ssh_command_len, WL);
         if (!ssh_command) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
@@ -168,6 +170,7 @@ cleanup:
     free_if_not_null(git_dir);
     free_if_not_null(git_dir_arg);
     free_if_not_null(message_buf);
+    free_if_not_null(ssh_command);
     free_if_not_null(time_buf);
     free_if_not_null(work_tree_arg);
     return ret;
