@@ -223,7 +223,6 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         CloseHandle(pipe_read);
         goto fail;
     }
-    free(cmd);
     bool proc_ended = false;
     for (; !proc_ended;) {
         // Give some time slice (50 ms), so we won't waste 100% CPU.
@@ -235,14 +234,8 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
             memset(buf, L'\0', 255);
             DWORD read = 0;
             DWORD avail = 0;
-            if (!PeekNamedPipe(pipe_read, nullptr, 0, nullptr, &avail, nullptr)) {
-                break;
-            }
-            if (!avail) { // No data available, return
-                break;
-            }
-            if (!ReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, nullptr) || !read) {
-                // Error, the child process might have ended
+            if (!PeekNamedPipe(pipe_read, nullptr, 0, nullptr, &avail, nullptr) || !avail ||
+                !ReadFile(pipe_read, buf, min(sizeof(buf) - 1, avail), &read, nullptr) || !read) {
                 break;
             }
             buf[min(sizeof(buf) - 1, avail)] = L'\0';
