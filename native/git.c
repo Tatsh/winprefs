@@ -16,7 +16,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
     cwd = date_buf = git_dir = git_dir_arg = message_buf = time_buf = work_tree_arg = nullptr;
     if (!has_git()) {
         debug_print(L"Wanted to commit but git.exe is not in PATH or failed to run.\n");
-        goto fail;
+        goto cleanup;
     }
     debug_print(L"Committing changes.\n");
     size_t work_tree_arg_len = wcslen(output_dir) + wcslen(L"--work-tree=") + 1;
