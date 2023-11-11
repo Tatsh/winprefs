@@ -19,6 +19,10 @@
 #define false FALSE
 #endif
 
+#if !HAVE_EKEYREJECTED
+#define EKEYREJECTED 129
+#endif
+
 #ifdef __WINE__
 #define IsWindowsVistaOrGreater() 0
 #endif

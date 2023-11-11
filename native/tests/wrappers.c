@@ -99,6 +99,8 @@ bool __wrap_WriteFile(HANDLE hFile,
                       DWORD nNumberOfBytesToWrite,
                       LPDWORD lpNumberOfBytesWritten,
                       LPOVERLAPPED lpOverlapped) {
+    check_expected(nNumberOfBytesToWrite);
+    *lpNumberOfBytesWritten = mock_type(DWORD);
     return mock_type(bool);
 }
 
@@ -187,6 +189,11 @@ LSTATUS __wrap_RegEnumKeyEx(HKEY hKey,
                             LPWSTR lpClass,
                             LPDWORD lpcchClass,
                             PFILETIME lpftLastWriteTime) {
+    wchar_t *name = mock_ptr_type(wchar_t *);
+    if (name) {
+        wmemcpy(lpName, name, wcslen(name));
+    }
+    *lpcchName = mock_type(DWORD);
     return mock_type(LSTATUS);
 }
 
@@ -202,6 +209,7 @@ LSTATUS __wrap_RegQueryInfoKey(HKEY hKey,
                                LPDWORD lpcbMaxValueLen,
                                LPDWORD lpcbSecurityDescriptor,
                                PFILETIME lpftLastWriteTime) {
+    *lpcSubKeys = mock_type(DWORD);
     return mock_type(LSTATUS);
 }
 
@@ -290,5 +298,41 @@ int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
 
 bool __wrap_write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
     check_expected(out);
+    return mock_type(bool);
+}
+
+bool __wrap_do_write_reg_command(HANDLE out_fp,
+                                 const wchar_t *full_path,
+                                 const wchar_t *prop,
+                                 const char *value,
+                                 size_t data_len,
+                                 unsigned long type) {
+    return mock_type(bool);
+}
+
+bool __wrap_do_write_c_reg_code(HANDLE out_fp,
+                                const wchar_t *full_path,
+                                const wchar_t *prop,
+                                const char *value,
+                                size_t data_len,
+                                unsigned long type) {
+    return mock_type(bool);
+}
+
+bool __wrap_do_write_c_sharp_reg_code(HANDLE out_fp,
+                                      const wchar_t *full_path,
+                                      const wchar_t *prop,
+                                      const char *value,
+                                      size_t data_len,
+                                      unsigned long type) {
+    return mock_type(bool);
+}
+
+bool __wrap_do_write_powershell_reg_code(HANDLE out_fp,
+                                         const wchar_t *full_path,
+                                         const wchar_t *prop,
+                                         const char *value,
+                                         size_t data_len,
+                                         unsigned long type) {
     return mock_type(bool);
 }

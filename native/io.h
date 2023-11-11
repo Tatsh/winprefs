@@ -8,8 +8,6 @@ enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_REG,
     OUTPUT_FORMAT_UNKNOWN
 };
-typedef bool (*do_write_callback)(
-    HANDLE, const wchar_t *, const wchar_t *, const char *, size_t, unsigned long);
 
 bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf);
 bool do_writes(HANDLE out_fp,

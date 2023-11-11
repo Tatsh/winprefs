@@ -7,24 +7,24 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
     bool ret = true;
     char *mb_out = nullptr;
     DWORD written = 0;
-    size_t addend = use_crlf ? 1 : 0;
     size_t req_size =
         (size_t)WideCharToMultiByte(CP_UTF8, 0, out, -1, nullptr, 0, nullptr, nullptr);
     if (req_size == 0) {
         goto cleanup;
     }
-    size_t total_size = req_size + addend;
+    size_t total_size = req_size + (use_crlf ? 1 : 0);
     mb_out = malloc(total_size);
     if (!mb_out) { // LCOV_EXCL_START
         goto fail;
     } // LCOV_EXCL_STOP
     memset(mb_out, 0, total_size);
-    WideCharToMultiByte(CP_UTF8, 0, out, -1, mb_out, (int)req_size, nullptr, nullptr);
+    if (!WideCharToMultiByte(CP_UTF8, 0, out, -1, mb_out, (int)req_size, nullptr, nullptr)) {
+        goto fail;
+    }
     if (use_crlf) {
         mb_out[total_size - 2] = '\r';
     }
     mb_out[total_size - 1] = '\n';
-
     ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
     goto cleanup;
 fail:
@@ -56,24 +56,7 @@ bool do_writes(HANDLE out_fp,
     if (!value) { // LCOV_EXCL_START
         return false;
     } // LCOV_EXCL_STOP
-    do_write_callback dwc = nullptr;
-    switch (format) {
-    case OUTPUT_FORMAT_REG:
-        dwc = do_write_reg_command;
-        break;
-    case OUTPUT_FORMAT_C:
-        dwc = do_write_c_reg_code;
-        break;
-    case OUTPUT_FORMAT_C_SHARP:
-        dwc = do_write_c_sharp_reg_code;
-        break;
-    case OUTPUT_FORMAT_POWERSHELL:
-        dwc = do_write_powershell_reg_code;
-        break;
-    default:
-        break;
-    }
-    if (!dwc) {
+    if (format == OUTPUT_FORMAT_UNKNOWN) {
         goto fail;
     }
     LSTATUS enum_value_ret = ERROR_SUCCESS;
@@ -86,13 +69,34 @@ bool do_writes(HANDLE out_fp,
         reg_type = REG_NONE;
         enum_value_ret = RegEnumValue(
             hk, i, value, (LPDWORD)&value_len, 0, &reg_type, (LPBYTE)data, (LPDWORD)&data_len);
-        if (enum_value_ret == ERROR_MORE_DATA) {
+        if (enum_value_ret == ERROR_MORE_DATA) { // LCOV_EXCL_START
             continue;
         }
         if (enum_value_ret == ERROR_NO_MORE_ITEMS) {
             break;
         }
-        if (!dwc(out_fp, full_path, value, data, data_len, reg_type)) {
+        // LCOV_EXCL_STOP
+        bool write_ret = false;
+        switch (format) {
+        case OUTPUT_FORMAT_REG:
+            write_ret = do_write_reg_command(out_fp, full_path, value, data, data_len, reg_type);
+            break;
+        case OUTPUT_FORMAT_C:
+            write_ret = do_write_c_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+            break;
+        case OUTPUT_FORMAT_C_SHARP:
+            write_ret =
+                do_write_c_sharp_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+            break;
+        case OUTPUT_FORMAT_POWERSHELL:
+            write_ret =
+                do_write_powershell_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+            break;
+        default: // LCOV_EXCL_START
+            goto fail;
+            // LCOV_EXCL_STOP
+        }
+        if (!write_ret) {
             goto fail;
         }
     }
@@ -116,6 +120,7 @@ bool write_key_filtered_recursive(HKEY hk,
     ach_key = full_path = nullptr;
     if (depth >= max_depth) {
         debug_print(L"%ls: Skipping %ls due to depth limit of %d.\n", prior_stem, stem, max_depth);
+        errno = EDOM;
         goto cleanup;
     }
     HKEY hk_out;
@@ -129,6 +134,7 @@ bool write_key_filtered_recursive(HKEY hk,
     size_t stem_len = stem ? wcslen(stem) : 0;
     if ((prior_stem_len + (stem_len * WL) + 2) > (full_path_len - 2)) {
         debug_print(L"%ls: Skipping %ls because of length limitation.\n", prior_stem, stem);
+        errno = E2BIG;
         goto cleanup;
     }
     memcpy(full_path, prior_stem, prior_stem_len);
@@ -150,6 +156,7 @@ bool write_key_filtered_recursive(HKEY hk,
         wcsstr(full_path, L"Windows\\Shell\\BagMRU") ||
         wcsstr(full_path, L"Windows\\Shell\\MuiCache")) {
         debug_print(L"%ls: Skipping %ls due to filter.\n", prior_stem, stem);
+        errno = EKEYREJECTED;
         goto cleanup;
     }
     if (RegOpenKeyEx(hk, stem, 0, KEY_READ, &hk_out) == ERROR_SUCCESS) {
@@ -167,6 +174,9 @@ bool write_key_filtered_recursive(HKEY hk,
                                            nullptr,
                                            nullptr,
                                            nullptr);
+        if (ret_code != ERROR_SUCCESS) {
+            goto fail;
+        }
         if (n_sub_keys) {
             size_t ach_key_len = 0;
             ach_key = calloc(MAX_KEY_LENGTH, WL);
@@ -194,9 +204,9 @@ bool write_key_filtered_recursive(HKEY hk,
             debug_print(L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
         if (n_values) {
-            if (!do_writes(out_fp, hk_out, n_values, full_path, format)) {
+            if (!do_writes(out_fp, hk_out, n_values, full_path, format)) { // LCOV_EXCL_START
                 goto fail;
-            }
+            } // LCOV_EXCL_STOP
         } else {
             debug_print(L"%ls: No values in %ls.\n", prior_stem, stem);
         }
