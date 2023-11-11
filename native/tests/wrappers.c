@@ -273,3 +273,22 @@ int __wrap_vfwprintf(FILE *stream, const wchar_t *format, va_list args) {
     function_called();
     return mock_type(int);
 }
+
+int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
+    int ret = -1;
+    va_list args;
+    va_start(args, format);
+    if (!buffer && count == 0) { // Request for size required only
+        wchar_t buf[10240];
+        ret = vswprintf(buf, 10240, format, args);
+    } else {
+        ret = vswprintf(buffer, count, format, args);
+    }
+    va_end(args);
+    return ret;
+}
+
+bool __wrap_write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
+    check_expected(out);
+    return mock_type(bool);
+}

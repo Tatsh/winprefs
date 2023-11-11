@@ -46,12 +46,12 @@ void test_get_git_branch(void **state) {
     free(w_master);
 }
 
-const struct CMUnitTest get_git_branch_tests[] = {
+const struct CMUnitTest powershell_tests[] = {
     cmocka_unit_test(test_get_git_branch),
     cmocka_unit_test(test_get_git_branch_CreatePipe_fails),
     cmocka_unit_test(test_get_git_branch_CreateProcess_fails),
 };
 
 int main(int argc, char *argv[]) {
-    return cmocka_run_group_tests(get_git_branch_tests, nullptr, nullptr);
+    return cmocka_run_group_tests(powershell_tests, nullptr, nullptr);
 }

@@ -82,7 +82,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   target_link_options(tests PRIVATE ${test_linker_flags})
   target_precompile_headers(tests PRIVATE ${test_pch})
 
-  set(test_categories get_git_branch git_commit main save_prefs shell)
+  set(test_categories get_git_branch git_commit main powershell save_prefs shell)
   foreach(category ${test_categories})
     add_executable(test-${category} test_${category}.c)
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
@@ -97,7 +97,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>
       $<$<STREQUAL:git_commit,${category}>:-Wl,--wrap,get_git_branch>
       $<$<STREQUAL:main,${category}>:-Wl,--wrap,save_preferences
-      -Wl,--wrap,export_single_value>)
+      -Wl,--wrap,export_single_value>
+      $<$<STREQUAL:powershell,${category}>:-Wl,--wrap,write_output>)
     target_precompile_headers(test-${category} PRIVATE ${test_pch})
 
     add_test(NAME "${category} tests" COMMAND test-${category})

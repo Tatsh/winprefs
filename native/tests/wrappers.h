@@ -19,6 +19,7 @@ typedef struct _SYSTEMTIME {
 } SYSTEMTIME;
 typedef char byte, BYTE, *PBYTE, *LPBYTE;
 typedef unsigned long DWORD, LCID, *LPDWORD, REGSAM;
+typedef unsigned long long QWORD;
 typedef long LONG;
 typedef LONG HRESULT, LSTATUS;
 typedef wchar_t WCHAR;
