@@ -122,7 +122,7 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         if (!out) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
-        wmemset(out, 0, (size_t)req_size);
+        wmemset(out, L'\0', (size_t)(req_size + 1));
         _snwprintf(out, (size_t)req_size, L"%lu", *(DWORD *)data);
         goto cleanup;
     }
@@ -138,7 +138,7 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     }
     errno = EINVAL;
 fail:
-    out = nullptr;
+    free_if_not_null(out);
 cleanup:
     free_if_not_null(bin);
     free_if_not_null(escaped);
