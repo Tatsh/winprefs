@@ -19,8 +19,8 @@ endif()
 
 option(BUILD_DOCS "Build documentation." OFF)
 option(BUILD_TESTS "Build and run tests." OFF)
-option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_ASAN "Enable address sanitiser." OFF)
+option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 set(TARGET_VERSION
     $<IF:$<BOOL:MSVC>,0x600,0x501>
@@ -46,7 +46,6 @@ if(NOT MSVC)
   set(CMAKE_REQUIRED_FLAGS "-std=gnu2x")
 endif()
 set(CMAKE_REQUIRED_DEFINITIONS -D_WIN32_WINNT=${TARGET_VERSION} -DUNICODE -D_UNICODE)
-check_symbol_exists(_snwprintf "wchar.h" HAVE_SNWPRINTF)
 check_symbol_exists(_wcsicmp "wchar.h" HAVE_WCSICMP)
 check_symbol_exists(_wcsnicmp "wchar.h" HAVE_WCSNICMP)
 check_type_size(_Bool STDBOOL BUILTIN_TYPES_ONLY LANGUAGE C)
@@ -55,7 +54,6 @@ add_compile_definitions(
   _CRT_SECURE_NO_WARNINGS
   _UNICODE
   HAVE_NULLPTR_T=$<IF:$<BOOL:${HAVE_STD_NULLPTR_T}>,1,0>
-  HAVE_SNWPRINTF=$<IF:$<BOOL:${HAVE_SNWPRINTF}>,1,0>
   HAVE_STDBOOL=$<IF:$<BOOL:${HAVE_STDBOOL}>,1,0>
   HAVE_WCSICMP=$<IF:$<BOOL:${HAVE_WCSICMP}>,1,0>
   HAVE_WCSNICMP=$<IF:$<BOOL:${HAVE_WCSNICMP}>,1,0>

@@ -1,9 +1,6 @@
 #ifndef MACROS_H
 #define MACROS_H
 
-#if !HAVE_SNWPRINTF
-#define _snwprintf swprintf
-#endif
 #if !HAVE_WCSNICMP
 #define _wcsnicmp wcsncmp
 #endif
