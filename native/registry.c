@@ -105,11 +105,12 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     HKEY starting_key = HKEY_CURRENT_USER;
     wchar_t *last_backslash = wcsrchr(reg_path, '\\');
     wchar_t *value_name_p = last_backslash + 1;
-    size_t value_name_len = wcslen(value_name_p);
+    size_t value_name_len = wcslen(value_name_p) + 1;
     value_name = calloc(value_name_len, WL);
     if (!value_name) { // LCOV_EXCL_START
         goto fail;
     } // LCOV_EXCL_STOP
+    wmemset(value_name, L'\0', value_name_len);
     wmemcpy(value_name, value_name_p, value_name_len);
     *last_backslash = L'\0';
     if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {

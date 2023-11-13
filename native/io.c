@@ -18,8 +18,10 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
         goto fail;
     } // LCOV_EXCL_STOP
     memset(mb_out, 0, total_size);
-    if (!WideCharToMultiByte(CP_UTF8, 0, out, -1, mb_out, (int)req_size, nullptr, nullptr)) {
-        goto fail;
+    if (!WideCharToMultiByte(CP_UTF8, 0, out, -1, mb_out, (int)total_size, nullptr, nullptr)) {
+        free(mb_out);
+        debug_print(L"Skipping possibly malformed wide character data.\n");
+        return true;
     }
     if (use_crlf) {
         mb_out[total_size - 2] = '\r';

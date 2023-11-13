@@ -90,8 +90,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     if (reg_type == REG_MULTI_SZ) {
         wchar_t *w_data = (wchar_t *)data;
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
-        if (w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2) {
-            size_t total_size = 9 + w_data_len;
+        size_t real_len = determine_multi_sz_size(w_data, w_data_len);
+        if (real_len > 2) {
+            size_t total_size = 9 + real_len;
             out = calloc(total_size, WL);
             if (!out) { // LCOV_EXCL_START
                 goto fail;
@@ -184,7 +185,7 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_powershell(type, value, data_len);
     wchar_t *escaped_reg_key = add_colon_if_required(full_path);
     wchar_t *escaped_prop = escape_for_powershell(prop, wcslen(prop));
-    if (!escaped_reg_key || !escaped_prop || (!escaped_d && type != REG_NONE)) {
+    if (!escaped_reg_key) {
         goto fail;
     }
     wchar_t reg_type[14];

@@ -110,17 +110,19 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
     if (reg_type == REG_MULTI_SZ) {
         wchar_t *w_data = (wchar_t *)data;
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
-        if (w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2) {
-            size_t total_size = (2 * sizeof(wchar_t)) + w_data_len;
-            wchar_t *escaped = escape_for_c((wchar_t *)data, true, w_data_len);
+        size_t real_len = determine_multi_sz_size(w_data, w_data_len);
+        if (real_len > 2) {
+            size_t total_size = (2 * sizeof(wchar_t)) + real_len;
+            wchar_t *escaped = escape_for_c((wchar_t *)data, true, real_len);
             if (!escaped) { // LCOV_EXCL_START
                 return nullptr;
             } // LCOV_EXCL_STOP
-            wchar_t *out = calloc(total_size, WL);
+            int req_size = _snwprintf(nullptr, 0, L"%ls\\0", escaped) + 1;
+            wchar_t *out = calloc(req_size, WL);
             if (!out) { // LCOV_EXCL_START
                 return nullptr;
             } // LCOV_EXCL_STOP
-            _snwprintf(out, total_size, L"%ls\\0", escaped);
+            _snwprintf(out, req_size, L"%ls\\0", escaped);
             free(escaped);
             return out;
         }
@@ -235,10 +237,10 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_key,
                                   escaped_prop ? escaped_prop : L"",
                                   reg_type,
-                                  escaped_d,
+                                  escaped_d ? escaped_d : L"",
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out || !escaped_d) { // LCOV_EXCL_START
+        if (!out) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
@@ -249,7 +251,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    escaped_key,
                    escaped_prop ? escaped_prop : L"",
                    reg_type,
-                   escaped_d,
+                   escaped_d ? escaped_d : L"",
                    data_len);
     } else if (type == REG_NONE) {
         int req_size = _snwprintf(nullptr,
@@ -340,11 +342,12 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
     }
     wchar_t *w_data = (wchar_t *)data;
     size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
-    if (!(w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2)) {
+    size_t real_len = determine_multi_sz_size(w_data, w_data_len);
+    if (real_len <= 2) {
         debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d, w_data_len = %d).\n",
                     data_len,
                     w_data_len);
-        goto fail;
+        goto cleanup;
     }
     unsigned i, j;
     size_t strings_size = 0;
@@ -410,7 +413,7 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
     escaped_d = convert_data_for_c_sharp(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s || (!escaped_d && type != REG_NONE)) {
+    if (!escaped_key || !top_key_s) {
         goto fail;
     }
     wchar_t reg_type[33];
@@ -445,7 +448,9 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                               top_key_s,
                               escaped_key,
                               escaped_prop ? escaped_prop : L"",
-                              escaped_d,
+                              escaped_d        ? escaped_d :
+                              type == REG_NONE ? L"null" :
+                                                 L"",
                               reg_type);
     out = calloc((size_t)req_size + 1, WL);
     if (!out) { // LCOV_EXCL_START
@@ -458,7 +463,9 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                top_key_s,
                escaped_key,
                escaped_prop ? escaped_prop : L"",
-               escaped_d,
+               escaped_d        ? escaped_d :
+               type == REG_NONE ? L"null" :
+                                  L"",
                reg_type);
     ret = write_output(out_fp, out, false);
     goto cleanup;
