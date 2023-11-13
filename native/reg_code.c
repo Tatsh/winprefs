@@ -112,17 +112,16 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
         size_t real_len = determine_multi_sz_size(w_data, w_data_len);
         if (real_len > 2) {
-            size_t total_size = (2 * sizeof(wchar_t)) + real_len;
             wchar_t *escaped = escape_for_c((wchar_t *)data, true, real_len);
             if (!escaped) { // LCOV_EXCL_START
                 return nullptr;
             } // LCOV_EXCL_STOP
             int req_size = _snwprintf(nullptr, 0, L"%ls\\0", escaped) + 1;
-            wchar_t *out = calloc(req_size, WL);
+            wchar_t *out = calloc((size_t)req_size, WL);
             if (!out) { // LCOV_EXCL_START
                 return nullptr;
             } // LCOV_EXCL_STOP
-            _snwprintf(out, req_size, L"%ls\\0", escaped);
+            _snwprintf(out, (size_t)req_size, L"%ls\\0", escaped);
             free(escaped);
             return out;
         }
@@ -173,7 +172,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
     escaped_d = convert_data_for_c(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s) {
+    if (!escaped_key || !top_key_s || (type == REG_MULTI_SZ && !escaped_d)) {
         goto fail;
     }
     wchar_t reg_type[14];
@@ -413,7 +412,7 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
     escaped_d = convert_data_for_c_sharp(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s) {
+    if (!escaped_key || !top_key_s || (type == REG_MULTI_SZ && !escaped_d)) {
         goto fail;
     }
     wchar_t reg_type[33];

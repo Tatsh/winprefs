@@ -175,7 +175,7 @@ void test_powershell_multi_sz_invalid(void **state) {
     bool ret = do_write_powershell_reg_code(nullptr,
                                             L"HKEY_USERS\\Environment",
                                             L"TEMP",
-                                            (const char *)MULTI_SZ_TEST_DATA,
+                                            (const char *)MULTI_SZ_TEST_DATA_INVALID,
                                             25 * sizeof(wchar_t),
                                             REG_MULTI_SZ);
     assert_false(ret);

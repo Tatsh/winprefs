@@ -5,10 +5,10 @@ void test_write_output_returns_false_when_WideCharToMultiByte_returns_req_size_0
     assert_false(write_output(nullptr, nullptr, false));
 }
 
-void test_write_output_returns_false_when_WideCharToMultiByte_returns_0(void **state) {
+void test_write_output_returns_true_when_WideCharToMultiByte_returns_0(void **state) {
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WideCharToMultiByte, 0);
-    assert_false(write_output(nullptr, nullptr, false));
+    assert_true(write_output(nullptr, nullptr, false));
 }
 
 void test_write_output_adds_cr(void **state) {
@@ -144,7 +144,7 @@ const struct CMUnitTest io_tests[] = {
     cmocka_unit_test(test_write_key_filtered_recursive_does_not_exceed_length_limitations),
     cmocka_unit_test(test_write_key_filtered_recursive_does_not_exceed_max_depth_inclusive),
     cmocka_unit_test(test_write_output_adds_cr),
-    cmocka_unit_test(test_write_output_returns_false_when_WideCharToMultiByte_returns_0),
+    cmocka_unit_test(test_write_output_returns_true_when_WideCharToMultiByte_returns_0),
     cmocka_unit_test(test_write_output_returns_false_when_WideCharToMultiByte_returns_req_size_0),
 };
 

@@ -113,7 +113,7 @@ bool do_write_reg_command(HANDLE out_fp,
     bool v_heap = false;
     wchar_t *v_param = fix_v_param(prop, prop ? wcslen(prop) : 0, &v_heap);
     wchar_t reg_type[14];
-    if (!escaped_reg_key || !v_param) {
+    if (!escaped_reg_key || !v_param || (type == REG_MULTI_SZ && !escaped_d)) {
         goto fail;
     }
     memset(reg_type, 0, sizeof(reg_type));
@@ -139,6 +139,8 @@ bool do_write_reg_command(HANDLE out_fp,
     case REG_QWORD:
         wcsncpy(reg_type, L"REG_QWORD", 9);
         break;
+    default:
+        goto fail;
     }
     int req_size = _snwprintf(nullptr,
                               0,

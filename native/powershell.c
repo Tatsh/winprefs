@@ -185,7 +185,7 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_powershell(type, value, data_len);
     wchar_t *escaped_reg_key = add_colon_if_required(full_path);
     wchar_t *escaped_prop = escape_for_powershell(prop, wcslen(prop));
-    if (!escaped_reg_key) {
+    if (!escaped_reg_key || (type == REG_MULTI_SZ && !escaped_d)) {
         goto fail;
     }
     wchar_t reg_type[14];
