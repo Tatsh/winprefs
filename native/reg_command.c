@@ -107,16 +107,20 @@ bool do_write_reg_command(HANDLE out_fp,
                           const char *value,
                           size_t data_len,
                           unsigned long type) {
+    bool ret = true;
     wchar_t *out = nullptr;
     wchar_t *escaped_d = convert_data_for_reg(type, value, data_len);
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));
     bool v_heap = false;
     wchar_t *v_param = fix_v_param(prop, prop ? wcslen(prop) : 0, &v_heap);
     wchar_t reg_type[14];
-    if (!escaped_reg_key || !v_param || (type == REG_MULTI_SZ && !escaped_d)) {
+    if (!escaped_reg_key || !v_param) {
         goto fail;
     }
-    memset(reg_type, 0, sizeof(reg_type));
+    if (type == REG_MULTI_SZ && !escaped_d) {
+        goto cleanup;
+    }
+    wmemset(reg_type, L'\0', 14);
     switch (type) {
     case REG_NONE:
         wcsncpy(reg_type, L"REG_NONE", 8);
@@ -150,7 +154,6 @@ bool do_write_reg_command(HANDLE out_fp,
                               v_param,
                               reg_type,
                               escaped_d ? escaped_d : L" ");
-    bool ret = true;
     if ((size_t)req_size < CMD_MAX_COMMAND_LENGTH) {
         size_t total_size = (size_t)req_size + 1;
         out = calloc(total_size, WL);

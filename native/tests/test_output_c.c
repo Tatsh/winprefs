@@ -113,7 +113,7 @@ void test_output_c_multi_sz_invalid(void **state) {
                                    (const char *)MULTI_SZ_TEST_DATA,
                                    25 * sizeof(wchar_t),
                                    REG_MULTI_SZ);
-    assert_false(ret);
+    assert_true(ret);
 }
 
 void test_output_c_top_key_invalid(void **state) {

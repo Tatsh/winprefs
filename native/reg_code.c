@@ -172,8 +172,11 @@ bool do_write_c_reg_code(HANDLE out_fp,
     escaped_d = convert_data_for_c(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s || (type == REG_MULTI_SZ && !escaped_d)) {
+    if (!escaped_key || !top_key_s) {
         goto fail;
+    }
+    if (type == REG_MULTI_SZ && !escaped_d) {
+        goto cleanup;
     }
     wchar_t reg_type[14];
     memset(reg_type, 0, sizeof(reg_type));
@@ -412,8 +415,11 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
     escaped_d = convert_data_for_c_sharp(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s || (type == REG_MULTI_SZ && !escaped_d)) {
+    if (!escaped_key || !top_key_s) {
         goto fail;
+    }
+    if (type == REG_MULTI_SZ && !escaped_d) {
+        goto cleanup;
     }
     wchar_t reg_type[33];
     memset(reg_type, 0, sizeof(reg_type));

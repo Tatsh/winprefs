@@ -185,8 +185,12 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_powershell(type, value, data_len);
     wchar_t *escaped_reg_key = add_colon_if_required(full_path);
     wchar_t *escaped_prop = escape_for_powershell(prop, wcslen(prop));
-    if (!escaped_reg_key || (type == REG_MULTI_SZ && !escaped_d)) {
+    bool ret = true;
+    if (!escaped_reg_key) {
         goto fail;
+    }
+    if (type == REG_MULTI_SZ && !escaped_d) {
+        goto cleanup;
     }
     wchar_t reg_type[14];
     memset(reg_type, 0, sizeof(reg_type));
@@ -222,7 +226,6 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
                               escaped_prop ? escaped_prop : L"",
                               reg_type,
                               escaped_d ? escaped_d : L"$null");
-    bool ret = true;
     if ((size_t)req_size < POWERSHELL_MAX_COMMAND_LENGTH) {
         out = calloc((size_t)req_size + 1, WL);
         if (!out) { // LCOV_EXCL_START

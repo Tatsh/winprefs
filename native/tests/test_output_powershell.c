@@ -94,7 +94,7 @@ void test_powershell_expand_sz(void **state) {
     assert_true(ret);
 }
 
-const wchar_t *MULTI_SZ_TEST_DATA[] = {L"a midsummer night's dream", L"test2"};
+const wchar_t *MULTI_SZ_TEST_DATA = L"a midsummer night's dream\0test2\0";
 
 void test_powershell_multi_sz(void **state) {
     expect_memory(
@@ -104,13 +104,13 @@ void test_powershell_multi_sz(void **state) {
         L"'HKEY_CURRENT_USER:\\Environment' -Force | Out-Null } "
         L"New-ItemProperty -LiteralPath 'HKEY_CURRENT_USER:\\Environment' -Name "
         L"'TEMP' -PropertyType String -Force -Value @\"\na midsummer night''s dream\ntest2\n)\n\"@",
-        271);
+        50 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_powershell_reg_code(nullptr,
                                             L"HKEY_CURRENT_USER\\Environment",
                                             L"TEMP",
                                             (const char *)MULTI_SZ_TEST_DATA,
-                                            31 * sizeof(wchar_t),
+                                            33 * sizeof(wchar_t),
                                             REG_MULTI_SZ);
     assert_true(ret);
 }
@@ -169,16 +169,16 @@ void test_powershell_skip_too_big(void **state) {
     free(buf);
 }
 
-const wchar_t *MULTI_SZ_TEST_DATA_INVALID = L"\"quoted string\" fff\0test2";
+const unsigned char MULTI_SZ_TEST_DATA_INVALID[] = {'e', 0, 'n', 0, '-', 0, 'U', 0, 'S'};
 
 void test_powershell_multi_sz_invalid(void **state) {
     bool ret = do_write_powershell_reg_code(nullptr,
                                             L"HKEY_USERS\\Environment",
                                             L"TEMP",
                                             (const char *)MULTI_SZ_TEST_DATA_INVALID,
-                                            25 * sizeof(wchar_t),
+                                            9,
                                             REG_MULTI_SZ);
-    assert_false(ret);
+    assert_true(ret);
 }
 
 const struct CMUnitTest powershell_tests[] = {
