@@ -140,6 +140,7 @@ bool do_write_reg_command(HANDLE out_fp,
         wcsncpy(reg_type, L"REG_QWORD", 9);
         break;
     default:
+        debug_print(L"Invalid registry data type.\n");
         goto fail;
     }
     int req_size = _snwprintf(nullptr,

@@ -177,6 +177,7 @@ bool write_key_filtered_recursive(HKEY hk,
                                            nullptr,
                                            nullptr);
         if (ret_code != ERROR_SUCCESS) {
+            debug_print(L"RegQueryInfoKey failed (stem = %ls).\n", stem);
             goto fail;
         }
         if (n_sub_keys) {
