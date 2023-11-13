@@ -69,7 +69,8 @@ if(WIN32)
     registry.c
     registry.h
     shell.c
-    shell.h)
+    shell.h
+    utils.h)
   target_precompile_headers(winprefs PRIVATE pch.h)
   target_link_libraries(winprefs PRIVATE shlwapi)
   target_compile_definitions(
