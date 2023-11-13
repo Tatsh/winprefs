@@ -19,7 +19,7 @@ void test_output_c_dword(void **state) {
                   out,
                   L"dnum = 4; RegSetKeyValue(HKEY_CLASSES_ROOT, TEXT(\"Control Panel\\Desktop\"), "
                   L"TEXT(\"DoubleClickHeight\"), REG_DWORD, (LPCVOID)&dnum, sizeof(DWORD));",
-                  132);
+                  64 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     DWORD *test_val = malloc(sizeof(DWORD));
     test_val[0] = 4;
@@ -38,7 +38,7 @@ void test_output_c_qword(void **state) {
                   out,
                   L"qnum = 4; RegSetKeyValue(HKEY_LOCAL_MACHINE, TEXT(\"Control Panel\\Desktop\"), "
                   L"TEXT(\"DoubleClickHeight\"), REG_QWORD, (LPCVOID)&qnum, sizeof(QWORD));",
-                  132);
+                  64 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     QWORD *test_val = malloc(sizeof(QWORD));
     test_val[0] = 4;
@@ -58,7 +58,7 @@ void test_output_c_sz(void **state) {
         out,
         L"RegSetKeyValue(HKEY_CURRENT_CONFIG, TEXT(\"Environment\"), TEXT(\"TEMP\"), REG_SZ, "
         L"TEXT(\"\\\"quoted \\\\string\\\" fff\"), 104);",
-        103);
+        50 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_CURRENT_CONFIG\\Environment",
@@ -74,8 +74,8 @@ void test_output_c_expand_sz(void **state) {
         __wrap_write_output,
         out,
         L"RegSetKeyValue(HKEY_CURRENT_USER, TEXT(\"Environment\"), TEXT(\"TEMP\"), REG_EXPAND_SZ, "
-        L"TEXT(\"a midsummer night's %dream%\"), 104);",
-        112);
+        L"TEXT(\"a midsummer night's %dream%\"), 52);",
+        126 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_CURRENT_USER\\Environment",
@@ -92,8 +92,8 @@ void test_output_c_multi_sz(void **state) {
     expect_memory(__wrap_write_output,
                   out,
                   L"RegSetKeyValue(HKEY_USERS, TEXT(\"Environment\"), TEXT(\"TEMP\"), "
-                  L"REG_MULTI_SZ, TEXT(\"\\\"quoted string\\\" fff\\0test2\\0\\0\\0\\\"), 108);",
-                  126);
+                  L"REG_MULTI_SZ, TEXT(\"\\\"quoted string\\\" fff\\0test2\\0\\0\"), 54);",
+                  123 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_USERS\\Environment",
@@ -142,7 +142,7 @@ void test_output_c_none(void **state) {
                   out,
                   L"RegSetKeyValue(HKEY_CURRENT_USER, TEXT(\"Environment\"), TEXT(\"TEMP\"), "
                   L"REG_NONE, NULL, 0);",
-                  79);
+                  89 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_CURRENT_USER\\Environment",
@@ -160,8 +160,8 @@ void test_output_c_binary(void **state) {
                   out,
                   L"data = { 0x30, 0x00, 0x02, 0x80, 0x12, 0x00, 0x00, 0x00 }; "
                   L"RegSetKeyValue(HKEY_DYN_DATA, TEXT(\"Control Panel\\\\Desktop\"), "
-                  L"TEXT(\"UserPreferencesMask\"), REG_BINARY, (LPCVOID)&data, 32);",
-                  445);
+                  L"TEXT(\"UserPreferencesMask\"), REG_BINARY, (LPCVOID)&data, 8);",
+                  182 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_DYN_DATA\\Control Panel\\Desktop",
