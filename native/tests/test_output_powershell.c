@@ -94,7 +94,7 @@ void test_powershell_expand_sz(void **state) {
     assert_true(ret);
 }
 
-const wchar_t *MULTI_SZ_TEST_DATA[] = {L"a midsummer night''s dream", L"test2"};
+const wchar_t *MULTI_SZ_TEST_DATA[] = {L"a midsummer night's dream", L"test2"};
 
 void test_powershell_multi_sz(void **state) {
     expect_memory(
@@ -103,7 +103,7 @@ void test_powershell_multi_sz(void **state) {
         L"if (!(Test-Path 'HKEY_CURRENT_USER:\\Environment')) { New-Item -Path "
         L"'HKEY_CURRENT_USER:\\Environment' -Force | Out-Null } "
         L"New-ItemProperty -LiteralPath 'HKEY_CURRENT_USER:\\Environment' -Name "
-        L"'TEMP' -PropertyType String -Force -Value @\"\na midsummer night's dream\ntest2\n)\n\"@",
+        L"'TEMP' -PropertyType String -Force -Value @\"\na midsummer night''s dream\ntest2\n)\n\"@",
         271);
     will_return(__wrap_write_output, true);
     bool ret = do_write_powershell_reg_code(nullptr,
@@ -169,11 +169,24 @@ void test_powershell_skip_too_big(void **state) {
     free(buf);
 }
 
+const wchar_t *MULTI_SZ_TEST_DATA_INVALID = L"\"quoted string\" fff\0test2";
+
+void test_powershell_multi_sz_invalid(void **state) {
+    bool ret = do_write_powershell_reg_code(nullptr,
+                                            L"HKEY_USERS\\Environment",
+                                            L"TEMP",
+                                            (const char *)MULTI_SZ_TEST_DATA,
+                                            25 * sizeof(wchar_t),
+                                            REG_MULTI_SZ);
+    assert_false(ret);
+}
+
 const struct CMUnitTest powershell_tests[] = {
     cmocka_unit_test(test_powershell_binary),
     cmocka_unit_test(test_powershell_dword),
     cmocka_unit_test(test_powershell_expand_sz),
     cmocka_unit_test(test_powershell_multi_sz),
+    cmocka_unit_test(test_powershell_multi_sz_invalid),
     cmocka_unit_test(test_powershell_none),
     cmocka_unit_test(test_powershell_null_escaped_reg_key),
     cmocka_unit_test(test_powershell_qword),

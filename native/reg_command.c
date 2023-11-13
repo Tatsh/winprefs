@@ -3,24 +3,18 @@
 #include "registry.h"
 #include "shell.h"
 
-static wchar_t REG_PARAM_SLASH_VE[] = L"/ve ";
-static wchar_t REG_PARAM_SLASH_V_EMPTY[] = L"/v \"\"";
+static wchar_t *REG_PARAM_SLASH_VE = L"/ve ";
 
 wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
     wchar_t *escaped, *out;
     escaped = out = nullptr;
     *heap = true;
-    if (!wcsncmp(L"(default)", prop, 9) || prop_len == 0 || prop == nullptr) {
+    if (prop_len == 0 || prop == nullptr || !wcsncmp(L"(default)", prop, 9)) {
         *heap = false;
         out = REG_PARAM_SLASH_VE;
         goto cleanup;
     }
     escaped = escape_for_batch(prop, prop_len);
-    if (!escaped) {
-        *heap = false;
-        out = REG_PARAM_SLASH_V_EMPTY;
-        goto cleanup;
-    }
     size_t escaped_len = (7 + wcslen(escaped)) * WL;
     out = calloc(7 + wcslen(escaped), WL);
     if (!out) { // LCOV_EXCL_START
@@ -29,8 +23,9 @@ wchar_t *fix_v_param(const wchar_t *prop, size_t prop_len, bool *heap) {
     memset(out, 0, escaped_len);
     _snwprintf(out, escaped_len, L"/v \"%ls\" ", escaped);
     goto cleanup;
-fail:
+fail: // LCOV_EXCL_START
     out = nullptr;
+    // LCOV_EXCL_STOP
 cleanup:
     free_if_not_null(escaped);
     return out;
@@ -64,10 +59,16 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         goto cleanup;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
-        s = escape_for_batch((wchar_t *)data, data_len == 0 ? 0 : data_len / WL);
-        if (!s) {
+        size_t w_data_len = ((data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1);
+        wchar_t *w_data = (wchar_t *)data;
+        if (reg_type == REG_MULTI_SZ &&
+            !(w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2)) {
             goto fail;
         }
+        s = escape_for_batch((wchar_t *)data, w_data_len);
+        if (!unlikely(s)) { // LCOV_EXCL_START
+            goto fail;
+        } // LCOV_EXCL_STOP
         size_t s_size = (wcslen(s) + 8);
         out = calloc(s_size, WL);
         if (!out) { // LCOV_EXCL_START
@@ -110,9 +111,9 @@ bool do_write_reg_command(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_reg(type, value, data_len);
     wchar_t *escaped_reg_key = escape_for_batch(full_path, wcslen(full_path));
     bool v_heap = false;
-    wchar_t *v_param = fix_v_param(prop, wcslen(prop), &v_heap);
+    wchar_t *v_param = fix_v_param(prop, prop ? wcslen(prop) : 0, &v_heap);
     wchar_t reg_type[14];
-    if (!escaped_reg_key || !v_param) {
+    if (!escaped_reg_key || !v_param || (type != REG_NONE && !escaped_d)) {
         goto fail;
     }
     memset(reg_type, 0, sizeof(reg_type));
@@ -155,19 +156,17 @@ bool do_write_reg_command(HANDLE out_fp,
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
         int wrote = _snwprintf(out,
-                               (size_t)req_size,
+                               total_size,
                                L"reg add \"%ls\" %ls/t %ls%ls/f",
                                escaped_reg_key,
                                v_param,
                                reg_type,
                                escaped_d ? escaped_d : L" ");
-
-        if (((size_t)wrote < total_size) ||
-            (wrote == req_size && out[total_size - 1] == L'f' && out[total_size - 2] == L'/' &&
-             out[total_size - 3] == L' ')) {
+        if (wrote) {
             ret = write_output(out_fp, out, true);
         }
     } else {
+        errno = EKEYREJECTED;
         debug_print(L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
     }
     goto cleanup;

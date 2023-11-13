@@ -87,7 +87,10 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       git_commit
       io
       main
-      powershell
+      output_c
+      output_c_sharp
+      output_powershell
+      output_reg_command
       save_prefs
       shell)
   foreach(category ${test_categories})
@@ -110,7 +113,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       -Wl,--wrap,do_write_powershell_reg_code>
       $<$<STREQUAL:main,${category}>:-Wl,--wrap,save_preferences
       -Wl,--wrap,export_single_value>
-      $<$<STREQUAL:powershell,${category}>:-Wl,--wrap,write_output>)
+      $<$<OR:$<STREQUAL:output_powershell,${category}>,$<STREQUAL:output_c,${category}>,$<STREQUAL:output_c_sharp,${category}>,$<STREQUAL:output_reg_command,${category}>>:-Wl,--wrap,write_output>
+    )
     target_precompile_headers(test-${category} PRIVATE ${test_pch})
 
     add_test(NAME "${category} tests" COMMAND test-${category})

@@ -4,10 +4,10 @@
 
 static wchar_t *escape_for_powershell(const wchar_t *input, size_t n_chars) {
     wchar_t *out = nullptr;
-    if (input == nullptr || n_chars == 0) {
+    if (input == nullptr || n_chars == 0) { // LCOV_EXCL_START
         errno = EINVAL;
-        goto fail;
-    }
+        return nullptr;
+    } // LCOV_EXCL_STOP
     unsigned i, j;
     size_t new_n_chars = 0;
     for (i = 0; i < n_chars; i++) {
@@ -19,12 +19,12 @@ static wchar_t *escape_for_powershell(const wchar_t *input, size_t n_chars) {
     }
     out = calloc(new_n_chars + 1, WL);
     if (!out) { // LCOV_EXCL_START
-        goto fail;
+        return nullptr;
     } // LCOV_EXCL_STOP
     wmemset(out, L'\0', new_n_chars + 1);
     if (n_chars == new_n_chars) {
         wmemcpy(out, input, new_n_chars + 1);
-        goto cleanup;
+        return out;
     }
     for (i = 0, j = 0; i < n_chars && j < new_n_chars; i++, j++) {
         out[j] = input[i];
@@ -32,10 +32,6 @@ static wchar_t *escape_for_powershell(const wchar_t *input, size_t n_chars) {
             out[++j] = input[i];
         }
     }
-    goto cleanup;
-fail:
-    out = nullptr;
-cleanup:
     return out;
 }
 
@@ -78,9 +74,9 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ) {
         escaped = escape_for_powershell((wchar_t *)data, data_len == 0 ? 0 : data_len / WL);
-        if (!escaped) {
+        if (!escaped) { // LCOV_EXCL_START
             goto fail;
-        }
+        } // LCOV_EXCL_STOP
         size_t escaped_len = wcslen(escaped);
         size_t total_size = escaped_len + 3;
         out = calloc(total_size, WL);
@@ -114,7 +110,7 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
             goto cleanup;
         }
         debug_print(L"Skipping incorrectly stored MultiString (length = %d).\n", w_data_len);
-        goto cleanup;
+        goto fail;
     }
     if (reg_type == REG_DWORD) {
         int req_size = _snwprintf(nullptr, 0, L"%lu", *(DWORD *)data);
@@ -188,7 +184,7 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
     wchar_t *escaped_d = convert_data_for_powershell(type, value, data_len);
     wchar_t *escaped_reg_key = add_colon_if_required(full_path);
     wchar_t *escaped_prop = escape_for_powershell(prop, wcslen(prop));
-    if (!escaped_reg_key) {
+    if (!escaped_reg_key || !escaped_prop || (!escaped_d && type != REG_NONE)) {
         goto fail;
     }
     wchar_t reg_type[14];

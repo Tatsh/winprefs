@@ -235,6 +235,100 @@ static void test_main_debug_arg(void **state) {
     free(prefs_export_path);
 }
 
+void test_main_deploy_key_arg(void **state) {
+    wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
+    wmemset(app_data_folder, L'\0', 30);
+    wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
+    will_return(__wrap_SHGetFolderPath, app_data_folder);
+    will_return(__wrap_SHGetFolderPath, 0);
+    wchar_t *prefs_export_path = calloc(43, sizeof(wchar_t));
+    wmemset(prefs_export_path, L'\0', 43);
+    wmemcpy(prefs_export_path, app_data_folder, 29);
+    wcsncat(prefs_export_path, L"prefs-export", 12);
+    will_return(__wrap_PathAppend, prefs_export_path);
+    will_return(__wrap_PathAppend, true);
+
+    expect_any(__wrap_save_preferences, max_depth);
+    expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, format);
+    expect_memory(__wrap_save_preferences, deploy_key, L"file.key", 8);
+    expect_any(__wrap_save_preferences, hk);
+    expect_any(__wrap_save_preferences, output_dir);
+    expect_any(__wrap_save_preferences, output_file);
+    expect_any(__wrap_save_preferences, specified_path);
+    will_return(__wrap_save_preferences, true);
+
+    wchar_t **buf = calloc(4, sizeof(wchar_t *));
+    buf[0] = calloc(8, sizeof(wchar_t));
+    buf[1] = calloc(3, sizeof(wchar_t));
+    buf[2] = calloc(9, sizeof(wchar_t));
+    buf[3] = nullptr;
+    wmemset(buf[0], L'\0', 8);
+    wmemcpy(buf[0], L"winprefs", 7);
+    wmemset(buf[1], L'\0', 3);
+    wmemcpy(buf[1], L"-K", 2);
+    wmemset(buf[2], L'\0', 9);
+    wmemcpy(buf[2], L"file.key", 8);
+    int ret = wmain(3, buf);
+
+    assert_return_code(ret, EXIT_SUCCESS);
+    debug_print_enabled = false;
+
+    free(buf[0]);
+    free(buf[1]);
+    free(buf[2]);
+    free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
+}
+
+void test_main_output_file_arg(void **state) {
+    wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
+    wmemset(app_data_folder, L'\0', 30);
+    wmemcpy(app_data_folder, L"\\c\\users\\name\\AppData\\Roaming", 29);
+    will_return(__wrap_SHGetFolderPath, app_data_folder);
+    will_return(__wrap_SHGetFolderPath, 0);
+    wchar_t *prefs_export_path = calloc(43, sizeof(wchar_t));
+    wmemset(prefs_export_path, L'\0', 43);
+    wmemcpy(prefs_export_path, app_data_folder, 29);
+    wcsncat(prefs_export_path, L"prefs-export", 12);
+    will_return(__wrap_PathAppend, prefs_export_path);
+    will_return(__wrap_PathAppend, true);
+
+    expect_any(__wrap_save_preferences, max_depth);
+    expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, format);
+    expect_any(__wrap_save_preferences, deploy_key);
+    expect_any(__wrap_save_preferences, hk);
+    expect_any(__wrap_save_preferences, output_dir);
+    expect_memory(__wrap_save_preferences, output_file, L"exec.reg", 8);
+    expect_any(__wrap_save_preferences, specified_path);
+    will_return(__wrap_save_preferences, true);
+
+    wchar_t **buf = calloc(4, sizeof(wchar_t *));
+    buf[0] = calloc(8, sizeof(wchar_t));
+    buf[1] = calloc(3, sizeof(wchar_t));
+    buf[2] = calloc(9, sizeof(wchar_t));
+    buf[3] = nullptr;
+    wmemset(buf[0], L'\0', 8);
+    wmemcpy(buf[0], L"winprefs", 7);
+    wmemset(buf[1], L'\0', 3);
+    wmemcpy(buf[1], L"-f", 2);
+    wmemset(buf[2], L'\0', 9);
+    wmemcpy(buf[2], L"exec.reg", 8);
+    int ret = wmain(3, buf);
+
+    assert_return_code(ret, EXIT_SUCCESS);
+    debug_print_enabled = false;
+
+    free(buf[0]);
+    free(buf[1]);
+    free(buf[2]);
+    free(buf);
+    free(app_data_folder);
+    free(prefs_export_path);
+}
+
 static const wchar_t *C_SHARP_FORMAT_NAMES[] = {L"cs", L"c#", L"csharp"};
 
 static void test_main_format_arg_c_sharp(void **state) {
@@ -581,7 +675,7 @@ static void test_main_format_arg_c(void **state) {
 const struct CMUnitTest main_tests[] = {
     cmocka_unit_test(test_main_commit_arg),
     cmocka_unit_test(test_main_debug_arg),
-    cmocka_unit_test(test_main_output_dir_arg),
+    cmocka_unit_test(test_main_deploy_key_arg),
     cmocka_unit_test(test_main_format_arg_c),
     cmocka_unit_test(test_main_format_arg_c_sharp),
     cmocka_unit_test(test_main_format_arg_default),
@@ -592,6 +686,8 @@ const struct CMUnitTest main_tests[] = {
     cmocka_unit_test(test_main_help),
     cmocka_unit_test(test_main_invalid_option),
     cmocka_unit_test(test_main_max_depth_conversion),
+    cmocka_unit_test(test_main_output_dir_arg),
+    cmocka_unit_test(test_main_output_file_arg),
     cmocka_unit_test(test_main_reg_path_invalid),
     cmocka_unit_test(test_main_reg_path_invalid_alt),
     cmocka_unit_test(test_main_save_prefs_failed),

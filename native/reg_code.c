@@ -30,11 +30,12 @@ static wchar_t *get_top_key_string(const wchar_t *reg_path) {
     return out;
 }
 
-static wchar_t *escape_for_c(const wchar_t *input, size_t n_chars, bool escape_null) {
-    if (input == nullptr || n_chars == 0) {
+static wchar_t *escape_for_c(const wchar_t *input, bool escape_null, size_t length) {
+    if (input == nullptr || (escape_null && length == 0)) { // LCOV_EXCL_START
         errno = EINVAL;
         return nullptr;
-    }
+    } // LCOV_EXCL_STOP
+    size_t n_chars = !escape_null ? wcslen(input) : length;
     unsigned i, j;
     size_t new_n_chars = 0;
     for (i = 0; i < n_chars; i++) {
@@ -68,24 +69,16 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         size_t n_bin_chars = 7 * data_len;
         size_t new_len = n_bin_chars + 1;
         wchar_t *bin = calloc(new_len, WL);
+        wchar_t conv[7];
         if (!bin) { // LCOV_EXCL_START
             return nullptr;
         } // LCOV_EXCL_STOP
         wmemset(bin, L'\0', new_len);
         for (i = 0, j = 0; i < data_len; i++) {
-            if (i < (data_len - 1)) {
-                wchar_t conv[7];
-                _snwprintf(conv, 6, L"0x%02x, ", data[i] & 0xFF);
-                conv[6] = L'\0';
-                wcsncat(bin + j, conv, 6);
-                j += 6;
-            } else {
-                wchar_t conv[5];
-                _snwprintf(conv, 4, L"0x%02x", data[i] & 0xFF);
-                conv[4] = L'\0';
-                wcsncat(bin + j, conv, 4);
-                j += 4;
-            }
+            wmemset(conv, L'\0', 7);
+            _snwprintf(conv, 7, L"0x%02x%ls", data[i] & 0xFF, i < (data_len - 1) ? L", " : L"");
+            wcsncat(bin + j, conv, i < (data_len - 1) ? 6 : 4);
+            j += i < (data_len - 1) ? 6 : 4;
         }
         size_t s_size = new_len + 4;
         wchar_t *out = calloc(s_size, WL);
@@ -99,11 +92,10 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         return out;
     }
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ) {
-        size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
-        wchar_t *escaped = escape_for_c((wchar_t *)data, data_len == 0 ? 0 : w_data_len, false);
-        if (!escaped) {
+        wchar_t *escaped = escape_for_c((wchar_t *)data, false, 0);
+        if (!escaped) { // LCOV_EXCL_START
             return nullptr;
-        }
+        } // LCOV_EXCL_STOP
         size_t escaped_len = wcslen(escaped);
         size_t total_size = escaped_len + 1;
         wchar_t *out = calloc(total_size, WL);
@@ -111,26 +103,30 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
             return nullptr;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
-        _snwprintf(out, escaped_len, L"%ls", escaped ? escaped : L"NULL");
+        _snwprintf(out, escaped ? total_size : 5, L"%ls", escaped ? escaped : L"NULL");
+        free(escaped);
         return out;
     }
     if (reg_type == REG_MULTI_SZ) {
         wchar_t *w_data = (wchar_t *)data;
         size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
         if (w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2) {
-            size_t total_size = 4 + w_data_len;
-            wchar_t *escaped = escape_for_c((wchar_t *)data, w_data_len, true);
-            if (!escaped) {
+            size_t total_size = (2 * sizeof(wchar_t)) + w_data_len;
+            wchar_t *escaped = escape_for_c((wchar_t *)data, true, w_data_len);
+            if (!escaped) { // LCOV_EXCL_START
                 return nullptr;
-            }
+            } // LCOV_EXCL_STOP
             wchar_t *out = calloc(total_size, WL);
             if (!out) { // LCOV_EXCL_START
                 return nullptr;
             } // LCOV_EXCL_STOP
             _snwprintf(out, total_size, L"%ls\\0", escaped);
+            free(escaped);
             return out;
         }
-        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d).\n", w_data_len);
+        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d, w_data_len = %d).\n",
+                    data_len,
+                    w_data_len);
         return nullptr;
     }
     if (reg_type == REG_DWORD) {
@@ -139,8 +135,8 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         if (!out) { // LCOV_EXCL_START
             return nullptr;
         } // LCOV_EXCL_STOP
-        wmemset(out, 0, (size_t)req_size);
-        _snwprintf(out, (size_t)req_size, L"%lu", *(DWORD *)data);
+        wmemset(out, 0, (size_t)(req_size + 1));
+        _snwprintf(out, (size_t)req_size + 1, L"%lu", *(DWORD *)data);
         return out;
     }
     if (reg_type == REG_QWORD) {
@@ -149,8 +145,8 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         if (!out) { // LCOV_EXCL_START
             return nullptr;
         } // LCOV_EXCL_STOP
-        wmemset(out, 0, (size_t)req_size);
-        _snwprintf(out, (size_t)req_size, L"%llu", *(UINT64 *)data);
+        wmemset(out, 0, (size_t)(req_size + 1));
+        _snwprintf(out, (size_t)(req_size + 1), L"%llu", *(UINT64 *)data);
         return out;
     }
     errno = EINVAL;
@@ -171,9 +167,9 @@ bool do_write_c_reg_code(HANDLE out_fp,
         goto fail;
     }
     wchar_t *subkey = first_backslash + 1;
-    escaped_key = escape_for_c(subkey, wcslen(subkey), false);
+    escaped_key = escape_for_c(subkey, false, 0);
     escaped_d = convert_data_for_c(type, value, data_len);
-    escaped_prop = escape_for_c(prop, wcslen(prop), false);
+    escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
     if (!escaped_key || !top_key_s) {
         goto fail;
@@ -213,14 +209,15 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_key,
                                   escaped_prop ? escaped_prop : L"",
                                   reg_type,
+                                  type == REG_DWORD ? L"d" : L"q",
                                   type == REG_DWORD ? KEYWORD_DWORD : KEYWORD_QWORD);
         out = calloc((size_t)req_size + 1, WL);
         if (!out) { // LCOV_EXCL_START
             return false;
         } // LCOV_EXCL_STOP
-        wmemset(out, L'\0', (size_t)req_size + 1);
+        wmemset(out, L'\0', (size_t)(req_size + 1));
         _snwprintf(out,
-                   (size_t)req_size,
+                   (size_t)(req_size + 1),
                    C_REGSETKEYVALUEW_TEMPLATE_NUMERIC,
                    type == REG_DWORD ? L"d" : L"q",
                    escaped_d ? escaped_d : L"",
@@ -228,6 +225,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
                    escaped_key,
                    escaped_prop ? escaped_prop : L"",
                    reg_type,
+                   type == REG_DWORD ? L"d" : L"q",
                    type == REG_DWORD ? KEYWORD_DWORD : KEYWORD_QWORD);
     } else if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_MULTI_SZ) {
         int req_size = _snwprintf(nullptr,
@@ -240,12 +238,12 @@ bool do_write_c_reg_code(HANDLE out_fp,
                                   escaped_d,
                                   data_len);
         out = calloc((size_t)req_size + 1, WL);
-        if (!out) { // LCOV_EXCL_START
+        if (!out || !escaped_d) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
-                   (size_t)req_size,
+                   (size_t)req_size + 1,
                    C_REGSETKEYVALUEW_TEMPLATE_SZ,
                    top_key_s,
                    escaped_key,
@@ -266,7 +264,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
-                   (size_t)req_size,
+                   (size_t)req_size + 1,
                    C_REGSETKEYVALUEW_TEMPLATE_NONE,
                    top_key_s,
                    escaped_key,
@@ -286,7 +284,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', (size_t)req_size + 1);
         _snwprintf(out,
-                   (size_t)req_size,
+                   (size_t)req_size + 1,
                    C_REGSETKEYVALUEW_TEMPLATE_BINARY,
                    escaped_d,
                    top_key_s,
@@ -318,31 +316,38 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
     if (reg_type == REG_BINARY || reg_type == REG_NONE || reg_type == REG_QWORD ||
         reg_type == REG_DWORD) {
         out = convert_data_for_c(reg_type, data, data_len);
-        if (!out) {
+        if (!out) { // LCOV_EXCL_START
             goto fail;
-        }
+        } // LCOV_EXCL_STOP
         goto cleanup;
     }
     if (reg_type == REG_SZ || reg_type == REG_EXPAND_SZ) {
         escaped = convert_data_for_c(reg_type, data, data_len);
-        if (!escaped) {
+        if (!escaped) { // LCOV_EXCL_START
             goto fail;
-        }
+        } // LCOV_EXCL_STOP
         size_t escaped_len = wcslen(escaped);
         out = calloc(escaped_len + 3, WL);
         if (!out) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
-        _snwprintf(out, escaped_len + 2, L"\"%ls\"", escaped);
+        _snwprintf(out, escaped_len + 3, L"\"%ls\"", escaped);
         goto cleanup;
     }
     if (reg_type != REG_MULTI_SZ) {
         errno = EINVAL;
         goto fail;
     }
+    wchar_t *w_data = (wchar_t *)data;
+    size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
+    if (!(w_data[w_data_len] == L'\0' && data[w_data_len - 1] == L'\0' && w_data_len > 2)) {
+        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d, w_data_len = %d).\n",
+                    data_len,
+                    w_data_len);
+        goto fail;
+    }
     unsigned i, j;
     size_t strings_size = 0;
-    wchar_t *w_data = (wchar_t *)data;
     for (i = 0; i < data_len; i++) {
         strings_size++;
         if (w_data[i] == L'"' || w_data[i] == L'\\') {
@@ -357,7 +362,6 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
         goto fail;
     } // LCOV_EXCL_STOP
     wmemset(strings, L'\0', strings_size + 1);
-    size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
     strings[0] = L'"';
     for (i = 0, j = 1; i < w_data_len - 2 && j < strings_size; i++, j++) {
         if (w_data[i] == L'\0') {
@@ -402,11 +406,11 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
         goto fail;
     }
     wchar_t *subkey = first_backslash + 1;
-    escaped_key = escape_for_c(subkey, wcslen(subkey), false);
+    escaped_key = escape_for_c(subkey, false, 0);
     escaped_d = convert_data_for_c_sharp(type, value, data_len);
-    escaped_prop = escape_for_c(prop, wcslen(prop), false);
+    escaped_prop = escape_for_c(prop, false, 0);
     top_key_s = get_top_key_string(full_path);
-    if (!escaped_key || !top_key_s) {
+    if (!escaped_key || !top_key_s || (!escaped_d && type != REG_NONE)) {
         goto fail;
     }
     wchar_t reg_type[33];
@@ -431,6 +435,9 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
     case REG_QWORD:
         wcsncpy(reg_type, L", RegistryValueKind.QWord", 25);
         break;
+    default: // LCOV_EXCL_START
+        goto fail;
+        // LCOV_EXCL_STOP
     }
     int req_size = _snwprintf(nullptr,
                               0,
@@ -446,7 +453,7 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
     } // LCOV_EXCL_STOP
     wmemset(out, L'\0', (size_t)req_size + 1);
     _snwprintf(out,
-               (size_t)req_size,
+               (size_t)req_size + 1,
                C_SHARP_REGISTRY_SET_VALUE_TEMPLATE,
                top_key_s,
                escaped_key,
