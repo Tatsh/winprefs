@@ -154,7 +154,7 @@ bool do_write_reg_command(HANDLE out_fp,
                               v_param,
                               reg_type,
                               escaped_d ? escaped_d : L" ");
-    if ((size_t)req_size < CMD_MAX_COMMAND_LENGTH) {
+    if (req_size >= 1 && (size_t)req_size < CMD_MAX_COMMAND_LENGTH) {
         size_t total_size = (size_t)req_size + 1;
         out = calloc(total_size, WL);
         if (!out) { // LCOV_EXCL_START

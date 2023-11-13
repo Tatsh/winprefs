@@ -99,7 +99,7 @@ void test_output_c_multi_sz(void **state) {
                                    L"HKEY_USERS\\Environment",
                                    L"TEMP",
                                    (const char *)MULTI_SZ_TEST_DATA,
-                                   27 * sizeof(wchar_t),
+                                   28 * sizeof(wchar_t),
                                    REG_MULTI_SZ);
     assert_true(ret);
 }

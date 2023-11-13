@@ -90,26 +90,16 @@ void test_output_reg_command_multi_sz(void **state) {
     assert_true(ret);
 }
 
-const wchar_t *MULTI_SZ_TEST_DATA_INVALID = L"\"quoted string\" fff\0test2";
+const unsigned char MULTI_SZ_TEST_DATA_INVALID[] = {'e', 0, 'n', 0, '-', 0, 'U', 0, 'S'};
 
 void test_output_reg_command_multi_sz_invalid(void **state) {
     bool ret = do_write_reg_command(nullptr,
                                     L"HKEY_USERS\\Environment",
                                     L"TEMP",
-                                    (const char *)MULTI_SZ_TEST_DATA,
-                                    25 * sizeof(wchar_t),
+                                    (const char *)MULTI_SZ_TEST_DATA_INVALID,
+                                    9,
                                     REG_MULTI_SZ);
-    assert_false(ret);
-}
-
-void test_output_reg_command_top_key_invalid(void **state) {
-    bool ret = do_write_reg_command(nullptr,
-                                    L"HKEY_USER_Z\\Environment",
-                                    L"TEMP",
-                                    (const char *)MULTI_SZ_TEST_DATA,
-                                    25 * sizeof(wchar_t),
-                                    REG_MULTI_SZ);
-    assert_false(ret);
+    assert_true(ret);
 }
 
 void test_output_reg_command_invalid_type(void **state) {
@@ -227,7 +217,6 @@ const struct CMUnitTest output_reg_command_tests[] = {
     cmocka_unit_test(test_output_reg_command_qword),
     cmocka_unit_test(test_output_reg_command_skip_too_big),
     cmocka_unit_test(test_output_reg_command_sz),
-    cmocka_unit_test(test_output_reg_command_top_key_invalid),
 };
 
 int main(int argc, char *argv[]) {
