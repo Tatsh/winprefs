@@ -75,7 +75,7 @@ void test_output_c_expand_sz(void **state) {
         out,
         L"RegSetKeyValue(HKEY_CURRENT_USER, TEXT(\"Environment\"), TEXT(\"TEMP\"), REG_EXPAND_SZ, "
         L"TEXT(\"a midsummer night's %dream%\"), 52);",
-        126 * sizeof(wchar_t));
+        50 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_CURRENT_USER\\Environment",
@@ -93,7 +93,7 @@ void test_output_c_multi_sz(void **state) {
                   out,
                   L"RegSetKeyValue(HKEY_USERS, TEXT(\"Environment\"), TEXT(\"TEMP\"), "
                   L"REG_MULTI_SZ, TEXT(\"\\\"quoted string\\\" fff\\0test2\\0\\0\"), 54);",
-                  123 * sizeof(wchar_t));
+                  50 * sizeof(wchar_t));
     will_return(__wrap_write_output, true);
     bool ret = do_write_c_reg_code(nullptr,
                                    L"HKEY_USERS\\Environment",
