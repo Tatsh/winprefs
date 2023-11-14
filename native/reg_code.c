@@ -353,7 +353,7 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
     }
     unsigned i, j;
     size_t strings_size = 0;
-    for (i = 0; i < data_len; i++) {
+    for (i = 0; i < w_data_len; i++) {
         strings_size++;
         if (w_data[i] == L'"' || w_data[i] == L'\\') {
             strings_size++;
