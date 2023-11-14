@@ -671,6 +671,78 @@ static void test_main_format_arg_c(void **state) {
     free(prefs_export_path);
 }
 
+void test_main_top_key_only(void **state) {
+    expect_any_always(__wrap_save_preferences, max_depth);
+    expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, deploy_key);
+    expect_any_always(__wrap_save_preferences, format);
+    expect_any_always(__wrap_save_preferences, hk);
+    expect_any_always(__wrap_save_preferences, output_dir);
+    expect_any_always(__wrap_save_preferences, output_file);
+    expect_any_always(__wrap_save_preferences, specified_path);
+    will_return_always(__wrap_save_preferences, true);
+
+    wchar_t **buf = calloc(5, sizeof(wchar_t *));
+    buf[0] = calloc(9, sizeof(wchar_t));
+    buf[1] = calloc(3, sizeof(wchar_t));
+    buf[2] = calloc(4, sizeof(wchar_t));
+    buf[3] = calloc(6, sizeof(wchar_t));
+    buf[4] = nullptr;
+    wmemset(buf[0], L'\0', 9);
+    wmemcpy(buf[0], L"winprefs", 8);
+    wmemset(buf[1], L'\0', 3);
+    wmemcpy(buf[1], L"-o", 2);
+    wmemset(buf[2], L'\0', 4);
+    wmemcpy(buf[2], L"out", 3);
+    wmemset(buf[3], L'\0', 6);
+    wmemcpy(buf[3], L"HKCU:", 5);
+
+    int ret = wmain(4, buf);
+    assert_return_code(ret, EXIT_SUCCESS);
+
+    free(buf[0]);
+    free(buf[1]);
+    free(buf[2]);
+    free(buf[3]);
+    free(buf);
+}
+
+void test_main_top_key_only_2(void **state) {
+    expect_any_always(__wrap_save_preferences, max_depth);
+    expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, deploy_key);
+    expect_any_always(__wrap_save_preferences, format);
+    expect_any_always(__wrap_save_preferences, hk);
+    expect_any_always(__wrap_save_preferences, output_dir);
+    expect_any_always(__wrap_save_preferences, output_file);
+    expect_any_always(__wrap_save_preferences, specified_path);
+    will_return_always(__wrap_save_preferences, true);
+
+    wchar_t **buf = calloc(5, sizeof(wchar_t *));
+    buf[0] = calloc(9, sizeof(wchar_t));
+    buf[1] = calloc(3, sizeof(wchar_t));
+    buf[2] = calloc(4, sizeof(wchar_t));
+    buf[3] = calloc(7, sizeof(wchar_t));
+    buf[4] = nullptr;
+    wmemset(buf[0], L'\0', 9);
+    wmemcpy(buf[0], L"winprefs", 8);
+    wmemset(buf[1], L'\0', 3);
+    wmemcpy(buf[1], L"-o", 2);
+    wmemset(buf[2], L'\0', 4);
+    wmemcpy(buf[2], L"out", 3);
+    wmemset(buf[3], L'\0', 6);
+    wmemcpy(buf[3], L"HKCU:\\", 6);
+
+    int ret = wmain(4, buf);
+    assert_return_code(ret, EXIT_SUCCESS);
+
+    free(buf[0]);
+    free(buf[1]);
+    free(buf[2]);
+    free(buf[3]);
+    free(buf);
+}
+
 const struct CMUnitTest main_tests[] = {
     cmocka_unit_test(test_main_commit_arg),
     cmocka_unit_test(test_main_debug_arg),
@@ -690,6 +762,8 @@ const struct CMUnitTest main_tests[] = {
     cmocka_unit_test(test_main_reg_path_invalid),
     cmocka_unit_test(test_main_reg_path_invalid_alt),
     cmocka_unit_test(test_main_save_prefs_failed),
+    cmocka_unit_test(test_main_top_key_only),
+    cmocka_unit_test(test_main_top_key_only_2),
 };
 
 int main(int argc, char *argv[]) {
