@@ -87,7 +87,8 @@ $(function() {
   <div class="headertitle"><div class="title">registry.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;windef.h&gt;</code><br />
+<div class="textblock"><code>#include &quot;io.h&quot;</code><br />
+<code>#include &quot;macros.h&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for registry.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -95,9 +96,11 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="registry_8h__incl.png" border="0" usemap="#aregistry_8h" alt=""/></div>
 <map name="aregistry_8h" id="aregistry_8h">
-<area shape="rect" title=" " alt="" coords="5,5,86,35"/>
-<area shape="rect" title=" " alt="" coords="8,83,83,113"/>
-<area shape="poly" title=" " alt="" coords="48,36,48,67,43,67,43,36"/>
+<area shape="rect" title=" " alt="" coords="30,5,110,35"/>
+<area shape="rect" href="io_8h_source.html" title=" " alt="" coords="5,83,50,113"/>
+<area shape="poly" title=" " alt="" coords="64,37,45,70,41,68,60,34"/>
+<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="74,83,152,113"/>
+<area shape="poly" title=" " alt="" coords="81,34,100,68,95,70,76,37"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -107,11 +110,29 @@ $(function() {
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="registry_8h__dep__incl.png" border="0" usemap="#aregistry_8hdep" alt=""/></div>
 <map name="aregistry_8hdep" id="aregistry_8hdep">
-<area shape="rect" title=" " alt="" coords="43,5,123,35"/>
-<area shape="rect" href="main_8c.html" title=" " alt="" coords="5,83,67,113"/>
-<area shape="poly" title=" " alt="" coords="68,50,47,84,42,81,64,47"/>
-<area shape="rect" href="registry_8c_source.html" title=" " alt="" coords="90,83,169,113"/>
-<area shape="poly" title=" " alt="" coords="102,47,123,81,118,84,97,50"/>
+<area shape="rect" title=" " alt="" coords="301,5,382,35"/>
+<area shape="rect" href="main_8c.html" title=" " alt="" coords="5,161,67,190"/>
+<area shape="poly" title=" " alt="" coords="299,44,215,85,64,162,62,158,212,81,297,40"/>
+<area shape="rect" href="reg__code_8c_source.html" title=" " alt="" coords="91,161,179,190"/>
+<area shape="poly" title=" " alt="" coords="311,46,256,85,154,162,151,158,253,81,307,42"/>
+<area shape="rect" href="reg__command_8c_source.html" title=" " alt="" coords="203,161,322,190"/>
+<area shape="poly" title=" " alt="" coords="306,46,287,63,272,84,265,104,262,124,263,160,258,160,257,124,260,102,267,82,283,60,302,42"/>
+<area shape="rect" href="reg__command_8h.html" title=" " alt="" coords="281,83,402,113"/>
+<area shape="poly" title=" " alt="" coords="344,51,344,82,339,82,339,51"/>
+<area shape="rect" href="registry_8c_source.html" title=" " alt="" coords="634,161,713,190"/>
+<area shape="poly" title=" " alt="" coords="370,43,413,78,466,110,535,132,634,161,633,166,533,138,464,115,410,82,366,47"/>
+<area shape="rect" href="test__export__single_8c_source.html" title=" " alt="" coords="477,83,622,113"/>
+<area shape="poly" title=" " alt="" coords="396,38,511,80,509,85,394,43"/>
+<area shape="rect" href="test__save__prefs_8c_source.html" title=" " alt="" coords="646,83,773,113"/>
+<area shape="poly" title=" " alt="" coords="397,30,646,81,645,86,396,35"/>
+<area shape="poly" title=" " alt="" coords="266,118,79,163,68,167,66,161,78,158,265,113"/>
+<area shape="poly" title=" " alt="" coords="289,121,174,163,172,158,287,116"/>
+<area shape="poly" title=" " alt="" coords="318,126,279,162,276,158,314,122"/>
+<area shape="rect" href="io_8c_source.html" title=" " alt="" coords="347,161,389,190"/>
+<area shape="poly" title=" " alt="" coords="354,126,366,159,360,161,349,128"/>
+<area shape="poly" title=" " alt="" coords="418,112,623,158,634,161,633,166,622,163,417,117"/>
+<area shape="rect" href="test__output__reg__command_8c_source.html" title=" " alt="" coords="413,161,611,190"/>
+<area shape="poly" title=" " alt="" coords="388,117,481,158,479,163,386,122"/>
 </map>
 </div>
 </div>
@@ -119,34 +140,37 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aede5df108516bb2bafcb3e0146bca4b6" id="r_aede5df108516bb2bafcb3e0146bca4b6"><td class="memItemLeft" align="right" valign="top">HKEY&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#aede5df108516bb2bafcb3e0146bca4b6">get_top_key</a> (wchar_t *reg_path)</td></tr>
-<tr class="memdesc:aede5df108516bb2bafcb3e0146bca4b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the <code>HKEY</code> pointer for the first part of a registry path.  <br /></td></tr>
-<tr class="separator:aede5df108516bb2bafcb3e0146bca4b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae7105a0989f6f1a87ab55d317645015a" id="r_ae7105a0989f6f1a87ab55d317645015a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#ae7105a0989f6f1a87ab55d317645015a">save_preferences</a> (bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path)</td></tr>
-<tr class="memdesc:ae7105a0989f6f1a87ab55d317645015a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the registry exporting process.  <br /></td></tr>
-<tr class="separator:ae7105a0989f6f1a87ab55d317645015a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28b37afd0edd4b5bf657fe906c95d581" id="r_a28b37afd0edd4b5bf657fe906c95d581"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a28b37afd0edd4b5bf657fe906c95d581">export_single_value</a> (const wchar_t *reg_path, HKEY top_key)</td></tr>
-<tr class="memdesc:a28b37afd0edd4b5bf657fe906c95d581"><td class="mdescLeft">&#160;</td><td class="mdescRight">Exports a single registry key to a <code>reg add</code> command.  <br /></td></tr>
-<tr class="separator:a28b37afd0edd4b5bf657fe906c95d581"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79781b26998a0a847977911358924db1" id="r_a79781b26998a0a847977911358924db1"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a79781b26998a0a847977911358924db1">save_preferences</a> (bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path, enum OUTPUT_FORMAT format)</td></tr>
+<tr class="memdesc:a79781b26998a0a847977911358924db1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the registry exporting process.  <br /></td></tr>
+<tr class="separator:a79781b26998a0a847977911358924db1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a2892288440cad7f651f0b33aefef4d" id="r_a6a2892288440cad7f651f0b33aefef4d"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a6a2892288440cad7f651f0b33aefef4d">export_single_value</a> (HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format)</td></tr>
+<tr class="memdesc:a6a2892288440cad7f651f0b33aefef4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a single registry value name to standard output.  <br /></td></tr>
+<tr class="separator:a6a2892288440cad7f651f0b33aefef4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a28b37afd0edd4b5bf657fe906c95d581" name="a28b37afd0edd4b5bf657fe906c95d581"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a28b37afd0edd4b5bf657fe906c95d581">&#9670;&#160;</a></span>export_single_value()</h2>
+<a id="a6a2892288440cad7f651f0b33aefef4d" name="a6a2892288440cad7f651f0b33aefef4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a2892288440cad7f651f0b33aefef4d">&#9670;&#160;</a></span>export_single_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool export_single_value </td>
+          <td class="memname">DLL_EXPORT bool export_single_value </td>
           <td>(</td>
+          <td class="paramtype">HKEY&#160;</td>
+          <td class="paramname"><em>top_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">const wchar_t *&#160;</td>
           <td class="paramname"><em>reg_path</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">HKEY&#160;</td>
-          <td class="paramname"><em>top_key</em>&#160;</td>
+          <td class="paramtype">enum OUTPUT_FORMAT&#160;</td>
+          <td class="paramname"><em>format</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -156,57 +180,29 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Exports a single registry key to a <code>reg add</code> command. </p>
+<p>Print a single registry value name to standard output. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">reg_path</td><td>Registry path to a key or a value name. </td></tr>
     <tr><td class="paramname">top_key</td><td>Handle to the top key (such as <code>HKEY_CURRENT_USER</code>). </td></tr>
+    <tr><td class="paramname">reg_path</td><td>Registry path to a key or a value name. </td></tr>
+    <tr><td class="paramname">format</td><td>Output format. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if successful, <code>false</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00109">109</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00097">97</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
 
 </div>
 </div>
-<a id="aede5df108516bb2bafcb3e0146bca4b6" name="aede5df108516bb2bafcb3e0146bca4b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aede5df108516bb2bafcb3e0146bca4b6">&#9670;&#160;</a></span>get_top_key()</h2>
+<a id="a79781b26998a0a847977911358924db1" name="a79781b26998a0a847977911358924db1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79781b26998a0a847977911358924db1">&#9670;&#160;</a></span>save_preferences()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">HKEY get_top_key </td>
-          <td>(</td>
-          <td class="paramtype">wchar_t *&#160;</td>
-          <td class="paramname"><em>reg_path</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Gets the <code>HKEY</code> pointer for the first part of a registry path. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">reg_path</td><td>Full registry path. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>Pointer to root key handle. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00012">12</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
-
-</div>
-</div>
-<a id="ae7105a0989f6f1a87ab55d317645015a" name="ae7105a0989f6f1a87ab55d317645015a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae7105a0989f6f1a87ab55d317645015a">&#9670;&#160;</a></span>save_preferences()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool save_preferences </td>
+          <td class="memname">DLL_EXPORT bool save_preferences </td>
           <td>(</td>
           <td class="paramtype">bool&#160;</td>
           <td class="paramname"><em>commit</em>, </td>
@@ -245,7 +241,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const wchar_t *&#160;</td>
-          <td class="paramname"><em>specified_path</em>&#160;</td>
+          <td class="paramname"><em>specified_path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">enum OUTPUT_FORMAT&#160;</td>
+          <td class="paramname"><em>format</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -265,12 +267,13 @@ Functions</h2></td></tr>
     <tr><td class="paramname">max_depth</td><td>Maximum depth to traverse. </td></tr>
     <tr><td class="paramname">hk</td><td>Starting registry key. </td></tr>
     <tr><td class="paramname">specified_path</td><td>A direct path to a key (and not a value name). </td></tr>
+    <tr><td class="paramname">format</td><td>Output format. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to string with branch name. Must be freed on caller side. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00059">59</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00036">36</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
 
 </div>
 </div>

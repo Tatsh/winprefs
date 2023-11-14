@@ -1,9 +1,11 @@
 <map id="reg_command.h" name="reg_command.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="31,5,153,35"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,83,80,113"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,37,62,71,58,68,80,34"/>
-<area shape="rect" id="Node000003" href="$macros_8h_source.html" title=" " alt="" coords="104,83,181,113"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="104,34,127,68,122,71,99,37"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="103,161,182,190"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="145,113,145,145,140,145,140,113"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="45,5,166,35"/>
+<area shape="rect" id="Node000002" href="$reg__code_8h_source.html" title=" " alt="" coords="5,83,96,113"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,37,72,72,67,69,93,34"/>
+<area shape="rect" id="Node000003" href="$registry_8h.html" title=" " alt="" coords="120,83,200,113"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="118,34,143,69,139,72,113,37"/>
+<area shape="rect" id="Node000004" href="$io_8h_source.html" title=" " alt="" coords="95,161,139,190"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="154,115,135,148,130,145,149,112"/>
+<area shape="rect" id="Node000005" href="$macros_8h_source.html" title=" " alt="" coords="164,161,241,190"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="170,112,189,145,185,148,166,115"/>
 </map>

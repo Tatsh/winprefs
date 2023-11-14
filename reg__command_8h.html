@@ -82,13 +82,11 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
-  <div class="summary">
-<a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">reg_command.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;windef.h&gt;</code><br />
-<code>#include &quot;macros.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;reg_code.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="registry_8h_source.html">registry.h</a>&quot;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for reg_command.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -96,13 +94,15 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="reg__command_8h__incl.png" border="0" usemap="#areg__command_8h" alt=""/></div>
 <map name="areg__command_8h" id="areg__command_8h">
-<area shape="rect" title=" " alt="" coords="31,5,153,35"/>
-<area shape="rect" title=" " alt="" coords="5,83,80,113"/>
-<area shape="poly" title=" " alt="" coords="85,37,62,71,58,68,80,34"/>
-<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="104,83,181,113"/>
-<area shape="poly" title=" " alt="" coords="104,34,127,68,122,71,99,37"/>
-<area shape="rect" title=" " alt="" coords="103,161,182,190"/>
-<area shape="poly" title=" " alt="" coords="145,113,145,145,140,145,140,113"/>
+<area shape="rect" title=" " alt="" coords="45,5,166,35"/>
+<area shape="rect" href="reg__code_8h_source.html" title=" " alt="" coords="5,83,96,113"/>
+<area shape="poly" title=" " alt="" coords="97,37,72,72,67,69,93,34"/>
+<area shape="rect" href="registry_8h.html" title=" " alt="" coords="120,83,200,113"/>
+<area shape="poly" title=" " alt="" coords="118,34,143,69,139,72,113,37"/>
+<area shape="rect" href="io_8h_source.html" title=" " alt="" coords="95,161,139,190"/>
+<area shape="poly" title=" " alt="" coords="154,115,135,148,130,145,149,112"/>
+<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="164,161,241,190"/>
+<area shape="poly" title=" " alt="" coords="170,112,189,145,185,148,166,115"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -112,93 +112,23 @@ $(function() {
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="reg__command_8h__dep__incl.png" border="0" usemap="#areg__command_8hdep" alt=""/></div>
 <map name="areg__command_8hdep" id="areg__command_8hdep">
-<area shape="rect" title=" " alt="" coords="90,5,211,35"/>
-<area shape="rect" href="main_8c.html" title=" " alt="" coords="5,83,67,113"/>
-<area shape="poly" title=" " alt="" coords="118,46,59,85,56,80,115,42"/>
-<area shape="rect" href="reg__command_8c_source.html" title=" " alt="" coords="91,83,210,113"/>
-<area shape="poly" title=" " alt="" coords="153,51,153,82,148,82,148,51"/>
-<area shape="rect" href="registry_8c_source.html" title=" " alt="" coords="234,83,313,113"/>
-<area shape="poly" title=" " alt="" coords="188,41,252,80,249,85,185,46"/>
+<area shape="rect" title=" " alt="" coords="205,5,326,35"/>
+<area shape="rect" href="io_8c_source.html" title=" " alt="" coords="5,83,48,113"/>
+<area shape="poly" title=" " alt="" coords="200,42,61,86,49,90,47,85,59,80,198,37"/>
+<area shape="rect" href="main_8c.html" title=" " alt="" coords="72,83,133,113"/>
+<area shape="poly" title=" " alt="" coords="222,44,134,85,132,80,220,40"/>
+<area shape="rect" href="reg__code_8c_source.html" title=" " alt="" coords="157,83,245,113"/>
+<area shape="poly" title=" " alt="" coords="245,49,215,84,211,81,241,45"/>
+<area shape="rect" href="reg__command_8c_source.html" title=" " alt="" coords="270,83,389,113"/>
+<area shape="poly" title=" " alt="" coords="289,45,319,81,315,84,285,49"/>
+<area shape="rect" href="registry_8c_source.html" title=" " alt="" coords="413,83,491,113"/>
+<area shape="poly" title=" " alt="" coords="315,39,418,80,416,85,313,44"/>
+<area shape="rect" href="test__output__reg__command_8c_source.html" title=" " alt="" coords="515,83,712,113"/>
+<area shape="poly" title=" " alt="" coords="341,35,548,80,547,85,340,40"/>
 </map>
 </div>
 </div>
 <p><a href="reg__command_8h_source.html">Go to the source code of this file.</a></p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
-Functions</h2></td></tr>
-<tr class="memitem:a299f63a8dcc254450e17525a335e0ddd" id="r_a299f63a8dcc254450e17525a335e0ddd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="reg__command_8h.html#a299f63a8dcc254450e17525a335e0ddd">write_reg_commands</a> (HKEY hk, const wchar_t *stem, int max_depth, int depth, HANDLE out_fp, const wchar_t *prior_stem)</td></tr>
-<tr class="memdesc:a299f63a8dcc254450e17525a335e0ddd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the registry exporting process.  <br /></td></tr>
-<tr class="separator:a299f63a8dcc254450e17525a335e0ddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="a299f63a8dcc254450e17525a335e0ddd" name="a299f63a8dcc254450e17525a335e0ddd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a299f63a8dcc254450e17525a335e0ddd">&#9670;&#160;</a></span>write_reg_commands()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool write_reg_commands </td>
-          <td>(</td>
-          <td class="paramtype">HKEY&#160;</td>
-          <td class="paramname"><em>hk</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const wchar_t *&#160;</td>
-          <td class="paramname"><em>stem</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>max_depth</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>depth</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">HANDLE&#160;</td>
-          <td class="paramname"><em>out_fp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const wchar_t *&#160;</td>
-          <td class="paramname"><em>prior_stem</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Starts the registry exporting process. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">hk</td><td>Key handle. </td></tr>
-    <tr><td class="paramname">stem</td><td>Subkey. </td></tr>
-    <tr><td class="paramname">max_depth</td><td>Maximum key depth. </td></tr>
-    <tr><td class="paramname">depth</td><td>Current depth. Used internally. Should be <code>0</code> at start. </td></tr>
-    <tr><td class="paramname">out_fp</td><td>File handle. </td></tr>
-    <tr><td class="paramname">prior_stem</td><td>Last subkey. Used internally. Should be <code>NULL</code>. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><code>true</code> if successful, <code>false</code> otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="reg__command_8c_source.html#l00226">226</a> of file <a class="el" href="reg__command_8c_source.html">reg_command.c</a>.</p>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

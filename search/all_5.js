@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['reg_5fcommand_2eh_0',['reg_command.h',['../reg__command_8h.html',1,'']]],
-  ['registry_2eh_1',['registry.h',['../registry_8h.html',1,'']]]
+  ['powershell_5fmax_5fcommand_5flength_0',['POWERSHELL_MAX_COMMAND_LENGTH',['../constants_8h.html#a667f4e7ede052632e783e71327530515',1,'constants.c']]]
 ];

@@ -94,15 +94,9 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#ifndef GIT_H</span></div>
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#define GIT_H</span></div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keywordtype">bool</span> git_commit(<span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_dir, <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *deploy_key);</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keywordtype">wchar_t</span> *<a class="code hl_function" href="git_8h.html#a1539ee2dae03e2e766ad3af02e49e364">get_git_branch</a>(<span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *git_dir_arg,</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>                        <span class="keywordtype">size_t</span> git_dir_arg_len,</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>                        <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *work_tree_arg,</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>                        <span class="keywordtype">size_t</span> work_tree_arg_len);</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="keywordtype">bool</span> git_commit(<span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_dir, <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *deploy_key);</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span><span class="preprocessor">#endif </span><span class="comment">// GIT_H</span></div>
-<div class="ttc" id="agit_8h_html_a1539ee2dae03e2e766ad3af02e49e364"><div class="ttname"><a href="git_8h.html#a1539ee2dae03e2e766ad3af02e49e364">get_git_branch</a></div><div class="ttdeci">wchar_t * get_git_branch(const wchar_t *git_dir_arg, size_t git_dir_arg_len, const wchar_t *work_tree_arg, size_t work_tree_arg_len)</div><div class="ttdoc">Get the current Git branch in a checked out repository.</div><div class="ttdef"><b>Definition</b> <a href="git_8c_source.html#l00179">git.c:179</a></div></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#endif </span><span class="comment">// GIT_H</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

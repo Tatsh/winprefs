@@ -1,9 +1,11 @@
 <map id="git.h" name="git.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="83,5,132,35"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="130,5,179,35"/>
 <area shape="rect" id="Node000002" href="$git_8c_source.html" title=" " alt="" coords="5,83,53,113"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="84,48,46,84,42,81,80,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="119,46,54,85,51,80,116,41"/>
 <area shape="rect" id="Node000003" href="$main_8c.html" title=" " alt="" coords="77,83,138,113"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="110,51,110,82,105,82,105,51"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="140,50,119,84,114,81,135,47"/>
 <area shape="rect" id="Node000004" href="$registry_8c_source.html" title=" " alt="" coords="162,83,240,113"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="139,43,185,80,182,85,136,47"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,47,195,81,190,84,169,50"/>
+<area shape="rect" id="Node000005" href="$test__git__commit_8c_source.html" title=" " alt="" coords="264,83,394,113"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="194,36,297,80,295,85,192,41"/>
 </map>

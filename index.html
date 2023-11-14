@@ -149,13 +149,25 @@ $(function() {
 <p>A native version is in the works and is much faster than PowerShell. Note that its output is <em>always</em> UTF-8 regardless of your set locale. It even works with Wine. Be aware that it may have bugs!</p>
 <p>Usage is similar to the PowerShell version:</p>
 <div class="fragment"><div class="line">Usage: winprefs.exe [OPTION...] [REG_PATH]</div>
+<div class="line"> </div>
+<div class="line">If a path to a value name is specified, the output directory argument is ignored and the line is</div>
+<div class="line">printed to standard output.</div>
+<div class="line"> </div>
 <div class="line">Options:</div>
+<div class="line">  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, reg. Default: reg.</div>
 <div class="line">  -K, --deploy-key    Deploy key for committing.</div>
 <div class="line">  -c, --commit        Commit changes.</div>
 <div class="line">  -d, --debug         Enable debug logging.</div>
+<div class="line">  -f, --output-file   Output filename.</div>
 <div class="line">  -m, --max-depth=INT Set maximum depth.</div>
+<div class="line">  -o, --output-dir    Output directory.</div>
 <div class="line">  -h, --help          Display this help and exit.</div>
-</div><!-- fragment --><h2>Building</h2>
+</div><!-- fragment --><p>Note the equivalent format names (case-insensitive):</p>
+<ul>
+<li>C#: <code>cs</code>, <code>c#</code></li>
+<li>PowerShell: <code>ps</code>, <code>ps1</code>, <code>powershell</code></li>
+</ul>
+<h2>Building</h2>
 <h3>Visual Studio</h3>
 <p>On Windows with Visual Studio installed, using the <em>Developer Command Prompt</em>:</p>
 <div class="fragment"><div class="line">mkdir build</div>
@@ -165,7 +177,7 @@ $(function() {
 </div><!-- fragment --><h3>Cross-compiling</h3>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
-<div class="line">cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -Wno-dev ..</div>
+<div class="line">cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -DCMAKE_SYSTEM_NAME=Windows -Wno-dev ..</div>
 <div class="line">cmake --build . --config Release --verbose</div>
 </div><!-- fragment --><p>You may need to adjust paths above.</p>
 <p>After building <code>winprefs.exe</code> will be in <code>build/native/winprefs.exe</code>. </p>
