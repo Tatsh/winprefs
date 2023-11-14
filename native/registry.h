@@ -25,12 +25,12 @@ bool save_preferences(bool commit,
                       HKEY hk,
                       const wchar_t *specified_path,
                       enum OUTPUT_FORMAT format);
-//! Exports a single registry key to a `reg add` command.
+//! Print a single registry value name to standard output.
 /*!
- \param reg_path Registry path to a key or a value name.
  \param top_key Handle to the top key (such as `HKEY_CURRENT_USER`).
+ \param reg_path Registry path to a key or a value name.
  \param format Output format.
  \return `true` if successful, `false` otherwise.
  */
-bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format);
+bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format);
 #endif // REGISTRY_H

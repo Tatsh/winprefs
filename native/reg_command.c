@@ -114,9 +114,9 @@ bool do_write_reg_command(HANDLE out_fp,
     bool v_heap = false;
     wchar_t *v_param = fix_v_param(prop, prop ? wcslen(prop) : 0, &v_heap);
     wchar_t reg_type[14];
-    if (!escaped_reg_key || !v_param) {
+    if (!escaped_reg_key || !v_param) { // LCOV_EXCL_START
         goto fail;
-    }
+    } // LCOV_EXCL_STOP
     if (type == REG_MULTI_SZ && !escaped_d) {
         goto cleanup;
     }

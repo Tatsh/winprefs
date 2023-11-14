@@ -83,6 +83,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   target_precompile_headers(tests PRIVATE ${test_pch})
 
   set(test_categories
+      export_single
       get_git_branch
       git_commit
       io
@@ -92,7 +93,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       output_powershell
       output_reg_command
       save_prefs
-      shell)
+      shell
+      utils)
   foreach(category ${test_categories})
     add_executable(test-${category} test_${category}.c)
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
@@ -106,15 +108,15 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       ${test_linker_flags}
       $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>
       $<$<STREQUAL:git_commit,${category}>:-Wl,--wrap,get_git_branch>
-      $<$<STREQUAL:io,${category}>:-Wl,--wrap,do_write_reg_command
-      -Wl,--wrap,do_write_reg_command
+      $<$<OR:$<STREQUAL:io,${category}>,$<STREQUAL:export_single,${category}>>:-Wl,--wrap,do_write_reg_command
       -Wl,--wrap,do_write_c_reg_code
       -Wl,--wrap,do_write_c_sharp_reg_code
       -Wl,--wrap,do_write_powershell_reg_code>
       $<$<STREQUAL:main,${category}>:-Wl,--wrap,save_preferences
       -Wl,--wrap,export_single_value>
       $<$<OR:$<STREQUAL:output_powershell,${category}>,$<STREQUAL:output_c,${category}>,$<STREQUAL:output_c_sharp,${category}>,$<STREQUAL:output_reg_command,${category}>>:-Wl,--wrap,write_output>
-    )
+      $<$<STREQUAL:save_prefs,${category}>:-Wl,--wrap,write_key_filtered_recursive
+      -Wl,--wrap,git_commit>)
     target_precompile_headers(test-${category} PRIVATE ${test_pch})
 
     add_test(NAME "${category} tests" COMMAND test-${category})

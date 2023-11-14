@@ -29,8 +29,9 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
     mb_out[total_size - 1] = '\n';
     ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
     goto cleanup;
-fail:
+fail: // LCOV_EXCL_START
     ret = false;
+    // LCOV_EXCL_STOP
 cleanup:
     free_if_not_null(mb_out);
     return ret && written > 0;

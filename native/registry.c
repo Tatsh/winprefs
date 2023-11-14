@@ -93,12 +93,17 @@ cleanup:
     return ret;
 }
 
-bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format) {
+bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
     bool ret = true;
     wchar_t *value_name = nullptr;
     char *data = nullptr;
+    if (!reg_path) {
+        errno = EINVAL;
+        goto fail;
+    }
     wchar_t *first_backslash = wcschr(reg_path, L'\\');
     if (!first_backslash) {
+        errno = EINVAL;
         goto fail;
     }
     wchar_t *subkey = first_backslash + 1;
@@ -112,7 +117,7 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
     } // LCOV_EXCL_STOP
     wmemset(value_name, L'\0', value_name_len);
     wmemcpy(value_name, value_name_p, value_name_len);
-    *last_backslash = L'\0';
+    // *last_backslash = L'\0';
     if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
         debug_print(L"Invalid subkey: '%ls'.\n", subkey);
         goto fail;
@@ -157,7 +162,8 @@ bool export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORM
         }
         break;
     default:
-        break;
+        errno = EINVAL;
+        goto fail;
     }
     goto cleanup;
 fail:

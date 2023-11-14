@@ -419,19 +419,18 @@ static void test_main_format_arg_full_reg_path(void **state) {
 
     size_t full_reg_path_len = wcslen(FULL_REG_PATH_SUFFIX);
     wchar_t **buf = calloc(3, sizeof(wchar_t *));
-    buf[0] = calloc(8, sizeof(wchar_t));
-    buf[1] = calloc(full_reg_path_len + 5, sizeof(wchar_t));
+    buf[0] = calloc(9, sizeof(wchar_t));
+    buf[1] = calloc(full_reg_path_len + 6, sizeof(wchar_t));
     buf[2] = nullptr;
-    wmemset(buf[0], L'\0', 8);
-    wmemcpy(buf[0], L"winprefs", 10);
+    wmemset(buf[0], L'\0', 9);
+    wmemcpy(buf[0], L"winprefs", 8);
 
     long unsigned int i;
     for (i = 0; i < ARRAY_SIZE(possible_hkey); i++) {
-
         expect_value(__wrap_export_single_value, top_key, possible_hkey[i]);
-        wmemset(buf[1], L'\0', full_reg_path_len + 5);
+        wmemset(buf[1], L'\0', full_reg_path_len + 6);
         _snwprintf(buf[1],
-                   full_reg_path_len + 4,
+                   full_reg_path_len + 5,
                    L"%ls%ls",
                    possible_short_paths[i],
                    FULL_REG_PATH_SUFFIX);

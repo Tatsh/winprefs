@@ -20,7 +20,7 @@ bool __wrap_save_preferences(bool commit,
     return mock_type(bool);
 }
 
-bool __wrap_export_single_value(const wchar_t *reg_path, HKEY top_key, enum OUTPUT_FORMAT format) {
+bool __wrap_export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
     check_expected(format);
     check_expected_ptr(reg_path);
     check_expected_ptr(top_key);
@@ -277,11 +277,6 @@ __wrap_SHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWST
     return mock_type(HRESULT);
 }
 
-int __wrap_vfwprintf(FILE *stream, const wchar_t *format, va_list args) {
-    function_called();
-    return mock_type(int);
-}
-
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
     int ret = -1;
     va_list args;
@@ -334,5 +329,19 @@ bool __wrap_do_write_powershell_reg_code(HANDLE out_fp,
                                          const char *value,
                                          size_t data_len,
                                          unsigned long type) {
+    return mock_type(bool);
+}
+
+bool __wrap_write_key_filtered_recursive(HKEY hk,
+                                         const wchar_t *stem,
+                                         int max_depth,
+                                         int depth,
+                                         HANDLE out_fp,
+                                         const wchar_t *prior_stem,
+                                         enum OUTPUT_FORMAT format) {
+    return mock_type(bool);
+}
+
+bool __wrap_git_commit(wchar_t *output_dir, wchar_t *deploy_key) {
     return mock_type(bool);
 }
