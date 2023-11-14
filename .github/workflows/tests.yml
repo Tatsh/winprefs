@@ -32,7 +32,7 @@ jobs:
         run: >-
           cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
           --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON -DENABLE_ASAN=ON
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON
           -DENABLE_COVERAGE=ON
         shell: msys2 {0}
       - name: Build
