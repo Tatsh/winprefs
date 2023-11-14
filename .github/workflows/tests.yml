@@ -29,7 +29,7 @@ jobs:
       - name: Install tools
         run: pipx install cpp-coveralls
       - name: Configure
-        run: |
+        run: >-
           cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
           --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON -DENABLE_ASAN=ON
@@ -42,10 +42,17 @@ jobs:
         run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests --verbose
         shell: msys2 {0}
       - name: Generate coverage information
-        run: lcov --capture --directory ${{steps.fixed_workspace.outputs.out}}/build --output-file coverage.info
+        run: >-
+          lcov --capture --directory ${{steps.fixed_workspace.outputs.out}}/build
+          --output-file coverage.info
         shell: msys2 {0}
-      - name: Coveralls
+      - if: matrix.build-type == 'Debug'
+        name: Coveralls
         run: coveralls
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
 name: Tests
 'on':
   pull_request:

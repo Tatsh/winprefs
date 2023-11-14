@@ -7,8 +7,9 @@ jobs:
     steps:
       - id: fixed_workspace
         name: Fix path
-        run: |
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        run: >-
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -16,7 +17,9 @@ jobs:
         name: Get Latest Tag
         uses: WyriHaximus/github-action-get-previous-tag@v1
       - name: Configure
-        run: cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build --install-prefix ${{github.workspace}}/build/prefix
+        run: >-
+          cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build
+          --install-prefix ${{github.workspace}}/build/prefix
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
@@ -32,7 +35,9 @@ jobs:
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
       - name: Package
-        run: cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
+        run: >-
+          cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
+          --verbose
       - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
         name: Upload package
         uses: softprops/action-gh-release@v1
@@ -53,8 +58,9 @@ jobs:
     steps:
       - id: fixed_workspace
         name: Fix path
-        run: |
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        run: >-
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: msys2/setup-msys2@v2
         with:
           install: >-
@@ -69,16 +75,23 @@ jobs:
         with:
           fetch-depth: 0
       - name: Configure
-        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+        run: >-
+          cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
+          --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
         shell: msys2 {0}
       - name: Build
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
         shell: msys2 {0}
       - name: Install
-        run: cmake --install ${{steps.fixed_workspace.outputs.out}}/build --config ${{matrix.build-type}} --verbose
+        run: >-
+          cmake --install ${{steps.fixed_workspace.outputs.out}}/build
+          --config ${{matrix.build-type}} --verbose
         shell: msys2 {0}
       - name: Package
-        run: cpack -C ${{matrix.build-type}} --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
+        run: >-
+          cpack -C ${{matrix.build-type}}
+          --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
         shell: msys2 {0}
       - name: Configure Git
         run: |
