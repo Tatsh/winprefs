@@ -1,3 +1,5 @@
+bool debug_print_enabled = false;
+
 void debug_print(const wchar_t *format, ...) {
     if (debug_print_enabled) { // LCOV_EXCL_START
         va_list args;

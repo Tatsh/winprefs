@@ -3,6 +3,7 @@
 #define REGISTRY_H
 
 #include "io.h"
+#include "macros.h"
 
 //! Starts the registry exporting process.
 /*!
@@ -17,14 +18,14 @@
  \param format Output format.
  \return Pointer to string with branch name. Must be freed on caller side.
  */
-bool save_preferences(bool commit,
-                      const wchar_t *deploy_key,
-                      const wchar_t *output_dir,
-                      const wchar_t *output_file,
-                      int max_depth,
-                      HKEY hk,
-                      const wchar_t *specified_path,
-                      enum OUTPUT_FORMAT format);
+DLL_EXPORT bool save_preferences(bool commit,
+                                 const wchar_t *deploy_key,
+                                 const wchar_t *output_dir,
+                                 const wchar_t *output_file,
+                                 int max_depth,
+                                 HKEY hk,
+                                 const wchar_t *specified_path,
+                                 enum OUTPUT_FORMAT format);
 //! Print a single registry value name to standard output.
 /*!
  \param top_key Handle to the top key (such as `HKEY_CURRENT_USER`).
@@ -32,5 +33,6 @@ bool save_preferences(bool commit,
  \param format Output format.
  \return `true` if successful, `false` otherwise.
  */
-bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format);
+DLL_EXPORT bool
+export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format);
 #endif // REGISTRY_H

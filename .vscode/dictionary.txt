@@ -33,6 +33,7 @@ ehthumbs
 einval
 ekeyrejected
 endforeach
+endfunction
 errno
 esbenp
 fopen

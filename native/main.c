@@ -11,8 +11,6 @@
 #include "reg_command.h"
 #include "registry.h"
 
-bool debug_print_enabled = false;
-
 static inline void print_leaks() {
 #ifndef ENABLE_VLD
     if (debug_print_enabled) {
@@ -144,6 +142,7 @@ int wmain(int argc, wchar_t *argv[]) {
     }
     if (reg_path) {
         size_t len = wcslen(reg_path);
+        fwprintf(stderr, L"@@ %ls, %lc\n", reg_path, reg_path[len - 1]);
         bool top_key_only =
             (reg_path[len - 1] == L'\\' && reg_path[len - 2] == L':') || reg_path[len - 1] == L':';
         if (reg_path[len - 1] == L'\\' && reg_path[len - 2] == L':') {

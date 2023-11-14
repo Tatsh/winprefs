@@ -44,50 +44,25 @@ set(GCC_CLANG_DEBUG_C_FLAGS
     -Wunused-parameter
     -Wunused-variable)
 
-if(WIN32)
-  add_executable(
-    winprefs
-    arg.h
-    constants.c
-    constants.h
-    debug.c
-    debug.h
-    git.c
-    git.h
-    git_branch.c
-    git_branch.h
-    io.c
-    io.h
-    macros.h
-    main.c
-    powershell.c
-    powershell.h
-    reg_code.c
-    reg_code.h
-    reg_command.c
-    reg_command.h
-    registry.c
-    registry.h
-    shell.c
-    shell.h
-    utils.h)
-  target_precompile_headers(winprefs PRIVATE pch.h)
-  target_link_libraries(winprefs PRIVATE shlwapi)
+function(add_vld target)
   target_compile_definitions(
-    winprefs
+    ${target}
     PRIVATE
       $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:ENABLE_VLD>
   )
   target_include_directories(
-    winprefs
+    ${target}
     PRIVATE
       $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD_H}>
   )
   target_link_libraries(
-    winprefs
+    ${target}
     PRIVATE
       $<$<AND:$<BOOL:${WITH_VLD}>,$<OR:$<STREQUAL:CMAKE_BUILD_TYPE,Debug>,$<STREQUAL:CMAKE_BUILD_TYPE,RelWithDebInfo>>>:${VLD}>
   )
+endfunction()
+
+function(add_min_winnt target)
   if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
     get_property(IS_64BIT GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
     # mingw can do 2000 without extra help. 64-bit requires at least XP.
@@ -96,20 +71,87 @@ if(WIN32)
         FATAL_ERROR
           "Invalid version for 64-bit. Must be XP (0x501) or higher. Version: ${TARGET_VERSION}")
     endif()
-    target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=${TARGET_VERSION})
-    target_compile_options(
-      winprefs PRIVATE ${GCC_CLANG_SHARED_C_FLAGS} $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
-                       $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
+    target_compile_definitions(${target} PRIVATE _WIN32_WINNT=${TARGET_VERSION})
+  else() # MSVC gets Vista+
+    target_compile_definitions(${target} PRIVATE _WIN32_WINNT=${TARGET_VERSION})
+  endif()
+endfunction()
+
+function(add_asan target)
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
+    target_compile_options(${target} PRIVATE $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
+    target_link_options(${target} PRIVATE $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
+  endif()
+endfunction()
+
+function(add_flags target)
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
+    target_compile_options(${target} PRIVATE ${GCC_CLANG_SHARED_C_FLAGS}
+                                             $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>)
+  else()
+    target_compile_options(${target} PRIVATE /Zc:forScope /Zc:inline /Zc:wchar_t /external:W0
+                                             /utf-8)
+  endif()
+endfunction()
+
+if(WIN32)
+  set(prefs_src
+      arg.h
+      constants.c
+      constants.h
+      debug.c
+      debug.h
+      git.c
+      git.h
+      git_branch.c
+      git_branch.h
+      io.c
+      io.h
+      macros.h
+      powershell.c
+      powershell.h
+      reg_code.c
+      reg_code.h
+      reg_command.c
+      reg_command.h
+      registry.c
+      registry.h
+      shell.c
+      shell.h
+      utils.h)
+
+  add_library(prefs-static STATIC ${prefs_src})
+  target_precompile_headers(prefs-static PRIVATE pch.h)
+  target_link_libraries(prefs-static PRIVATE shlwapi)
+  add_asan(prefs-static)
+  add_flags(prefs-static)
+  add_min_winnt(prefs-static)
+  add_vld(prefs-static)
+
+  add_library(prefs SHARED ${prefs_src})
+  target_precompile_headers(prefs PRIVATE pch.h)
+  target_link_libraries(prefs PRIVATE shlwapi)
+  add_asan(prefs)
+  add_flags(prefs)
+  add_min_winnt(prefs)
+  add_vld(prefs)
+
+  add_executable(winprefs constants.c constants.h debug.c debug.h main.c)
+  target_precompile_headers(winprefs PRIVATE pch.h)
+  target_link_libraries(winprefs PRIVATE prefs-static shlwapi)
+  add_asan(winprefs)
+  add_flags(winprefs)
+  add_min_winnt(winprefs)
+  add_vld(winprefs)
+
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
     target_link_libraries(winprefs PRIVATE shell32)
-    target_link_options(winprefs PRIVATE -mconsole -municode
-                        $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
+    target_link_options(winprefs PRIVATE -mconsole -municode)
     if(CMAKE_C_COMPILER MATCHES "/winegcc$")
       target_include_directories(winprefs PRIVATE /usr/include/wine/msvcrt)
       target_link_libraries(winprefs PRIVATE ucrtbase)
     endif()
-  else() # MSVC gets Vista+
-    target_compile_definitions(winprefs PRIVATE _WIN32_WINNT=${TARGET_VERSION})
-    target_compile_options(winprefs PRIVATE /Zc:forScope /Zc:inline /Zc:wchar_t /external:W0 /utf-8)
+  else()
     target_link_libraries(winprefs PRIVATE kernel32)
     target_link_options(winprefs PRIVATE /DYNAMICBASE /NXCOMPAT /TLBID:1)
   endif()

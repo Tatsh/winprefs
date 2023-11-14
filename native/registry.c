@@ -33,14 +33,14 @@ static inline bool create_dir_recursive(wchar_t *path) {
     return true;
 }
 
-bool save_preferences(bool commit,
-                      const wchar_t *deploy_key,
-                      const wchar_t *output_dir,
-                      const wchar_t *output_file,
-                      int max_depth,
-                      HKEY hk,
-                      const wchar_t *specified_path,
-                      enum OUTPUT_FORMAT format) {
+DLL_EXPORT bool save_preferences(bool commit,
+                                 const wchar_t *deploy_key,
+                                 const wchar_t *output_dir,
+                                 const wchar_t *output_file,
+                                 int max_depth,
+                                 HKEY hk,
+                                 const wchar_t *specified_path,
+                                 enum OUTPUT_FORMAT format) {
     bool ret = true;
     wchar_t full_output_dir[MAX_PATH];
     bool writing_to_stdout = !wcscmp(L"-", output_file);
@@ -93,22 +93,28 @@ cleanup:
     return ret;
 }
 
-bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
+DLL_EXPORT bool
+export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
+    debug_print_enabled = true;
     bool ret = true;
+    wchar_t *m_reg_path = nullptr;
     wchar_t *value_name = nullptr;
     char *data = nullptr;
     if (!reg_path) {
         errno = EINVAL;
         goto fail;
     }
-    wchar_t *first_backslash = wcschr(reg_path, L'\\');
+    size_t reg_path_len = wcslen(reg_path) + 1;
+    m_reg_path = calloc(reg_path_len, WL);
+    wmemcpy(m_reg_path, reg_path, reg_path_len);
+    wchar_t *first_backslash = wcschr(m_reg_path, L'\\');
     if (!first_backslash) {
         errno = EINVAL;
         goto fail;
     }
     wchar_t *subkey = first_backslash + 1;
     HKEY starting_key = HKEY_CURRENT_USER;
-    wchar_t *last_backslash = wcsrchr(reg_path, '\\');
+    wchar_t *last_backslash = wcsrchr(m_reg_path, '\\');
     wchar_t *value_name_p = last_backslash + 1;
     size_t value_name_len = wcslen(value_name_p) + 1;
     value_name = calloc(value_name_len, WL);
@@ -117,7 +123,7 @@ bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORM
     } // LCOV_EXCL_STOP
     wmemset(value_name, L'\0', value_name_len);
     wmemcpy(value_name, value_name_p, value_name_len);
-    // *last_backslash = L'\0';
+    *last_backslash = L'\0';
     if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
         debug_print(L"Invalid subkey: '%ls'.\n", subkey);
         goto fail;
@@ -169,6 +175,7 @@ bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORM
 fail:
     ret = false;
 cleanup:
+    free_if_not_null(m_reg_path);
     free_if_not_null(value_name);
     free_if_not_null(data);
     return ret;
