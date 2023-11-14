@@ -58,6 +58,7 @@ isort
 itemproperty
 iwyu
 lcov
+libcmocka
 lmcstr
 lpbyte
 lpcb
