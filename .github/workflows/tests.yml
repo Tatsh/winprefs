@@ -29,7 +29,11 @@ jobs:
       - name: Install tools
         run: pipx install cpp-coveralls
       - name: Configure
-        run: cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON -DENABLE_COVERAGE=ON
+        run: |
+          cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
+          --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON -DENABLE_ASAN=ON
+          -DENABLE_COVERAGE=ON
         shell: msys2 {0}
       - name: Build
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
