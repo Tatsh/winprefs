@@ -23,7 +23,7 @@ option(ENABLE_ASAN "Enable address sanitiser." OFF)
 option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 set(TARGET_VERSION
-    $<IF:$<BOOL:MSVC>,0x600,0x501>
+    $<IF:$<CXX_COMPILER_ID:MSVC>,0x600,0x501>
     CACHE STRING "Version of Windows to target in 0x format.")
 
 if(BUILD_TESTS)
