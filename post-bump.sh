@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+export PRE_COMMIT_ALLOW_NO_CONFIG=1
 temp_dir=$(mktemp -d)
 clean() {
     rm -fR "$temp_dir"
