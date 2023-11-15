@@ -8,3 +8,7 @@ void debug_print(const wchar_t *format, ...) {
         va_end(args);
     } // LCOV_EXCL_STOP
 }
+
+DLL_EXPORT void set_debug_print_enabled(bool enabled) {
+    debug_print_enabled = enabled;
+}

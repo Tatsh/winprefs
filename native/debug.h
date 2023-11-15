@@ -2,6 +2,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "macros.h"
+
 extern bool debug_print_enabled;
 
 //! Print only when debug logging is enabled.
@@ -9,5 +11,7 @@ extern bool debug_print_enabled;
  \param format Format string.
  */
 void debug_print(const wchar_t *format, ...);
+
+DLL_EXPORT void set_debug_print_enabled(bool enabled);
 
 #endif
