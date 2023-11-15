@@ -11,7 +11,10 @@
 ehthumbs.db
 Thumbs.db
 # Other
+*.cache
 *.db
+*.exe
+*.pdb
 *.sqlite
 .cache/
 /.vs/CMake Overview
@@ -20,6 +23,9 @@ Thumbs.db
 /.vs/VSWorkspaceState.json
 /.vs/tasks.vs.json
 /.vs/winprefs/
+/src/.vs/
+/src/bin/
+/src/obj/
 build/
 exec-reg.bat
 node_modules/
