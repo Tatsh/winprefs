@@ -3,4 +3,8 @@ updates:
     package-ecosystem: npm
     schedule:
       interval: weekly
+  - directory: /src
+    package-ecosystem: nuget
+    schedule:
+      interval: weekly
 version: 2
