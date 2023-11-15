@@ -10,10 +10,21 @@
     "prettier-plugin-sort-json": "^3.1.0",
     "prettier-plugin-toml": "^1.0.0"
   },
+  "license": "MIT",
+  "name": "winprefs",
   "prettier": {
     "endOfLine": "lf",
     "iniSpaceAroundEquals": true,
     "jsonRecursiveSort": true,
+    "overrides": [
+      {
+        "files": "*.csproj",
+        "options": {
+          "parser": "xml",
+          "xmlWhitespaceSensitivity": "ignore"
+        }
+      }
+    ],
     "plugins": [
       "@prettier/plugin-xml",
       "prettier-plugin-ini",
@@ -21,10 +32,9 @@
       "prettier-plugin-toml"
     ],
     "printWidth": 100,
-    "singleQuote": true
+    "singleQuote": true,
+    "xmlSortAttributesByKey": true
   },
-  "license": "MIT",
-  "name": "winprefs",
   "repository": "git@github.com:Tatsh/winprefs.git",
   "scripts": {
     "check-formatting": "prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
