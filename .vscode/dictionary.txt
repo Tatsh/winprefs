@@ -25,6 +25,7 @@ dcmake
 denable
 dnum
 domaain
+dotnettools
 doxyfile
 dunicode
 dwin

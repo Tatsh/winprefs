@@ -1,13 +1,11 @@
 using System.Management.Automation;
 using System.Runtime.Versioning;
 
-namespace WinPrefsTestingArea
-{
+namespace WinPrefsTestingArea {
     [SupportedOSPlatform("windows")]
     [Cmdlet("Unregister", "SavePreferencesScheduledTask")]
     [Alias("winprefs-uninstall-job")]
-    public class UnregisterSavePreferencesScheduledTask : PSCmdlet
-    {
+    public class UnregisterSavePreferencesScheduledTask : PSCmdlet {
         [Parameter(HelpMessage = "Depth limit.")]
         [Alias("m")]
         public int MaxDepth = 20;
@@ -36,7 +34,6 @@ namespace WinPrefsTestingArea
         [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
         public string Format = "reg";
 
-        protected override void ProcessRecord()
-        { }
+        protected override void ProcessRecord() { }
     }
 }

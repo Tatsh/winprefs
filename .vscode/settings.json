@@ -3,6 +3,9 @@
   "[c]": {
     "editor.tabSize": 4
   },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
