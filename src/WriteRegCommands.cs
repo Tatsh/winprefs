@@ -1,4 +1,4 @@
-﻿using System.Management.Automation;
+using System.Management.Automation;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
 
