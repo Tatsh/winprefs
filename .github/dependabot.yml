@@ -7,4 +7,6 @@ updates:
     package-ecosystem: nuget
     schedule:
       interval: weekly
+    ignore:
+      - dependency-name: Microsoft.PowerShell.SDK
 version: 2
