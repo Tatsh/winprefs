@@ -5,6 +5,7 @@ autogen
 bindir
 buglist
 calloc
+cdecl
 cmder
 cmocka
 codefile
