@@ -1,6 +1,7 @@
 analyzer
 appdata
 asan
+autobuild
 autogen
 bindir
 buglist
