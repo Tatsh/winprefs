@@ -23,6 +23,7 @@ Thumbs.db
 /.vs/VSWorkspaceState.json
 /.vs/tasks.vs.json
 /.vs/winprefs/
+/out/
 /src/.vs/
 /src/bin/
 /src/obj/
