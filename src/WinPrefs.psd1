@@ -7,9 +7,8 @@
   DotNetFrameworkVersion = "6.0"
   GUID                   = '57c33a4f-3d66-422b-8e2b-596231011201'
   HelpInfoURI            = 'https://github.com/Tatsh/winprefs'
-  ModuleVersion          = '0.3.0-b0'
+  ModuleVersion          = '0.3.0'
   PowerShellVersion      = '5.1'
-  PreRelease             = 'beta'
   NestedModules          = @()
   RequiredAssemblies     = @()
   RequiredModules        = @()
@@ -26,6 +25,7 @@
     PSData = @{
       IconUri      = 'https://avatars.githubusercontent.com/u/724848?s=96&v=4'
       LicenseUri   = 'https://github.com/Tatsh/winprefs/blob/master/LICENSE.txt'
+      PreRelease   = 'beta'
       ProjectUri   = 'https://github.com/Tatsh/winprefs'
       ReleaseNotes = 'https://github.com/Tatsh/winprefs/blob/master/CHANGELOG.md'
       Tags         = @('admin', 'administrator', 'backup', 'batch', 'registry', 'windows')
