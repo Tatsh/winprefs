@@ -92,6 +92,7 @@ msvcrt
 msys
 msystem
 municode
+mwindows
 nsis
 nullptr
 nxcompat
@@ -156,6 +157,7 @@ wfullpath
 wgetcwd
 winegcc
 winprefs
+winprefsw
 wmain
 wmissing
 wparentheses
