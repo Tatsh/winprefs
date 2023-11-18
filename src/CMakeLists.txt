@@ -14,7 +14,8 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
                VS_PACKAGE_REFERENCES
                "Microsoft.PowerShell.SDK_7.2.7;TaskScheduler_${TASKSCHEDULER_VERSION}")
   target_compile_options(PSWinPrefs PRIVATE "/unsafe")
-  set(NUGET_PACKAGES_DIR $ENV{HOME}/.nuget/packages)
+  file(TO_CMAKE_PATH $ENV{USERPROFILE} USERPROFILE_DIR)
+  set(NUGET_PACKAGES_DIR "${USERPROFILE_DIR}/.nuget/packages")
   install(
     FILES
       WinPrefs.psd1
