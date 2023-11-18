@@ -133,6 +133,7 @@ struct
 structs
 sublang
 swprintf
+taskscheduler
 tatsh
 testlist
 tlbid
