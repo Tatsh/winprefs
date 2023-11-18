@@ -47,7 +47,7 @@ namespace WinPrefs {
 
         protected override void ProcessRecord() {
             using (TaskService ts = new TaskService()) {
-                TaskFolder folder = ts.RootFolder.CreateFolder(@"tat.sh\WinPrefs\");
+                TaskFolder folder = ts.RootFolder.CreateFolder(@"tat.sh\WinPrefs", null, false);
                 TaskDefinition td = ts.NewTask();
                 td.RegistrationInfo.Description = $"Runs WinPrefs every 12 hours (path {Path}).";
                 DailyTrigger trigger = new DailyTrigger();

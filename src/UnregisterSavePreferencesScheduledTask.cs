@@ -47,19 +47,23 @@ namespace WinPrefs {
 
         protected override void ProcessRecord() {
             using (TaskService ts = new TaskService()) {
-                Microsoft.Win32.TaskScheduler.Task task = ts.GetTask(
-                    $"tat.sh\\WinPrefs\\WinPrefs-{getSuffix()}");
-                if (task == null) {
-                    return;
-                }
                 TaskFolderCollection rootColl = ts.RootFolder.SubFolders;
                 if (!rootColl.Exists("tat.sh")) {
                     return;
                 }
                 TaskFolder tatshFolder = ts.RootFolder.SubFolders["tat.sh"];
+                if (!tatshFolder.SubFolders.Exists("WinPrefs")) {
+                    return;
+                }
                 TaskFolder winprefsFolder = tatshFolder.SubFolders["WinPrefs"];
+                string taskName = $"tat.sh\\WinPrefs\\WinPrefs-{getSuffix()}";
+                Microsoft.Win32.TaskScheduler.Task task = ts.GetTask(taskName);
+                if (task == null) {
+                    return;
+                }
+                winprefsFolder.DeleteTask(task.Name);
                 // If everything is empty under tat.sh\WinPrefs delete the directories.
-                if (tatshFolder.SubFolders.Exists("WinPrefs") && winprefsFolder.Tasks.Count == 0) {
+                if (winprefsFolder.Tasks.Count == 0) {
                     tatshFolder.DeleteFolder("WinPrefs");
                 }
                 // Again for tat.sh
