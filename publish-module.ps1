@@ -16,5 +16,5 @@ Remove-Item -Path WinPrefs\*.lib
 Remove-Item -Path WinPrefs\*.pdb
 Remove-Item -Recurse -Path WinPrefs\ref
 Remove-Item -Recurse -Path WinPrefs\runtimes
-Write-Output Publish-Module -Name .\WinPrefs -NuGetApiKey ${env:NUGET_API_KEY}
+Publish-Module -Name .\WinPrefs -NuGetApiKey ${env:NUGET_API_KEY}
 Set-Location ..\..
