@@ -44,8 +44,8 @@ namespace WinPrefs {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
-               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format}," +
-               $"m={MaxDepth}")));
+               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path}," +
+               $"f={Format},m={MaxDepth}")));
         }
 
         protected override void ProcessRecord() {
@@ -75,9 +75,17 @@ namespace WinPrefs {
                 if (File.Exists(winprefswPath)) {
                     File.Delete(winprefswPath);
                 }
-                File.Copy(IOPath.Combine(IOPath.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "winprefsw.exe"), winprefswPath);
-                td.Actions.Add(new ExecAction(winprefswPath, Regex.Replace(String.Join(" ", args), @"\s+", " "),
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
+                string? assemblyLoc = IOPath.GetDirectoryName(
+                    Assembly.GetExecutingAssembly().Location);
+                if (assemblyLoc == null) {
+                    throw new Exception();
+                }
+                File.Copy(IOPath.Combine(assemblyLoc, "winprefsw.exe"), winprefswPath);
+                td.Actions.Add(new ExecAction(
+                    winprefswPath,
+                    Regex.Replace(String.Join(" ", args), @"\s+", " "),
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile
+                )));
                 folder.RegisterTaskDefinition($"WinPrefs-{getSuffix()}", td);
             }
         }

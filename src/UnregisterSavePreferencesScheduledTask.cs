@@ -42,8 +42,8 @@ namespace WinPrefs {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
-               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format}," +
-               $"m={MaxDepth}")));
+               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path}," +
+               $"f={Format},m={MaxDepth}")));
         }
 
         protected override void ProcessRecord() {
