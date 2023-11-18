@@ -138,25 +138,33 @@ if(WIN32)
 
   set(winprefs_targets winprefs winprefsw)
   foreach(exe ${winprefs_targets})
-  add_executable(${exe} constants.c constants.h debug.c debug.h main.c)
-  target_precompile_headers(${exe} PRIVATE pch.h)
-  target_link_libraries(${exe} PRIVATE prefs-static shlwapi)
-  add_asan(${exe})
-  add_flags(${exe})
-  add_min_winnt(${exe})
-  add_vld(${exe})
-  if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
-    target_link_libraries(${exe} PRIVATE shell32)
-    target_link_options(${exe} PRIVATE $<IF:$<STREQUAL:winprefsc,${exe}>,-mconsole,-mwindows> -municode)
-    if(CMAKE_C_COMPILER MATCHES "/winegcc$")
-      target_include_directories(${exe} PRIVATE /usr/include/wine/msvcrt)
-      target_link_libraries(${exe} PRIVATE ucrtbase)
+    add_executable(${exe} constants.c constants.h debug.c debug.h main.c)
+    target_precompile_headers(${exe} PRIVATE pch.h)
+    target_link_libraries(${exe} PRIVATE prefs-static shlwapi)
+    add_asan(${exe})
+    add_flags(${exe})
+    add_min_winnt(${exe})
+    add_vld(${exe})
+    if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
+      target_link_libraries(${exe} PRIVATE shell32)
+      target_link_options(${exe} PRIVATE $<IF:$<STREQUAL:winprefs,${exe}>,-mconsole,-mwindows>
+                          -municode)
+      if(CMAKE_C_COMPILER MATCHES "/winegcc$")
+        target_include_directories(${exe} PRIVATE /usr/include/wine/msvcrt)
+        target_link_libraries(${exe} PRIVATE ucrtbase)
+      endif()
+    else()
+      target_link_libraries(${exe} PRIVATE kernel32)
+      target_link_options(
+        ${exe}
+        PRIVATE
+        /DYNAMICBASE
+        /NXCOMPAT
+        /TLBID:1
+        $<$<STREQUAL:winprefsw,${exe}>:/ENTRY:wmainCRTStartup
+        /SUBSYSTEM:WINDOWS>)
     endif()
-  else()
-    target_link_libraries(${exe} PRIVATE kernel32)
-    target_link_options(${exe} PRIVATE /DYNAMICBASE /NXCOMPAT /TLBID:1 $<$<STREQUAL:winprefsn,${exe}>:/ENTRY:wmainCRTStartup /SUBSYSTEM:WINDOWS>)
-  endif()
-  install(TARGETS ${exe} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(TARGETS ${exe} DESTINATION ${CMAKE_INSTALL_BINDIR})
   endforeach()
 
 endif()
