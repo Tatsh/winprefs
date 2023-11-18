@@ -116,6 +116,28 @@ jobs:
           - { env: i686, name: mingw32 }
           - { env: x86_64, name: mingw64 }
           - { env: ucrt-x86_64, name: ucrt64 }
+  build_cross:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Configure
+        run: >-
+          cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
+          -DCMAKE_SYSTEM_NAME=Windows
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
 name: Build
 'on':
   pull_request:

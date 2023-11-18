@@ -143,6 +143,38 @@ Output:
 reg add "HKCU\Control Panel\Desktop\WindowMetrics\StatusFont" /v "StatusFont" /t REG_BINARY /d 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b /f
 ```
 
+## Native version
+
+The PowerShell module makes use of the native code with `DllImport` to get a significant speed
+increase in making registry queries and performing I/O. A native binary `winprefs.exe` can also be
+built that can also be used without needing PowerShell installed and it should work with XP and
+newer. As a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
+even works with Wine.
+
+Usage is similar to the PowerShell version:
+
+```plain
+Usage: winprefs.exe [OPTION...] [REG_PATH]
+
+If a path to a value name is specified, the output directory argument is ignored and the line is
+printed to standard output.
+
+Options:
+  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, reg. Default: reg.
+  -K, --deploy-key    Deploy key for committing.
+  -c, --commit        Commit changes.
+  -d, --debug         Enable debug logging.
+  -f, --output-file   Output filename.
+  -m, --max-depth=INT Set maximum depth.
+  -o, --output-dir    Output directory.
+  -h, --help          Display this help and exit.
+```
+
+Note the equivalent format names (case-insensitive):
+
+- C#: `cs`, `c#`
+- PowerShell: `ps`, `ps1`, `powershell`
+
 ## Development
 
 Requirements:
@@ -198,35 +230,3 @@ After building `winprefs.exe` will be in `build/native/winprefs.exe`.
 
 - `yarn format`: to format the project's files.
 - `yarn qa`: Perform a QA check.
-
-## Native version
-
-The PowerShell module makes use of the native code with `DllImport` to get a significant speed
-increase in making registry queries and performing I/O. A native binary `winprefs.exe` can also be
-built that can also be used without needing PowerShell installed and it should work with XP and
-newer. As a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
-even works with Wine.
-
-Usage is similar to the PowerShell version:
-
-```plain
-Usage: winprefs.exe [OPTION...] [REG_PATH]
-
-If a path to a value name is specified, the output directory argument is ignored and the line is
-printed to standard output.
-
-Options:
-  -F, --format=FORMAT Format to output. Options: c, cs, c#, ps, ps1, powershell, reg. Default: reg.
-  -K, --deploy-key    Deploy key for committing.
-  -c, --commit        Commit changes.
-  -d, --debug         Enable debug logging.
-  -f, --output-file   Output filename.
-  -m, --max-depth=INT Set maximum depth.
-  -o, --output-dir    Output directory.
-  -h, --help          Display this help and exit.
-```
-
-Note the equivalent format names (case-insensitive):
-
-- C#: `cs`, `c#`
-- PowerShell: `ps`, `ps1`, `powershell`
