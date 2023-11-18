@@ -17,6 +17,7 @@
 #if !defined(TESTING) || !TESTING
 #include <crtdbg.h>
 #include <process.h>
+#include <shellapi.h>
 #include <shlobj.h>
 #include <shlwapi.h>
 #include <windows.h>
