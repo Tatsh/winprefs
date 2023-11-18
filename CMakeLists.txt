@@ -63,6 +63,7 @@ add_compile_definitions(
   WIN32_LEAN_AND_MEAN)
 
 add_subdirectory(native)
+add_subdirectory(src)
 
 set(CPACK_PACKAGE_NAME "winprefs")
 set(CPACK_PACKAGE_VENDOR "Tatsh")
