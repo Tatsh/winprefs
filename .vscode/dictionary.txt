@@ -119,6 +119,7 @@ reflow
 regsam
 regsetkeyvaluew
 rpath
+runtimes
 sarif
 securestring
 shlwapi
