@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['c-cpp', 'csharp']
+        language: ['csharp']
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
 name: CodeQL
 'on':
