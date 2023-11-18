@@ -52,8 +52,13 @@ Save-Preferences
 prefs-export
 ```
 
-`Save-Preferences` generates an `exec-reg.bat` file and saves to `${env:APPDATA}\prefs-export` by
-default. This can be changed by passing `-OutputDirectory DIR` (or `-o DIR`).
+`Save-Preferences` generates an `exec-reg.bat` (default name) file and saves to
+`${env:APPDATA}\prefs-export` by default. This can be changed by passing `-OutputDirectory DIR`
+(or `-o DIR`). The file name can be changed by passing `-OutputFile FILE` (or `-f FILE`).
+
+The format can be changed with the `-Format` argument. Accepted format strings:
+
+-
 
 It accepts switch `-Commit`/`-c` to initialise and commit to a Git repository in the output
 directory. It also accepts a `-DeployKey PATH` parameter and will push if this is specified. Any
@@ -102,18 +107,16 @@ REM ...
 
 ### Export, commit with Git and push with a key
 
-#### Dump the local environment variables
+#### Dump WindowMetrics as C code
 
 ```powershell
-Write-RegCommands HKCU:\Environment
+Write-RegCommands HKCU:\Environment -Format c
 ```
 
 Output:
 
-```batch
-reg add "HKCU\Environment" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\OneDrive" /f
-reg add "HKCU\Environment" /v "Path" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\AppData\Local\Microsoft\WindowsApps;C:\msys64\mingw64\bin;C:\tools\Cmder;" /f
-REM ...
+```c
+data = { 0xee, 0xff, 0xff, 0xff, /* ... */}; RegSetKeyValue(HKEY_CURRENT_USER, TEXT("Control Panel\\Desktop\\WindowMetrics"), TEXT("CaptionFont"), REG_BINARY, (LPCVOID)&data, 92);
 ```
 
 #### Dump a single value
@@ -147,6 +150,50 @@ Requirements:
 - Windows
 - Yarn
 
+### Building
+
+#### Visual Studio
+
+On Windows with Visual Studio installed:
+
+```shell
+mkdir build
+cd build
+cmake -Wno-dev ..
+cmake -G 'Visual Studio 17 2022' --build . -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+```
+
+Using the VS developer environment shell is not required but it may help.
+
+After building `winprefs.exe` will be in `build\native\Release\winprefs.exe`.
+
+#### MinGW
+
+Note: The PowerShell module (C# code) is only buildable with Visual Studio 2022.
+
+```shell
+mkdir build
+cd build
+cmake -G Ninja -Wno-dev ..
+cmake --build . --config Release --verbose
+```
+
+After building `winprefs.exe` will be in `build/native/winprefs.exe`.
+
+#### Cross-compiling
+
+```shell
+mkdir build
+cd build
+cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -DCMAKE_SYSTEM_NAME=Windows -Wno-dev ..
+cmake --build . --config Release --verbose
+```
+
+You may need to adjust paths above.
+
+After building `winprefs.exe` will be in `build/native/winprefs.exe`.
+
 ### Tasks
 
 - `yarn format`: to format the project's files.
@@ -154,9 +201,11 @@ Requirements:
 
 ## Native version
 
-A native version is in the works and is much faster than PowerShell. Note that its output is
-_always_ UTF-8 regardless of your set locale. It even works with Wine. Be aware that it may have
-bugs!
+The PowerShell module makes use of the native code with `DllImport` to get a significant speed
+increase in making registry queries and performing I/O. A native binary `winprefs.exe` can also be
+built that can also be used without needing PowerShell installed and it should work with XP and
+newer. As a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
+even works with Wine.
 
 Usage is similar to the PowerShell version:
 
@@ -181,29 +230,3 @@ Note the equivalent format names (case-insensitive):
 
 - C#: `cs`, `c#`
 - PowerShell: `ps`, `ps1`, `powershell`
-
-### Building
-
-#### Visual Studio
-
-On Windows with Visual Studio installed, using the _Developer Command Prompt_:
-
-```shell
-mkdir build
-cd build
-cmake -Wno-dev ..
-cmake --build . --config Release --verbose
-```
-
-#### Cross-compiling
-
-```shell
-mkdir build
-cd build
-cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -DCMAKE_SYSTEM_NAME=Windows -Wno-dev ..
-cmake --build . --config Release --verbose
-```
-
-You may need to adjust paths above.
-
-After building `winprefs.exe` will be in `build/native/winprefs.exe`.

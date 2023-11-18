@@ -5,18 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0-b0]
 
 ### Added
 
-- Native version written in C
-- New output formats: PowerShell, C, and C# (native version)
-- Start of tests
-- Build/test in CI
+- New output formats: PowerShell, C, and C#
 
 ### Changed
 
+- Mostly rewrote in C
+- Native code: 100% code coverage from tests
+- Re-wrote PowerShell part in C#
 - Source reorganisation
+- The PowerShell (from its C# DLL) calls the native DLL. This is significantly faster than the
+  100% PowerShell prior version.
 
 ## [0.2.1] - 2023-10-08
 
@@ -52,7 +54,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[Unreleased]: https://github.com/Tatsh/winprefs/compare/v0.2.1...HEAD
 [0.2.1]: https://github.com/Tatsh/winprefs/compare/v0.2.1...HEAD
 [0.2.0]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0
