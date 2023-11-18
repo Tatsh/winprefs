@@ -1,3 +1,4 @@
+using IOPath = System.IO.Path;
 using System.Management.Automation;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
@@ -65,6 +66,15 @@ namespace WinPrefs {
                 // If everything is empty under tat.sh\WinPrefs delete the directories.
                 if (winprefsFolder.Tasks.Count == 0) {
                     tatshFolder.DeleteFolder("WinPrefs");
+                    string appDataDir = IOPath.Combine(Environment.GetFolderPath(
+                      Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
+                    string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
+                    if (File.Exists(winprefswPath)) {
+                        File.Delete(winprefswPath);
+                    }
+                    if (Directory.GetFiles(appDataDir).Length == 0) {
+                        Directory.Delete(appDataDir);
+                    }
                 }
                 // Again for tat.sh
                 if (tatshFolder.SubFolders.Count == 0 && tatshFolder.Tasks.Count == 0) {

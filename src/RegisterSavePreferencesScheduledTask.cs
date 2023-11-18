@@ -1,7 +1,10 @@
+using IOPath = System.IO.Path;
 using System.Management.Automation;
+using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using Microsoft.Win32.TaskScheduler;
 
@@ -65,11 +68,15 @@ namespace WinPrefs {
                 };
                 td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(2);
                 td.Settings.StartWhenAvailable = true;
-                td.Actions.Add(new ExecAction(
-                    Environment.GetFolderPath(
-                      Environment.SpecialFolder.CommonApplicationData) +
-                      @"\WinPrefs\winprefsw.exe",
-                    String.Join(" ", args),
+                string appDataDir = IOPath.Combine(Environment.GetFolderPath(
+                      Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
+                string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
+                Directory.CreateDirectory(appDataDir);
+                if (File.Exists(winprefswPath)) {
+                    File.Delete(winprefswPath);
+                }
+                File.Copy(IOPath.Combine(IOPath.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "winprefsw.exe"), winprefswPath);
+                td.Actions.Add(new ExecAction(winprefswPath, Regex.Replace(String.Join(" ", args), @"\s+", " "),
                     Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
                 folder.RegisterTaskDefinition($"WinPrefs-{getSuffix()}", td);
             }
