@@ -4,27 +4,28 @@ using System.Runtime.Versioning;
 using Microsoft.Win32;
 
 namespace WinPrefs {
-    [SupportedOSPlatform("windows")]
-    [Cmdlet(VerbsCommunications.Write, "RegCommands")]
     [Alias("path2reg")]
+    [Cmdlet(VerbsCommunications.Write, "RegCommands")]
+    [SupportedOSPlatform("windows")]
     public class WriteRegCommands : PSCmdlet {
+        [Alias("F")]
+        [Parameter(HelpMessage = "Output format.")]
+        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
+        public string Format = "reg";
+
+        [Alias("m")]
+        [Parameter(HelpMessage = "Depth limit.")]
+        public int MaxDepth = 20;
+
         [Parameter(Mandatory = true, HelpMessage = "Registry path.")]
         [ValidatePattern("^HK(LM|CU|CR|U|CC):")]
         public string Path = "";
 
-        [Parameter(HelpMessage = "Output format.")]
-        [Alias("F")]
-        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
-        public string Format = "reg";
-
-        [Parameter(HelpMessage = "Depth limit.")]
-        [Alias("m")]
-        public int MaxDepth = 20;
-
         private bool IsDebugMode() {
             return MyInvocation.BoundParameters.ContainsKey("Debug") ?
                 ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
-                (ActionPreference)GetVariableValue("DebugPreference") != ActionPreference.SilentlyContinue;
+                ((ActionPreference)GetVariableValue("DebugPreference")
+                    != ActionPreference.SilentlyContinue);
         }
 
         protected override void ProcessRecord() {

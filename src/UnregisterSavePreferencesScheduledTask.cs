@@ -1,39 +1,38 @@
 using System.Management.Automation;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
-using System.Linq;
 using System.Text;
 
 using Microsoft.Win32.TaskScheduler;
 
 namespace WinPrefs {
-    [SupportedOSPlatform("windows")]
-    [Cmdlet("Unregister", "SavePreferencesScheduledTask")]
     [Alias("winprefs-uninstall-job")]
+    [Cmdlet("Unregister", "SavePreferencesScheduledTask")]
+    [SupportedOSPlatform("windows")]
     public class UnregisterSavePreferencesScheduledTask : PSCmdlet {
-        [Parameter(HelpMessage = "Depth limit.")]
-        [Alias("m")]
-        public int MaxDepth = 20;
-
-        [Parameter(HelpMessage = "Commit the changes with Git.")]
         [Alias("c")]
+        [Parameter(HelpMessage = "Commit the changes with Git.")]
         public SwitchParameter Commit { get; set; } = false;
 
-        [Parameter(HelpMessage = "Deploy key file path.")]
         [Alias("K")]
+        [Parameter(HelpMessage = "Deploy key file path.")]
         public string? DeployKey;
-
-        [Parameter(HelpMessage = "Output directory.")]
-        [Alias("o")]
-        public string? OutputDirectory;
-
-        [Parameter(HelpMessage = "Output filename.")]
-        [Alias("f")]
-        public string OutputFile = "exec-reg.bat";
 
         [Parameter(HelpMessage = "Output format.")]
         [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
         public string Format = "reg";
+
+        [Alias("m")]
+        [Parameter(HelpMessage = "Depth limit.")]
+        public int MaxDepth = 20;
+
+        [Alias("o")]
+        [Parameter(HelpMessage = "Output directory.")]
+        public string? OutputDirectory;
+
+        [Alias("f")]
+        [Parameter(HelpMessage = "Output filename.")]
+        public string OutputFile = "exec-reg.bat";
 
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
@@ -42,13 +41,14 @@ namespace WinPrefs {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
-               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format},m={MaxDepth}")));
+               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format}," +
+               $"m={MaxDepth}")));
         }
 
         protected override void ProcessRecord() {
-            string suffix = getSuffix();
             using (TaskService ts = new TaskService()) {
-                Microsoft.Win32.TaskScheduler.Task task = ts.GetTask($"tat.sh\\WinPrefs\\WinPrefs-{getSuffix()}");
+                Microsoft.Win32.TaskScheduler.Task task = ts.GetTask(
+                    $"tat.sh\\WinPrefs\\WinPrefs-{getSuffix()}");
                 if (task == null) {
                     return;
                 }

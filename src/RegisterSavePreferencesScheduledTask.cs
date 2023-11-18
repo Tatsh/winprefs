@@ -1,6 +1,5 @@
 using System.Management.Automation;
 using System.Runtime.Versioning;
-using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,45 +10,46 @@ namespace WinPrefs {
     [Cmdlet("Register", "SavePreferencesScheduledTask")]
     [SupportedOSPlatform("windows")]
     public class RegisterSavePreferencesScheduledTask : PSCmdlet {
-        [Parameter(HelpMessage = "Depth limit.")]
         [Alias("m")]
+        [Parameter(HelpMessage = "Depth limit.")]
         public int MaxDepth = 20;
 
-        [Parameter(HelpMessage = "Commit the changes with Git.")]
         [Alias("c")]
+        [Parameter(HelpMessage = "Commit the changes with Git.")]
         public SwitchParameter Commit { get; set; } = false;
 
-        [Parameter(HelpMessage = "Deploy key file path.")]
         [Alias("K")]
+        [Parameter(HelpMessage = "Deploy key file path.")]
         public string? DeployKey;
-
-        [Parameter(HelpMessage = "Output directory.")]
-        [Alias("o")]
-        public string? OutputDirectory;
-
-        [Parameter(HelpMessage = "Output filename.")]
-        [Alias("f")]
-        public string OutputFile = "exec-reg.bat";
-
-        [Parameter(HelpMessage = "Full registry path.")]
-        public string Path = @"HKCU:\";
 
         [Parameter(HelpMessage = "Output format.")]
         [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
         public string Format = "reg";
 
+        [Alias("o")]
+        [Parameter(HelpMessage = "Output directory.")]
+        public string? OutputDirectory;
+
+        [Alias("f")]
+        [Parameter(HelpMessage = "Output filename.")]
+        public string OutputFile = "exec-reg.bat";
+
+        [Parameter(HelpMessage = "Full registry path.")]
+        public string Path = @"HKCU:\";
+
         private string getSuffix() {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
-               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format},m={MaxDepth}")));
+               $"c={Commit},K={DeployKey},o={OutputDirectory},f={OutputFile},p={Path},f={Format}," +
+               $"m={MaxDepth}")));
         }
 
         protected override void ProcessRecord() {
             using (TaskService ts = new TaskService()) {
                 TaskFolder folder = ts.RootFolder.CreateFolder(@"tat.sh\WinPrefs\");
                 TaskDefinition td = ts.NewTask();
-                td.RegistrationInfo.Description = $"Run SavePreferences every 12 hours (path {Path}).";
+                td.RegistrationInfo.Description = $"Runs WinPrefs every 12 hours (path {Path}).";
                 DailyTrigger trigger = new DailyTrigger();
                 trigger.StartBoundary = DateTime.Today.AddDays(1);
                 trigger.Repetition.Interval = TimeSpan.FromHours(12);
@@ -63,11 +63,14 @@ namespace WinPrefs {
                     $"-F {Format}",
                     Path
                 };
-                string winprefswPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\WinPrefs\\winprefsw.exe";
-                // td.Settings.MultipleInstances = "IgnoreNew";
                 td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(2);
                 td.Settings.StartWhenAvailable = true;
-                td.Actions.Add(new ExecAction(winprefswPath, String.Join(" ", args), Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
+                td.Actions.Add(new ExecAction(
+                    Environment.GetFolderPath(
+                      Environment.SpecialFolder.CommonApplicationData) +
+                      @"\WinPrefs\winprefsw.exe",
+                    String.Join(" ", args),
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)));
                 folder.RegisterTaskDefinition($"WinPrefs-{getSuffix()}", td);
             }
         }

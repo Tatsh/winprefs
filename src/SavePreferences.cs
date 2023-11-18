@@ -2,15 +2,10 @@ using System.Management.Automation;
 using System.Runtime.Versioning;
 
 namespace WinPrefs {
-    [SupportedOSPlatform("windows")]
-    [Cmdlet("Save", "Preferences")]
     [Alias("prefs-export")]
-
+    [Cmdlet("Save", "Preferences")]
+    [SupportedOSPlatform("windows")]
     public class SavePreferences : PSCmdlet {
-        [Parameter(HelpMessage = "Depth limit.")]
-        [Alias("m")]
-        public int MaxDepth = 20;
-
         [Parameter(HelpMessage = "Commit the changes with Git.")]
         [Alias("c")]
         public SwitchParameter Commit { get; set; } = false;
@@ -18,6 +13,14 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Deploy key file path.")]
         [Alias("K")]
         public string? DeployKey;
+
+        [Parameter(HelpMessage = "Output format.")]
+        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
+        public string Format = "reg";
+
+        [Parameter(HelpMessage = "Depth limit.")]
+        [Alias("m")]
+        public int MaxDepth = 20;
 
         [Parameter(HelpMessage = "Output directory.")]
         [Alias("o")]
@@ -30,14 +33,11 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
 
-        [Parameter(HelpMessage = "Output format.")]
-        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
-        public string Format = "reg";
-
         private bool IsDebugMode() {
             return MyInvocation.BoundParameters.ContainsKey("Debug") ?
                 ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
-                (ActionPreference)GetVariableValue("DebugPreference") != ActionPreference.SilentlyContinue;
+                ((ActionPreference)GetVariableValue("DebugPreference")
+                    != ActionPreference.SilentlyContinue);
         }
 
         protected override void ProcessRecord() {

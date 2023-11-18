@@ -17,14 +17,14 @@ namespace WinPrefs {
 
         public static OutputFormat ToEnum(string format) {
             switch (format.ToLower()) {
-                case "ps":
-                case "ps1":
-                    return OutputFormat.PowerShell;
+                case "c":
+                    return OutputFormat.C;
                 case "cs":
                 case "c#":
                     return OutputFormat.CSharp;
-                case "c":
-                    return OutputFormat.C;
+                case "ps":
+                case "ps1":
+                    return OutputFormat.PowerShell;
                 default:
                     return OutputFormat.Reg;
             }
@@ -35,7 +35,8 @@ namespace WinPrefs {
             SafeHandle? handle;
             Type registryKeyType = typeof(RegistryKey);
             try {
-                fieldInfo = registryKeyType.GetField("_hkey", BindingFlags.NonPublic | BindingFlags.Instance);
+                fieldInfo = registryKeyType.GetField("_hkey",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
             } catch (ArgumentNullException) {
                 return null;
             }
@@ -49,26 +50,23 @@ namespace WinPrefs {
 
         public static RegistryKey GetTopKey(string RegPath) {
             switch (RegPath.Split(":").First().ToUpper()) {
-                case "HKCU":
-                case "HKEY_CURRENT_USER":
-                    return Registry.CurrentUser;
-                case "HKCR":
-                case "HKEY_CLASSES_ROOT":
-                    return Registry.ClassesRoot;
-                case "HKLM":
-                case "HKEY_LOCAL_MACHINE":
-                    return Registry.LocalMachine;
                 case "HKCC":
                 case "HKEY_CURRENT_CONFIG":
                     return Registry.CurrentConfig;
+                case "HKCR":
+                case "HKEY_CLASSES_ROOT":
+                    return Registry.ClassesRoot;
+                case "HKCU":
+                case "HKEY_CURRENT_USER":
+                    return Registry.CurrentUser;
+                case "HKLM":
+                case "HKEY_LOCAL_MACHINE":
+                    return Registry.LocalMachine;
                 default:
                     return Registry.Users;
             }
         }
 
-        /**
-         * Really, hk is required.
-         */
         [DllImport("prefs.dll",
                    CallingConvention = CallingConvention.Cdecl,
                    CharSet = CharSet.Unicode,
