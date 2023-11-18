@@ -3,7 +3,7 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 
 cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
-set(version 0.2.1)
+set(version 0.3.0)
 project(
   winprefs
   DESCRIPTION "Dump a registry path to a series of 'reg add' commands."
@@ -11,7 +11,8 @@ project(
   LANGUAGES C
   VERSION ${version})
 
-if((CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 19.37.0.0)
+if((CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 19.37.0.0
+   )
    OR CMAKE_C_COMPILER_ID MATCHES "Clang|GNU"
    OR CMAKE_C_COMPILER MATCHES "/winegcc$")
   set(CMAKE_C_STANDARD 23)
