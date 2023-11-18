@@ -147,8 +147,8 @@ reg add "HKCU\Control Panel\Desktop\WindowMetrics\StatusFont" /v "StatusFont" /t
 
 The PowerShell module makes use of the native code with `DllImport` to get a significant speed
 increase in making registry queries and performing I/O. A native binary `winprefs.exe` can also be
-built that can also be used without needing PowerShell installed and it should work with XP and
-newer. As a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
+built that can be used without needing PowerShell installed and it should work with XP and newer. If
+built as a a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
 even works with Wine.
 
 Usage is similar to the PowerShell version:
