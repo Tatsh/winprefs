@@ -4,7 +4,7 @@ using System.Runtime.Versioning;
 
 using Microsoft.Win32;
 
-namespace WinPrefsTestingArea {
+namespace WinPrefs {
     [SupportedOSPlatform("windows")]
     public class LibPrefs {
         public enum OutputFormat {

@@ -1,7 +1,7 @@
 using System.Management.Automation;
 using System.Runtime.Versioning;
 
-namespace WinPrefsTestingArea {
+namespace WinPrefs {
     [SupportedOSPlatform("windows")]
     [Cmdlet("Save", "Preferences")]
     [Alias("prefs-export")]
@@ -24,14 +24,13 @@ namespace WinPrefsTestingArea {
         public string? OutputDirectory;
 
         [Parameter(HelpMessage = "Output filename.")]
-        [Alias("-f")]
+        [Alias("f")]
         public string OutputFile = "exec-reg.bat";
 
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
 
         [Parameter(HelpMessage = "Output format.")]
-        [Alias("-F")]
         [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
         public string Format = "reg";
 
@@ -49,7 +48,7 @@ namespace WinPrefsTestingArea {
                 if (OutputDirectory == null) {
                     string path = Environment.GetFolderPath(
                         Environment.SpecialFolder.CommonApplicationData);
-                    OutputDirectory = path + "\\prefs-export";
+                    OutputDirectory = $"{path}\\prefs-export";
                 }
                 Directory.CreateDirectory(OutputDirectory);
                 if (!LibPrefs.SavePreferences(LibPrefs.GetTopKey(Path),

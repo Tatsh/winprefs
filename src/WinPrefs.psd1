@@ -4,18 +4,20 @@
   CompatiblePSEditions = @('Windows')
   Copyright            = '(c) 2023 Tatsh. All rights reserved.'
   Description          = 'Convert a registry path to a series of reg commands.'
+  DotNetFrameworkVersion = "6.0"
   GUID                 = '57c33a4f-3d66-422b-8e2b-596231011201'
   HelpInfoURI          = 'https://github.com/Tatsh/winprefs'
   ModuleVersion        = '0.2.1'
   PowerShellVersion    = '5.1'
+  NestedModules        = @()
   RequiredAssemblies   = @()
-  RequiredModules      = @()
-  RootModule           = 'WinPrefs'
+  # RequiredModules      = @(@{ModuleName = 'Microsoft.Win32.TaskScheduler'; ModuleVersion = '2.10.1.0'; })
+  RootModule           = 'PSWinPrefs.dll'
 
   AliasesToExport      = @('path2reg', 'prefs-export', 'winprefs-install-job', 'winprefs-uninstall-job')
-  CmdletsToExport      = @()
-  FunctionsToExport    = @('Register-SavePreferencesScheduledTask', 'Save-Preferences',
+  CmdletsToExport      = @('Register-SavePreferencesScheduledTask', 'Save-Preferences',
     'Unregister-SavePreferencesScheduledTask', 'Write-RegCommands')
+  FunctionsToExport    = @()
   VariablesToExport    = '*'
 
   PrivateData          = @{

@@ -3,11 +3,11 @@
     "post_bump_hooks": ["./post-bump.sh"],
     "tag_format": "v$version",
     "version_files": [
-      "CMakeLists.txt",
-      "Doxyfile.in",
-      "README.md",
-      "WinPrefs/WinPrefs.psd1",
-      "package.json"
+        "CMakeLists.txt",
+        "Doxyfile.in",
+        "README.md",
+        "package.json",
+        "src/WinPrefs.psd1"
     ],
     "version_provider": "npm",
     "version_scheme": "semver"
