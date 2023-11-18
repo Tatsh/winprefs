@@ -1,6 +1,4 @@
 /** \file */
-#include <shellapi.h>
-
 #ifdef ENABLE_VLD
 #include <vld.h>
 #endif
