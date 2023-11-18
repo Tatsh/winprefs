@@ -1,4 +1,5 @@
-if(CMAKE_GENERATOR MATCHES "Visual Studio")
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_CSharp_COMPILER_VERSION VERSION_GREATER_EQUAL
+                                           4.7.0)
   enable_language(CSharp)
   add_library(
     PSWinPrefs SHARED LibPrefs.cs RegisterSavePreferencesScheduledTask.cs SavePreferences.cs
