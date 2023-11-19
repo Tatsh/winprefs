@@ -2,8 +2,43 @@
 #include "constants.h"
 #include "git_branch.h"
 
+static inline bool run_process_no_window(wchar_t *arg0, ...) {
+    PROCESS_INFORMATION pi = {0};
+    STARTUPINFO si = {.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES,
+                      .wShowWindow = SW_HIDE};
+    wchar_t cmd[32767];
+    wmemset(cmd, L'\0', 32767);
+    va_list args;
+    va_start(args, arg0);
+    wchar_t *cur;
+    size_t i = 0;
+    size_t req_size = (size_t)_snwprintf(nullptr, 0, L"\"%ls\" ", arg0);
+    _snwprintf(cmd, req_size + 1, L"\"%ls\" ", arg0);
+    i += req_size;
+    while (*arg0++) {
+        cur = va_arg(args, wchar_t *);
+        if (!cur) {
+            break;
+        }
+        req_size = (size_t)_snwprintf(nullptr, 0, L"\"%ls\" ", cur);
+        _snwprintf(cmd + i, req_size + 1, L"\"%ls\" ", cur);
+        i += req_size;
+    }
+    va_end(args);
+    cmd[i - 1] = L'\0';
+    debug_print(L"Executing: '%ls'\n", cmd);
+    bool ret = CreateProcess(
+        nullptr, cmd, nullptr, nullptr, true, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
+    if (ret) {
+        WaitForSingleObject(pi.hProcess, INFINITE);
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    }
+    return ret;
+}
+
 static inline bool has_git() {
-    return _wspawnlp(P_WAIT, L"git.exe", L"git", L"--version", nullptr) >= 0;
+    return run_process_no_window(L"git.exe", L"--version", nullptr);
 }
 
 static inline bool dir_exists(wchar_t *path) {
@@ -43,7 +78,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
         } // LCOV_EXCL_STOP
         wmemset(cwd, L'\0', MAX_PATH);
         if (!_wgetcwd(cwd, MAX_PATH) || _wchdir(output_dir) != 0 ||
-            _wspawnlp(P_WAIT, L"git.exe", L"git", L"init", L"--quiet", nullptr) != 0 ||
+            !run_process_no_window(L"git.exe", L"git", L"init", L"--quiet", nullptr) ||
             _wchdir(cwd) != 0) {
             goto fail;
         }
@@ -56,8 +91,8 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
     wmemset(git_dir_arg, L'\0', git_dir_arg_len);
     _snwprintf(git_dir_arg, git_dir_arg_len, L"--git-dir=%ls", git_dir);
     git_dir_arg[git_dir_arg_len - 1] = L'\0';
-    if (_wspawnlp(P_WAIT, L"git.exe", L"git", git_dir_arg, work_tree_arg, L"add", L".", nullptr) !=
-        0) {
+    if (!run_process_no_window(
+            L"git.exe", L"git", git_dir_arg, work_tree_arg, L"add", L".", nullptr)) {
         goto fail;
     }
     size_t time_needed_size =
@@ -97,19 +132,18 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                AUTOMATIC_COMMIT_MESSAGE_PREFIX,
                date_buf,
                time_buf);
-    if (_wspawnlp(P_WAIT,
-                  L"git.exe",
-                  L"git",
-                  git_dir_arg,
-                  work_tree_arg,
-                  L"commit",
-                  L"--no-gpg-sign",
-                  L"--quiet",
-                  L"--no-verify",
-                  L"\"--author=winprefs <winprefs@tat.sh>\"",
-                  L"-m",
-                  message_buf,
-                  nullptr) != 0) {
+    if (!run_process_no_window(L"git.exe",
+                               L"git",
+                               git_dir_arg,
+                               work_tree_arg,
+                               L"commit",
+                               L"--no-gpg-sign",
+                               L"--quiet",
+                               L"--no-verify",
+                               L"\"--author=winprefs <winprefs@tat.sh>\"",
+                               L"-m",
+                               message_buf,
+                               nullptr)) {
         goto fail;
     }
     if (deploy_key) {
@@ -128,15 +162,14 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                    ssh_command_len,
                    L"\"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no\"",
                    full_deploy_key_path);
-        if (_wspawnlp(P_WAIT,
-                      L"git.exe",
-                      L"git",
-                      git_dir_arg,
-                      work_tree_arg,
-                      L"config",
-                      L"core.sshCommand",
-                      ssh_command,
-                      nullptr) != 0) {
+        if (!run_process_no_window(L"git.exe",
+                                   L"git",
+                                   git_dir_arg,
+                                   work_tree_arg,
+                                   L"config",
+                                   L"core.sshCommand",
+                                   ssh_command,
+                                   nullptr)) {
             goto fail;
         }
         wchar_t *branch_arg =
@@ -145,19 +178,18 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                     git_dir_arg,
                     work_tree_arg,
                     branch_arg);
-        if (_wspawnlp(P_WAIT,
-                      L"git.exe",
-                      L"git",
-                      git_dir_arg,
-                      work_tree_arg,
-                      L"push",
-                      L"-u",
-                      L"--porcelain",
-                      L"--no-signed",
-                      L"origin",
-                      L"origin",
-                      branch_arg,
-                      nullptr) != 0) {
+        if (!run_process_no_window(L"git.exe",
+                                   L"git",
+                                   git_dir_arg,
+                                   work_tree_arg,
+                                   L"push",
+                                   L"-u",
+                                   L"--porcelain",
+                                   L"--no-signed",
+                                   L"origin",
+                                   L"origin",
+                                   branch_arg,
+                                   nullptr)) {
             goto fail;
         }
     }
