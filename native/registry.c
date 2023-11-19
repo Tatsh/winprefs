@@ -43,8 +43,8 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  const wchar_t *specified_path,
                                  enum OUTPUT_FORMAT format,
                                  writer_t *writer) {
-    bool using_default_writer, writer_was_setup;
-    using_default_writer = writer_was_setup = false;
+    bool using_default_writer, writer_was_setup, writer_was_torn_down;
+    using_default_writer = writer_was_setup = writer_was_torn_down = false;
     if (!writer || !writer->write_output) {
         debug_print(L"Using default writer.");
         writer = get_default_writer();
@@ -82,14 +82,18 @@ DLL_EXPORT bool save_preferences(bool commit,
         writer->write_output(writer, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written);
     }
     ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, prior_stem, format, writer);
+    if (writer_was_setup && writer->teardown) {
+        writer->teardown(writer);
+        writer_was_torn_down = true;
+    }
     if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
     }
     goto cleanup;
 fail:
     ret = false;
-cleanup:
-    if (writer_was_setup && writer->teardown) {
+  cleanup:
+    if (!writer_was_torn_down && writer_was_setup && writer->teardown) {
         writer->teardown(writer);
     }
     if (using_default_writer) {
