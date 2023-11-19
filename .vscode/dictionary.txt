@@ -80,6 +80,7 @@ lstatus
 macprefs
 mainpage
 makelangid
+maml
 mathjax
 mconsole
 mdfile
@@ -132,6 +133,7 @@ sublang
 swprintf
 taskscheduler
 tatsh
+teardown
 tensin
 testlist
 tlbid

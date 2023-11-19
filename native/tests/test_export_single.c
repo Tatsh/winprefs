@@ -8,7 +8,7 @@ void test_export_single_value_invalid_format(void **state) {
     will_return(__wrap_RegQueryValueEx, ERROR_SUCCESS);
     will_return(__wrap_GetStdHandle, 0);
     bool ret = export_single_value(
-        HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_UNKNOWN);
+        HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_UNKNOWN, nullptr);
     assert_false(ret);
     assert_int_equal(errno, EINVAL);
 }
@@ -23,8 +23,8 @@ void test_export_single_value_formats(void **state) {
     will_return(__wrap_do_write_powershell_reg_code, true);
     size_t i;
     for (i = 0; i < 4; i++) {
-        bool ret =
-            export_single_value(HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", formats[i]);
+        bool ret = export_single_value(
+            HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", formats[i], nullptr);
         assert_true(ret);
     }
 }
@@ -39,43 +39,43 @@ void test_export_single_value_formats_fail(void **state) {
     will_return(__wrap_do_write_powershell_reg_code, false);
     size_t i;
     for (i = 0; i < 4; i++) {
-        bool ret =
-            export_single_value(HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", formats[i]);
+        bool ret = export_single_value(
+            HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", formats[i], nullptr);
         assert_false(ret);
     }
 }
 
 void test_export_single_value_RegOpenKeyEx_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_ACCESS_DENIED);
-    bool ret =
-        export_single_value(HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG);
+    bool ret = export_single_value(
+        HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG, nullptr);
     assert_false(ret);
 }
 
 void test_export_single_value_RegQueryValueEx_too_large(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryValueEx, ERROR_MORE_DATA);
-    bool ret =
-        export_single_value(HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG);
+    bool ret = export_single_value(
+        HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG, nullptr);
     assert_false(ret);
 }
 
 void test_export_single_value_RegQueryValueEx_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryValueEx, ERROR_ACCESS_DENIED);
-    bool ret =
-        export_single_value(HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG);
+    bool ret = export_single_value(
+        HKEY_CURRENT_USER, L"HKEY_CURRENT_USER\\A\\B\\C", OUTPUT_FORMAT_REG, nullptr);
     assert_false(ret);
 }
 
 void test_export_single_value_no_backslash(void **state) {
-    bool ret = export_single_value(HKEY_CURRENT_USER, L"", OUTPUT_FORMAT_REG);
+    bool ret = export_single_value(HKEY_CURRENT_USER, L"", OUTPUT_FORMAT_REG, nullptr);
     assert_false(ret);
     assert_int_equal(errno, EINVAL);
 }
 
 void test_export_single_value_null_reg_path(void **state) {
-    bool ret = export_single_value(HKEY_CURRENT_USER, nullptr, OUTPUT_FORMAT_REG);
+    bool ret = export_single_value(HKEY_CURRENT_USER, nullptr, OUTPUT_FORMAT_REG, nullptr);
     assert_false(ret);
     assert_int_equal(errno, EINVAL);
 }
