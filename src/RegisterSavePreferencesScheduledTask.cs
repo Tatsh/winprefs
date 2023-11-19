@@ -78,7 +78,7 @@ namespace WinPrefs {
                 string? assemblyLoc = IOPath.GetDirectoryName(
                     Assembly.GetExecutingAssembly().Location);
                 if (assemblyLoc == null) {
-                    throw new Exception();
+                    ThrowTerminatingError(new ErrorRecord(new Exception("Failed to get assembly location."), "WinPrefs_RegisterTaskError", ErrorCategory.InvalidResult, null));
                 }
                 File.Copy(IOPath.Combine(assemblyLoc, "winprefsw.exe"), winprefswPath);
                 td.Actions.Add(new ExecAction(

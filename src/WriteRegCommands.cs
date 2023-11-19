@@ -39,7 +39,7 @@ namespace WinPrefs {
                 hk = hk.OpenSubKey(subkey);
                 if (hk == null) {
                     if (!LibPrefs.ExportSingleValue(topKey, Path, LibPrefs.ToEnum(Format))) {
-                        throw new Exception();
+                        ThrowTerminatingError(new ErrorRecord(new Exception($"Failed to export {Path} as a single value."), "WinPrefs_ExportSingleValueError", ErrorCategory.InvalidResult, null));
                     }
                     return;
                 }
@@ -49,8 +49,7 @@ namespace WinPrefs {
                                           hk: hk,
                                           specifiedPath: Path,
                                           format: LibPrefs.ToEnum(Format))) {
-                WriteObject($"Failed to export {Path}.");
-                throw new Exception();
+                ThrowTerminatingError(new ErrorRecord(new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError", ErrorCategory.InvalidResult, null));
             }
         }
     }
