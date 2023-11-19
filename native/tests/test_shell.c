@@ -21,7 +21,7 @@ static void test_escape_handles_special_characters(void **state) {
 static void test_escape_handles_reg_multi_sz(void **state) {
     (void)state;
     wchar_t input[] = {L'a', L'\0', L'b', L'\0', L'c'};
-    wchar_t *out = escape_for_batch(input, 7);
+    wchar_t *out = escape_for_batch(input, 5);
     assert_memory_equal(L"a\\0b\\0c", out, 9);
     free(out);
 }
