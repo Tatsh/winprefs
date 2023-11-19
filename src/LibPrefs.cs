@@ -20,7 +20,10 @@ namespace WinPrefs {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void WriterTeardownT();
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate bool WriterWriteOutputT(object instance, string mbOut, int totalSize, out uint written);
+        public delegate bool WriterWriteOutputT(object instance,
+                                                string mbOut,
+                                                int totalSize,
+                                                out uint written);
         [StructLayout(LayoutKind.Sequential)]
         public struct Writer {
             [MarshalAs(UnmanagedType.FunctionPtr)] public WriterSetupT? setup;
@@ -101,7 +104,10 @@ namespace WinPrefs {
                                                        OutputFormat format,
                                                        ref Writer writer);
 
-        public static bool WriteOutputImpl(object instance, string mbOut, int totalSize, out uint written) {
+        public static bool WriteOutputImpl(object instance,
+                                           string mbOut,
+                                           int totalSize,
+                                           out uint written) {
             if (WriteObjectImpl != null) {
                 WriteObjectImpl(mbOut.Substring(0, totalSize - 1));
             }

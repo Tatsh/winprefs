@@ -69,7 +69,9 @@ namespace WinPrefs {
                                           MaxDepth,
                                           Path,
                                           LibPrefs.ToEnum(Format))) {
-                ThrowTerminatingError(new ErrorRecord(new Exception("Failed to save."), "WinPrefs_SavePreferencesError", ErrorCategory.NotSpecified, null));
+                ThrowTerminatingError(new ErrorRecord(
+                    new Exception("Failed to save."), "WinPrefs_SavePreferencesError",
+                    ErrorCategory.NotSpecified, null));
             }
         }
     }
