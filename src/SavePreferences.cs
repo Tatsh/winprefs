@@ -15,7 +15,7 @@ namespace WinPrefs {
         public string? DeployKey;
 
         [Parameter(HelpMessage = "Output format.")]
-        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
+        [ValidatePattern("^(reg|ps1?|powershell|cs|c#|c)$")]
         public string Format = "reg";
 
         [Parameter(HelpMessage = "Depth limit.")]
@@ -40,27 +40,36 @@ namespace WinPrefs {
                     != ActionPreference.SilentlyContinue);
         }
 
-        protected override void ProcessRecord() {
+        protected override void BeginProcessing() {
+            base.BeginProcessing();
             if (IsDebugMode()) {
-                {
-                    LibPrefs.SetDebugPrintEnabled();
-                }
-                if (OutputDirectory == null) {
-                    string path = Environment.GetFolderPath(
-                        Environment.SpecialFolder.CommonApplicationData);
-                    OutputDirectory = $"{path}\\prefs-export";
-                }
-                Directory.CreateDirectory(OutputDirectory);
-                if (!LibPrefs.SavePreferences(LibPrefs.GetTopKey(Path),
-                                              Commit.ToBool(),
-                                              DeployKey,
-                                              OutputDirectory,
-                                              OutputFile,
-                                              MaxDepth,
-                                              Path,
-                                              LibPrefs.ToEnum(Format))) {
-                    ThrowTerminatingError(new ErrorRecord(new Exception("Failed to save."), "WinPrefs_SavePreferencesError", ErrorCategory.NotSpecified, null));
-                }
+                LibPrefs.SetDebugPrintEnabled();
+            }
+        }
+
+        protected override void EndProcessing() {
+            base.EndProcessing();
+            LibPrefs.SetDebugPrintEnabled(false);
+        }
+
+        protected override void ProcessRecord() {
+            if (OutputDirectory == null) {
+                string path = Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData);
+                OutputDirectory = $"{path}\\prefs-export";
+            }
+            Directory.CreateDirectory(OutputDirectory);
+            if (!LibPrefs.SavePreferences(LibPrefs.GetTopKey(Path),
+                WriteObject,
+                OutputFile == "-",
+                                          Commit.ToBool(),
+                                          DeployKey,
+                                          OutputDirectory,
+                                          OutputFile,
+                                          MaxDepth,
+                                          Path,
+                                          LibPrefs.ToEnum(Format))) {
+                ThrowTerminatingError(new ErrorRecord(new Exception("Failed to save."), "WinPrefs_SavePreferencesError", ErrorCategory.NotSpecified, null));
             }
         }
     }

@@ -1,4 +1,5 @@
 using System.Management.Automation;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
 using Microsoft.Win32;
@@ -10,7 +11,7 @@ namespace WinPrefs {
     public class WriteRegCommands : PSCmdlet {
         [Alias("F")]
         [Parameter(HelpMessage = "Output format.")]
-        [ValidatePattern("^(reg|ps1?|cs|c#|c)$")]
+        [ValidatePattern("^(reg|powershell|ps1?|cs|c#|c)$")]
         public string Format = "reg";
 
         [Alias("m")]
@@ -28,17 +29,26 @@ namespace WinPrefs {
                     != ActionPreference.SilentlyContinue);
         }
 
-        protected override void ProcessRecord() {
+        protected override void BeginProcessing() {
+            base.BeginProcessing();
             if (IsDebugMode()) {
                 LibPrefs.SetDebugPrintEnabled();
             }
+        }
+
+        protected override void EndProcessing() {
+            base.EndProcessing();
+            LibPrefs.SetDebugPrintEnabled(false);
+        }
+
+        protected override void ProcessRecord() {
             RegistryKey? hk = LibPrefs.GetTopKey(Path);
             RegistryKey topKey = hk;
             string subkey = string.Join("\\", Path.Split("\\").Skip(1));
             if (subkey.Length > 0) {
                 hk = hk.OpenSubKey(subkey);
                 if (hk == null) {
-                    if (!LibPrefs.ExportSingleValue(topKey, Path, LibPrefs.ToEnum(Format))) {
+                    if (!LibPrefs.ExportSingleValue(topKey, Path, WriteObject, LibPrefs.ToEnum(Format))) {
                         ThrowTerminatingError(new ErrorRecord(new Exception($"Failed to export {Path} as a single value."), "WinPrefs_ExportSingleValueError", ErrorCategory.InvalidResult, null));
                     }
                     return;
@@ -48,9 +58,9 @@ namespace WinPrefs {
                                           maxDepth: MaxDepth,
                                           hk: hk,
                                           specifiedPath: Path,
-                                          format: LibPrefs.ToEnum(Format))) {
+                                          format: LibPrefs.ToEnum(Format), writeStdOut: true, writeObjectIn: WriteObject)) {
                 ThrowTerminatingError(new ErrorRecord(new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError", ErrorCategory.InvalidResult, null));
-            }
+            }   
         }
     }
 }

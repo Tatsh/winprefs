@@ -15,6 +15,23 @@ namespace WinPrefs {
             Unknown
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool WriterSetupT();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void WriterTeardownT();
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate bool WriterWriteOutputT(object instance, string mbOut, int totalSize, out uint written);
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Writer {
+            [MarshalAs(UnmanagedType.FunctionPtr)] public WriterSetupT? setup;
+            [MarshalAs(UnmanagedType.FunctionPtr)] public WriterTeardownT? teardown;
+            [MarshalAs(UnmanagedType.FunctionPtr)] public WriterWriteOutputT write;
+        }
+
+        public delegate void WriteObject(object sendToPipeline);
+
+        public static WriteObject? WriteObjectImpl;
+
         public static OutputFormat ToEnum(string format) {
             switch (format.ToLower()) {
                 case "c":
@@ -22,6 +39,7 @@ namespace WinPrefs {
                 case "cs":
                 case "c#":
                     return OutputFormat.CSharp;
+                case "powershell":
                 case "ps":
                 case "ps1":
                     return OutputFormat.PowerShell;
@@ -80,9 +98,20 @@ namespace WinPrefs {
                                                        int maxDepth,
                                                        UIntPtr hk,
                                                        string? specifiedPath,
-                                                       OutputFormat format);
+                                                       OutputFormat format,
+                                                       ref Writer writer);
+
+        public static bool WriteOutputImpl(object instance, string mbOut, int totalSize, out uint written) {
+            if (WriteObjectImpl != null) {
+                WriteObjectImpl(mbOut.Substring(0, totalSize - 1));
+            }
+            written = (uint)totalSize;
+            return true;
+        }
 
         public unsafe static bool SavePreferences(RegistryKey hk,
+            WriteObject writeObjectIn,
+                                                  bool writeStdOut = false,
                                                   bool commit = false,
                                                   string? deployKey = null,
                                                   string? outputDirectory = null,
@@ -90,11 +119,19 @@ namespace WinPrefs {
                                                   int maxDepth = 20,
                                                   string? specifiedPath = null,
                                                   OutputFormat format = OutputFormat.Reg) {
+            WriteObjectImpl = writeObjectIn;
             IntPtr? handle = ToUnsafeHandle(hk);
-            return handle != null ? SavePreferencesImpl(commit, deployKey, outputDirectory,
+            if (handle == null) {
+                return false;
+            }
+            Writer writer = new Writer();
+            if (writeStdOut) {
+                writer.write = WriteOutputImpl;
+            }
+            return SavePreferencesImpl(commit, deployKey, outputDirectory,
                                                         outputFile, maxDepth,
                                                         (UIntPtr)handle.Value.ToPointer(),
-                                                        specifiedPath, format) : false;
+                                                        specifiedPath, format, ref writer);
         }
 
         [DllImport("prefs.dll",
@@ -105,14 +142,22 @@ namespace WinPrefs {
                    ThrowOnUnmappableChar = true)]
         private static extern bool ExportSingleValueImpl(UIntPtr topKey,
                                                          string regPath,
-                                                         OutputFormat format = OutputFormat.Reg);
+                                                         OutputFormat format,
+                                                         ref Writer writer);
 
         public unsafe static bool ExportSingleValue(RegistryKey topKey,
                                                     string regPath,
+                                                    WriteObject writeObjectIn,
                                                     OutputFormat format = OutputFormat.Reg) {
+            WriteObjectImpl = writeObjectIn;
             IntPtr? handle = ToUnsafeHandle(topKey);
-            return handle != null ? ExportSingleValueImpl((UIntPtr)handle.Value.ToPointer(),
-                                                          regPath, format) : false;
+            if (handle == null) {
+                return false;
+            }
+            Writer writer = new Writer();
+            writer.write = WriteOutputImpl;
+            return ExportSingleValueImpl((UIntPtr)handle.Value.ToPointer(),
+                                                          regPath, format, ref writer);
         }
 
         [DllImport("prefs.dll",
