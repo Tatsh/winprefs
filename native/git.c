@@ -44,7 +44,7 @@ static inline bool run_process_no_window(int n_args, wchar_t *arg0, ...) {
             debug_print(L"Failed to get exit code.\n");
             return false;
         }
-        debug_print(L"Exit code: %d\n", exit_code);
+        debug_print(L"Exit code: %lu\n", exit_code);
         return exit_code == 0;
     }
     return ret;

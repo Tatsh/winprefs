@@ -125,7 +125,7 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
             free(escaped);
             return out;
         }
-        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d, w_data_len = %d).\n",
+        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %lu, w_data_len = %lu).\n",
                     data_len,
                     w_data_len);
         return nullptr;
@@ -346,7 +346,7 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
     size_t w_data_len = (data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1;
     size_t real_len = determine_multi_sz_size(w_data, w_data_len);
     if (real_len <= 2) {
-        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %d, w_data_len = %d).\n",
+        debug_print(L"Skipping incorrectly stored REG_MULTI_SZ (length = %lu, w_data_len = %lu).\n",
                     data_len,
                     w_data_len);
         goto cleanup;

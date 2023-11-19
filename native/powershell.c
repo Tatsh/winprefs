@@ -110,7 +110,7 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
             _snwprintf(out, total_size, L"@\"\n%ls\n\"@", strings_nl);
             goto cleanup;
         }
-        debug_print(L"Skipping incorrectly stored MultiString (length = %d).\n", w_data_len);
+        debug_print(L"Skipping incorrectly stored MultiString (length = %lu).\n", w_data_len);
         goto fail;
     }
     if (reg_type == REG_DWORD) {

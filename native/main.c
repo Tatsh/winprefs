@@ -204,7 +204,7 @@ int wmain(int argc, wchar_t *argv[]) {
                       8192,
                       nullptr);
         fprintf(stderr, "POSIX   (%d): %s\n", errno, strerror(errno));
-        fwprintf(stderr, L"Windows (%d): %ls", last_win_error, p_message_buf);
+        fwprintf(stderr, L"Windows (%lu): %ls", last_win_error, p_message_buf);
         goto fail;
     }
     goto cleanup;
