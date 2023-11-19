@@ -43,7 +43,7 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  const wchar_t *specified_path,
                                  enum OUTPUT_FORMAT format,
                                  writer_t *writer) {
-    if (!writer) {
+    if (!writer || !writer->write_output) {
         writer = &default_writer;
     }
     bool ret = true;
@@ -95,6 +95,7 @@ DLL_EXPORT bool export_single_value(HKEY top_key,
                                     enum OUTPUT_FORMAT format,
                                     writer_t *writer) {
     if (!writer) {
+        debug_print(L"Using default writer.");
         writer = &default_writer;
     }
     bool ret = true;
