@@ -106,6 +106,9 @@ export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT fo
     }
     size_t reg_path_len = wcslen(reg_path) + 1;
     m_reg_path = calloc(reg_path_len, WL);
+    if (!m_reg_path) { // LCOV_EXCL_START
+        goto fail;
+    } // LCOV_EXCL_STOP
     wmemcpy(m_reg_path, reg_path, reg_path_len);
     wchar_t *first_backslash = wcschr(m_reg_path, L'\\');
     if (!first_backslash) {
