@@ -341,3 +341,8 @@ bool __wrap_write_key_filtered_recursive(HKEY hk,
 bool __wrap_git_commit(wchar_t *output_dir, wchar_t *deploy_key) {
     return mock_type(bool);
 }
+
+bool __wrap_GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode) {
+    *lpExitCode = mock_type(DWORD);
+    return mock_type(bool);
+}

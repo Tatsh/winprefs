@@ -33,11 +33,19 @@ static inline bool run_process_no_window(int n_args, wchar_t *arg0, ...) {
     cmd[i - 1] = L'\0';
     debug_print(L"Executing: '%ls'\n", cmd);
     bool ret = CreateProcess(
-        nullptr, cmd, nullptr, nullptr, true, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
+        nullptr, cmd, nullptr, nullptr, false, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
     if (ret) {
         WaitForSingleObject(pi.hProcess, INFINITE);
+        DWORD exit_code;
+        bool result = GetExitCodeProcess(pi.hProcess, &exit_code);
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
+        if (!result) {
+            debug_print(L"Failed to get exit code.\n");
+            return false;
+        }
+        debug_print(L"Exit code: %d\n", exit_code);
+        return exit_code == 0;
     }
     return ret;
 }

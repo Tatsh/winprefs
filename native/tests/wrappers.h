@@ -244,5 +244,6 @@ DWORD FormatMessage(DWORD dwFlags,
                     LPWSTR lpBuffer,
                     DWORD nSize,
                     va_list *Arguments);
+bool GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
 
 #endif // TESTS_WRAPPERS_H

@@ -9,6 +9,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       CreateProcess
       FormatMessage
       GetDateFormat
+      GetExitCodeProcess
       GetFileAttributes
       GetLastError
       GetStdHandle
