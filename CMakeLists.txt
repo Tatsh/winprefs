@@ -51,6 +51,7 @@ set(CMAKE_REQUIRED_DEFINITIONS -D_WIN32_WINNT=${TARGET_VERSION} -DUNICODE -D_UNI
 check_symbol_exists(_wcsicmp "wchar.h" HAVE_WCSICMP)
 check_symbol_exists(_wcsnicmp "wchar.h" HAVE_WCSNICMP)
 check_symbol_exists(EKEYREJECTED "errno.h" HAVE_EKEYREJECTED)
+check_type_size(wchar_t SIZEOF_WCHAR_T LANGUAGE C)
 check_type_size(_Bool STDBOOL BUILTIN_TYPES_ONLY LANGUAGE C)
 check_type_size(nullptr_t STD_NULLPTR_T BUILTIN_TYPES_ONLY LANGUAGE C)
 add_compile_definitions(
@@ -61,6 +62,7 @@ add_compile_definitions(
   HAVE_STDBOOL=$<IF:$<BOOL:${HAVE_STDBOOL}>,1,0>
   HAVE_WCSICMP=$<IF:$<BOOL:${HAVE_WCSICMP}>,1,0>
   HAVE_WCSNICMP=$<IF:$<BOOL:${HAVE_WCSNICMP}>,1,0>
+  SIZEOF_WCHAR_T=${SIZEOF_WCHAR_T}
   UNICODE
   WIN32_LEAN_AND_MEAN)
 

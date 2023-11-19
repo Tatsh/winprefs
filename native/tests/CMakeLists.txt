@@ -31,8 +31,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       _CrtDumpMemoryLeaks
       _wchdir
       _wfullpath
-      _wgetcwd
-      _wspawnlp)
+      _wgetcwd)
   foreach(func ${mocked_functions})
     list(APPEND test_linker_flags "-Wl,--wrap,${func}")
   endforeach()
