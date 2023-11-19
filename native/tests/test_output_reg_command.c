@@ -90,14 +90,19 @@ void test_output_reg_command_multi_sz(void **state) {
     assert_true(ret);
 }
 
-const unsigned char MULTI_SZ_TEST_DATA_INVALID[] = {'e', 0, 'n', 0, '-', 0, 'U', 0, 'S'};
+#if SIZEOF_WCHAR_T == 4
+const unsigned char MULTI_SZ_TEST_DATA_INVALID[] = {
+    L'e', 0, 0, 0, 'n', 0, 0, 0, '-', 0, 0, 0, 'U', 0, 0, 0, 'S'};
+#else
+const unsigned char MULTI_SZ_TEST_DATA_INVALID[] = {L'e', 0, 'n', 0, '-', 0, 'U', 0, 'S'};
+#endif
 
 void test_output_reg_command_multi_sz_invalid(void **state) {
     bool ret = do_write_reg_command(nullptr,
                                     L"HKEY_USERS\\Environment",
                                     L"TEMP",
                                     (const char *)MULTI_SZ_TEST_DATA_INVALID,
-                                    9,
+                                    sizeof(MULTI_SZ_TEST_DATA_INVALID),
                                     REG_MULTI_SZ);
     assert_true(ret);
 }
