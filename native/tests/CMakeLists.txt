@@ -60,6 +60,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     ../git_branch.h
     ../io.c
     ../io.h
+    ../io_default_writer.c
+    ../io_default_writer.h
     ../macros.h
     ../main.c
     ../powershell.c
@@ -72,6 +74,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     ../registry.h
     ../shell.c
     ../shell.h
+    default_writer_setup.c
     wrappers.c
     wrappers.h)
   target_compile_definitions(tests PRIVATE ${test_c_defs})

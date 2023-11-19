@@ -25,7 +25,8 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  int max_depth,
                                  HKEY hk,
                                  const wchar_t *specified_path,
-                                 enum OUTPUT_FORMAT format);
+                                 enum OUTPUT_FORMAT format,
+                                 writer_t *writer);
 //! Print a single registry value name to standard output.
 /*!
  \param top_key Handle to the top key (such as `HKEY_CURRENT_USER`).
@@ -33,6 +34,8 @@ DLL_EXPORT bool save_preferences(bool commit,
  \param format Output format.
  \return `true` if successful, `false` otherwise.
  */
-DLL_EXPORT bool
-export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format);
+DLL_EXPORT bool export_single_value(HKEY top_key,
+                                    const wchar_t *reg_path,
+                                    enum OUTPUT_FORMAT format,
+                                    writer_t *writer);
 #endif // REGISTRY_H

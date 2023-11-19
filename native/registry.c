@@ -2,6 +2,7 @@
 #include "constants.h"
 #include "git.h"
 #include "io.h"
+#include "io_default_writer.h"
 #include "reg_code.h"
 #include "reg_command.h"
 
@@ -40,7 +41,11 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  int max_depth,
                                  HKEY hk,
                                  const wchar_t *specified_path,
-                                 enum OUTPUT_FORMAT format) {
+                                 enum OUTPUT_FORMAT format,
+                                 writer_t *writer) {
+    if (!writer) {
+        writer = &default_writer;
+    }
     bool ret = true;
     wchar_t full_output_dir[MAX_PATH];
     bool writing_to_stdout = !wcscmp(L"-", output_file);
@@ -57,15 +62,7 @@ DLL_EXPORT bool save_preferences(bool commit,
     }
     PathAppend(full_output_dir, output_file);
     full_output_dir[MAX_PATH - 1] = L'\0';
-    HANDLE out_fp = !writing_to_stdout ? CreateFile(full_output_dir,
-                                                    GENERIC_READ | GENERIC_WRITE,
-                                                    0,
-                                                    nullptr,
-                                                    CREATE_ALWAYS,
-                                                    FILE_ATTRIBUTE_NORMAL,
-                                                    nullptr) :
-                                         GetStdHandle(STD_OUTPUT_HANDLE);
-    if (out_fp == INVALID_HANDLE_VALUE) {
+    if (writer->setup && !writer->setup(writer, writing_to_stdout, full_output_dir)) {
         goto fail;
     }
     const wchar_t *prior_stem = hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
@@ -77,11 +74,11 @@ DLL_EXPORT bool save_preferences(bool commit,
                                                             specified_path;
     if (format == OUTPUT_FORMAT_C) {
         DWORD written;
-        WriteFile(out_fp, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written, nullptr);
+        writer->write_output(writer, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written);
     }
-    ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, out_fp, prior_stem, format);
-    if (!writing_to_stdout) {
-        CloseHandle(out_fp);
+    ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, prior_stem, format, writer);
+    if (writer->teardown) {
+        writer->teardown(writer);
     }
     if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
@@ -93,9 +90,13 @@ cleanup:
     return ret;
 }
 
-DLL_EXPORT bool
-export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
-    debug_print_enabled = true;
+DLL_EXPORT bool export_single_value(HKEY top_key,
+                                    const wchar_t *reg_path,
+                                    enum OUTPUT_FORMAT format,
+                                    writer_t *writer) {
+    if (!writer) {
+        writer = &default_writer;
+    }
     bool ret = true;
     wchar_t *m_reg_path = nullptr;
     wchar_t *value_name = nullptr;
@@ -147,32 +148,36 @@ export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT fo
         debug_print(L"Invalid value name '%ls'.\n", value_name);
         goto fail;
     }
-    HANDLE h_stdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (writer->setup && !writer->setup(writer, true, nullptr)) {
+        goto fail;
+    }
     switch (format) {
     case OUTPUT_FORMAT_REG:
-        if (!do_write_reg_command(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+        if (!do_write_reg_command(writer, reg_path, value_name, data, buf_size, reg_type)) {
             goto fail;
         }
         break;
     case OUTPUT_FORMAT_C:
-        if (!do_write_c_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+        if (!do_write_c_reg_code(writer, reg_path, value_name, data, buf_size, reg_type)) {
             goto fail;
         }
         break;
     case OUTPUT_FORMAT_C_SHARP:
-        if (!do_write_c_sharp_reg_code(h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+        if (!do_write_c_sharp_reg_code(writer, reg_path, value_name, data, buf_size, reg_type)) {
             goto fail;
         }
         break;
     case OUTPUT_FORMAT_POWERSHELL:
-        if (!do_write_powershell_reg_code(
-                h_stdout, reg_path, value_name, data, buf_size, reg_type)) {
+        if (!do_write_powershell_reg_code(writer, reg_path, value_name, data, buf_size, reg_type)) {
             goto fail;
         }
         break;
     default:
         errno = EINVAL;
         goto fail;
+    }
+    if (writer->teardown) {
+        writer->teardown(writer);
     }
     goto cleanup;
 fail:

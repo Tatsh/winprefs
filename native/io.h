@@ -1,6 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
+#include "io_writer.h"
+
 enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_C,
     OUTPUT_FORMAT_C_SHARP,
@@ -9,12 +11,12 @@ enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_UNKNOWN
 };
 
-bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf);
-bool do_writes(HANDLE out_fp,
-               HKEY hk,
+bool write_output(wchar_t *out, bool use_crlf, writer_t *writer);
+bool do_writes(HKEY hk,
                long unsigned int n_values,
                const wchar_t *prior_stem,
-               enum OUTPUT_FORMAT format);
+               enum OUTPUT_FORMAT format,
+               writer_t *writer);
 //! Starts the registry exporting process.
 /*!
  \param hk Key handle.
@@ -30,8 +32,8 @@ bool write_key_filtered_recursive(HKEY hk,
                                   const wchar_t *stem,
                                   int max_depth,
                                   int depth,
-                                  HANDLE out_fp,
                                   const wchar_t *prior_stem,
-                                  enum OUTPUT_FORMAT format);
+                                  enum OUTPUT_FORMAT format,
+                                  writer_t *writer);
 
 #endif // IO_H

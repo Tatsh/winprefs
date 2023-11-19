@@ -175,7 +175,7 @@ cleanup:
     return escaped_reg_key;
 }
 
-bool do_write_powershell_reg_code(HANDLE out_fp,
+bool do_write_powershell_reg_code(writer_t *writer,
                                   const wchar_t *full_path,
                                   const wchar_t *prop,
                                   const char *value,
@@ -241,7 +241,7 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
                    escaped_prop ? escaped_prop : L"",
                    reg_type,
                    escaped_d ? escaped_d : L"$null");
-        ret = write_output(out_fp, out, false);
+        ret = write_output(out, false, writer);
     } else {
         debug_print(L"%ls %ls: Skipping due to length of command.\n", full_path, prop);
     }

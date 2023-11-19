@@ -154,7 +154,7 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
     return nullptr;
 }
 
-bool do_write_c_reg_code(HANDLE out_fp,
+bool do_write_c_reg_code(writer_t *writer,
                          const wchar_t *full_path,
                          const wchar_t *prop,
                          const char *value,
@@ -300,7 +300,7 @@ bool do_write_c_reg_code(HANDLE out_fp,
         ret = false;
     }
     if (ret && out) {
-        ret = write_output(out_fp, out, false);
+        ret = write_output(out, false, writer);
     }
     goto cleanup;
 fail:
@@ -397,7 +397,7 @@ cleanup:
     return out;
 }
 
-bool do_write_c_sharp_reg_code(HANDLE out_fp,
+bool do_write_c_sharp_reg_code(writer_t *writer,
                                const wchar_t *full_path,
                                const wchar_t *prop,
                                const char *value,
@@ -472,7 +472,7 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
                type == REG_NONE ? L"null" :
                                   L"",
                reg_type);
-    ret = write_output(out_fp, out, false);
+    ret = write_output(out, false, writer);
     goto cleanup;
 fail:
     ret = false;

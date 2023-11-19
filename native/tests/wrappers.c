@@ -287,12 +287,12 @@ int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
     return ret;
 }
 
-bool __wrap_write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
+bool __wrap_write_output(wchar_t *out, bool use_crlf, writer_t *writer) {
     check_expected(out);
     return mock_type(bool);
 }
 
-bool __wrap_do_write_reg_command(HANDLE out_fp,
+bool __wrap_do_write_reg_command(writer_t *writer,
                                  const wchar_t *full_path,
                                  const wchar_t *prop,
                                  const char *value,
@@ -301,7 +301,7 @@ bool __wrap_do_write_reg_command(HANDLE out_fp,
     return mock_type(bool);
 }
 
-bool __wrap_do_write_c_reg_code(HANDLE out_fp,
+bool __wrap_do_write_c_reg_code(writer_t *writer,
                                 const wchar_t *full_path,
                                 const wchar_t *prop,
                                 const char *value,
@@ -310,7 +310,7 @@ bool __wrap_do_write_c_reg_code(HANDLE out_fp,
     return mock_type(bool);
 }
 
-bool __wrap_do_write_c_sharp_reg_code(HANDLE out_fp,
+bool __wrap_do_write_c_sharp_reg_code(writer_t *writer,
                                       const wchar_t *full_path,
                                       const wchar_t *prop,
                                       const char *value,
@@ -319,7 +319,7 @@ bool __wrap_do_write_c_sharp_reg_code(HANDLE out_fp,
     return mock_type(bool);
 }
 
-bool __wrap_do_write_powershell_reg_code(HANDLE out_fp,
+bool __wrap_do_write_powershell_reg_code(writer_t *writer,
                                          const wchar_t *full_path,
                                          const wchar_t *prop,
                                          const char *value,
@@ -332,9 +332,9 @@ bool __wrap_write_key_filtered_recursive(HKEY hk,
                                          const wchar_t *stem,
                                          int max_depth,
                                          int depth,
-                                         HANDLE out_fp,
                                          const wchar_t *prior_stem,
-                                         enum OUTPUT_FORMAT format) {
+                                         enum OUTPUT_FORMAT format,
+                                         writer_t *writer) {
     return mock_type(bool);
 }
 

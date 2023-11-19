@@ -158,8 +158,9 @@ int wmain(int argc, wchar_t *argv[]) {
             wchar_t *subkey = wcschr(reg_path, L'\\') + 1;
             if (RegOpenKeyEx(top_key, subkey, 0, KEY_READ, &starting_key) != ERROR_SUCCESS) {
                 // See if it's a full path to value
-                ret = export_single_value(top_key, reg_path, output_format_e) ? EXIT_SUCCESS :
-                                                                                EXIT_FAILURE;
+                ret = export_single_value(top_key, reg_path, output_format_e, nullptr) ?
+                          EXIT_SUCCESS :
+                          EXIT_FAILURE;
                 goto cleanup;
             }
         }
@@ -189,7 +190,8 @@ int wmain(int argc, wchar_t *argv[]) {
         max_depth,
         starting_key,
         reg_path,
-        output_format_e);
+        output_format_e,
+        nullptr);
     if (!success) {
         fwprintf(stderr, L"Error occurred. Possibilities:\n");
         DWORD last_win_error = GetLastError();

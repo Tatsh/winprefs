@@ -1,9 +1,10 @@
 #include "io.h"
 #include "constants.h"
+#include "io_default_writer.h"
 #include "reg_code.h"
 #include "reg_command.h"
 
-bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
+bool write_output(wchar_t *out, bool use_crlf, writer_t *writer) {
     bool ret = true;
     char *mb_out = nullptr;
     DWORD written = 0;
@@ -27,7 +28,7 @@ bool write_output(HANDLE out_fp, wchar_t *out, bool use_crlf) {
         mb_out[total_size - 2] = '\r';
     }
     mb_out[total_size - 1] = '\n';
-    ret = WriteFile(out_fp, mb_out, (DWORD)total_size, &written, nullptr);
+    ret = writer->write_output(writer, mb_out, total_size, &written);
     goto cleanup;
 fail: // LCOV_EXCL_START
     ret = false;
@@ -37,17 +38,17 @@ cleanup:
     return ret && written > 0;
 }
 
-bool do_writes(HANDLE out_fp,
-               HKEY hk,
+bool do_writes(HKEY hk,
                long unsigned n_values,
                const wchar_t *full_path,
-               enum OUTPUT_FORMAT format) {
+               enum OUTPUT_FORMAT format,
+               writer_t *writer) {
     bool ret = true;
     wchar_t *value = nullptr;
     if (n_values == 0) {
         goto cleanup;
     }
-    if (!out_fp || !full_path) {
+    if (!writer || !full_path) {
         errno = EINVAL;
         goto fail;
     }
@@ -82,18 +83,18 @@ bool do_writes(HANDLE out_fp,
         bool write_ret = false;
         switch (format) {
         case OUTPUT_FORMAT_REG:
-            write_ret = do_write_reg_command(out_fp, full_path, value, data, data_len, reg_type);
+            write_ret = do_write_reg_command(writer, full_path, value, data, data_len, reg_type);
             break;
         case OUTPUT_FORMAT_C:
-            write_ret = do_write_c_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+            write_ret = do_write_c_reg_code(writer, full_path, value, data, data_len, reg_type);
             break;
         case OUTPUT_FORMAT_C_SHARP:
             write_ret =
-                do_write_c_sharp_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+                do_write_c_sharp_reg_code(writer, full_path, value, data, data_len, reg_type);
             break;
         case OUTPUT_FORMAT_POWERSHELL:
             write_ret =
-                do_write_powershell_reg_code(out_fp, full_path, value, data, data_len, reg_type);
+                do_write_powershell_reg_code(writer, full_path, value, data, data_len, reg_type);
             break;
         default: // LCOV_EXCL_START
             goto fail;
@@ -115,9 +116,9 @@ bool write_key_filtered_recursive(HKEY hk,
                                   const wchar_t *stem,
                                   int max_depth,
                                   int depth,
-                                  HANDLE out_fp,
                                   const wchar_t *prior_stem,
-                                  enum OUTPUT_FORMAT format) {
+                                  enum OUTPUT_FORMAT format,
+                                  writer_t *writer) {
     bool ret = true;
     wchar_t *ach_key, *full_path;
     ach_key = full_path = nullptr;
@@ -195,7 +196,7 @@ bool write_key_filtered_recursive(HKEY hk,
                     hk_out, i, ach_key, (LPDWORD)&ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
                     if (!write_key_filtered_recursive(
-                            hk_out, ach_key, max_depth, depth + 1, out_fp, full_path, format)) {
+                            hk_out, ach_key, max_depth, depth + 1, full_path, format, writer)) {
                         goto fail;
                     }
                 } else {
@@ -208,7 +209,7 @@ bool write_key_filtered_recursive(HKEY hk,
             debug_print(L"%ls: No subkeys in %ls.\n", prior_stem, stem);
         }
         if (n_values) {
-            if (!do_writes(out_fp, hk_out, n_values, full_path, format)) { // LCOV_EXCL_START
+            if (!do_writes(hk_out, n_values, full_path, format, writer)) { // LCOV_EXCL_START
                 goto fail;
             } // LCOV_EXCL_STOP
         } else {

@@ -1,5 +1,6 @@
 #include "reg_command.h"
 #include "constants.h"
+#include "io.h"
 #include "registry.h"
 #include "shell.h"
 
@@ -101,7 +102,7 @@ cleanup:
     return out;
 }
 
-bool do_write_reg_command(HANDLE out_fp,
+bool do_write_reg_command(writer_t *writer,
                           const wchar_t *full_path,
                           const wchar_t *prop,
                           const char *value,
@@ -169,7 +170,7 @@ bool do_write_reg_command(HANDLE out_fp,
                                reg_type,
                                escaped_d ? escaped_d : L" ");
         if (wrote) {
-            ret = write_output(out_fp, out, true);
+            ret = write_output(out, true, writer);
         }
     } else {
         errno = EKEYREJECTED;

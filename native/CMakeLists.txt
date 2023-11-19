@@ -116,6 +116,8 @@ if(WIN32)
       git_branch.h
       io.c
       io.h
+      io_default_writer.c
+      io_default_writer.h
       macros.h
       powershell.c
       powershell.h

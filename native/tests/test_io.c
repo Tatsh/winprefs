@@ -1,14 +1,16 @@
+#include "default_writer_setup.h"
 #include "io.h"
+#include "io_default_writer.h"
 
 void test_write_output_returns_false_when_WideCharToMultiByte_returns_req_size_0(void **state) {
     will_return(__wrap_WideCharToMultiByte, 0);
-    assert_false(write_output(nullptr, nullptr, false));
+    assert_false(write_output(nullptr, false, &default_writer));
 }
 
 void test_write_output_returns_true_when_WideCharToMultiByte_returns_0(void **state) {
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WideCharToMultiByte, 0);
-    assert_true(write_output(nullptr, nullptr, false));
+    assert_true(write_output(nullptr, false, &default_writer));
 }
 
 void test_write_output_adds_cr(void **state) {
@@ -17,12 +19,12 @@ void test_write_output_adds_cr(void **state) {
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WriteFile, 11);
     will_return(__wrap_WriteFile, true);
-    assert_true(write_output(nullptr, nullptr, true));
+    assert_true(write_output(nullptr, true, &default_writer));
 }
 
 void test_write_key_filtered_recursive_does_not_exceed_max_depth_inclusive(void **state) {
     assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 20, nullptr, nullptr, OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 20, nullptr, OUTPUT_FORMAT_REG, &default_writer));
     assert_int_equal(errno, EDOM);
 }
 
@@ -36,23 +38,23 @@ void test_write_key_filtered_recursive_does_not_exceed_length_limitations(void *
         L"\\Windows\\Windows",
         20,
         4,
-        nullptr,
         L"HKCR\\Software\\Microsoft\\Windows\\Windows\\CurrentVersion\\Windows\\CurrentVersion"
         L"\\Windows\\CurrentVersion\\Windows\\CurrentVersion",
-        OUTPUT_FORMAT_REG));
+        OUTPUT_FORMAT_REG,
+        &default_writer));
     assert_int_equal(errno, E2BIG);
 }
 
 void test_write_key_filtered_has_filters(void **state) {
     assert_true(write_key_filtered_recursive(
-        nullptr, L"MuiCache", 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, L"MuiCache", 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
     assert_int_equal(errno, EKEYREJECTED);
 }
 
 void test_write_key_filtered_RegOpenKeyEx_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, -1);
     assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_write_key_filtered_RegQueryInfoKey_fail(void **state) {
@@ -60,7 +62,7 @@ void test_write_key_filtered_RegQueryInfoKey_fail(void **state) {
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
     assert_false(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_write_key_filtered_RegQueryInfoKey_0_subkeys_returns_true(void **state) {
@@ -69,7 +71,7 @@ void test_write_key_filtered_RegQueryInfoKey_0_subkeys_returns_true(void **state
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegCloseKey, 0);
     assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
@@ -81,7 +83,7 @@ void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
     will_return(__wrap_RegEnumKeyEx, -1);
     will_return(__wrap_RegCloseKey, 0);
     assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_write_key_filtered_recursion_fail(void **state) {
@@ -95,20 +97,20 @@ void test_write_key_filtered_recursion_fail(void **state) {
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
     assert_false(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, nullptr, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG));
+        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_do_writes_n_values_0_returns_true(void **state) {
-    assert_true(do_writes(nullptr, nullptr, 0, nullptr, OUTPUT_FORMAT_REG));
+    assert_true(do_writes(nullptr, 0, nullptr, OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_do_writes_nullptr_args(void **state) {
-    assert_false(do_writes(nullptr, nullptr, 1, L"full path", OUTPUT_FORMAT_REG));
-    assert_false(do_writes((HANDLE)1, nullptr, 1, nullptr, OUTPUT_FORMAT_REG));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_REG, nullptr));
+    assert_false(do_writes(nullptr, 1, nullptr, OUTPUT_FORMAT_REG, nullptr));
 }
 
 void test_do_writes_unknown_format_arg(void **state) {
-    assert_false(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_UNKNOWN));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_UNKNOWN, &default_writer));
 }
 
 void test_do_writes_callbacks_fail(void **state) {
@@ -117,16 +119,16 @@ void test_do_writes_callbacks_fail(void **state) {
     will_return(__wrap_do_write_c_reg_code, false);
     will_return(__wrap_do_write_c_sharp_reg_code, false);
     will_return(__wrap_do_write_powershell_reg_code, false);
-    assert_false(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_C));
-    assert_false(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_C_SHARP));
-    assert_false(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_POWERSHELL));
-    assert_false(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_REG));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_C, &default_writer));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_C_SHARP, &default_writer));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_POWERSHELL, &default_writer));
+    assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_REG, &default_writer));
 }
 
 void test_do_writes(void **state) {
     will_return_always(__wrap_RegEnumValue, ERROR_SUCCESS);
     will_return(__wrap_do_write_c_reg_code, true);
-    assert_true(do_writes((HANDLE)1, nullptr, 1, L"full path", OUTPUT_FORMAT_C));
+    assert_true(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_C, &default_writer));
 }
 
 const struct CMUnitTest io_tests[] = {
@@ -149,5 +151,5 @@ const struct CMUnitTest io_tests[] = {
 };
 
 int main(int argc, char *argv[]) {
-    return cmocka_run_group_tests(io_tests, nullptr, nullptr);
+    return cmocka_run_group_tests(io_tests, default_writer_setup_stdout, default_writer_teardown);
 }

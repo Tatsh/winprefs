@@ -14,7 +14,8 @@ static void test_save_prefs_wfullpath_error(void **state) {
                                 2,
                                 HKEY_CURRENT_USER,
                                 L"HKCU:\\",
-                                OUTPUT_FORMAT_REG);
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_false(ret);
 }
@@ -32,7 +33,8 @@ static void test_save_prefs_fail_to_create_storage_dir(void **state) {
                                 2,
                                 HKEY_CURRENT_USER,
                                 L"HKCU:\\",
-                                OUTPUT_FORMAT_REG);
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_false(ret);
 }
@@ -56,7 +58,8 @@ static void test_save_prefs_fail_to_create_storage_dir_alt(void **state) {
                                 2,
                                 HKEY_CURRENT_USER,
                                 L"HKCU:\\",
-                                OUTPUT_FORMAT_REG);
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_false(ret);
 }
@@ -76,7 +79,8 @@ static void test_save_prefs_CreateFile_returns_invalid_handle(void **state) {
                                 2,
                                 HKEY_CURRENT_USER,
                                 L"HKCU:\\",
-                                OUTPUT_FORMAT_REG);
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_false(ret);
 }
@@ -88,8 +92,15 @@ void test_save_prefs_GetStdHandle_returns_invalid_handle(void **state) {
     will_return(__wrap_PathAppend, true);
     will_return(__wrap_GetStdHandle, INVALID_HANDLE_VALUE);
 
-    bool ret = save_preferences(
-        false, nullptr, OUTPUT_DIR, L"-", 2, HKEY_CURRENT_USER, L"HKCU:\\", OUTPUT_FORMAT_REG);
+    bool ret = save_preferences(false,
+                                nullptr,
+                                OUTPUT_DIR,
+                                L"-",
+                                2,
+                                HKEY_CURRENT_USER,
+                                L"HKCU:\\",
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_false(ret);
 }
@@ -106,7 +117,7 @@ void test_save_prefs_c_preamble(void **state) {
     will_return(__wrap_write_key_filtered_recursive, true);
 
     bool ret = save_preferences(
-        false, nullptr, OUTPUT_DIR, L"-", 2, HKEY_DYN_DATA, L"HKDD:\\", OUTPUT_FORMAT_C);
+        false, nullptr, OUTPUT_DIR, L"-", 2, HKEY_DYN_DATA, L"HKDD:\\", OUTPUT_FORMAT_C, nullptr);
 
     assert_true(ret);
 }
@@ -129,7 +140,8 @@ void test_save_prefs_commit(void **state) {
                                 2,
                                 HKEY_DYN_DATA,
                                 L"HKDD:\\",
-                                OUTPUT_FORMAT_REG);
+                                OUTPUT_FORMAT_REG,
+                                nullptr);
 
     assert_true(ret);
 }
