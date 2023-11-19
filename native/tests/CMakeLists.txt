@@ -74,7 +74,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     ../registry.h
     ../shell.c
     ../shell.h
-    default_writer_setup.c
     wrappers.c
     wrappers.h)
   target_compile_definitions(tests PRIVATE ${test_c_defs})

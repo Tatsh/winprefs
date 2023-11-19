@@ -43,8 +43,12 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  const wchar_t *specified_path,
                                  enum OUTPUT_FORMAT format,
                                  writer_t *writer) {
+    bool using_default_writer, writer_was_setup;
+    using_default_writer = writer_was_setup = false;
     if (!writer || !writer->write_output) {
-        writer = &default_writer;
+        debug_print(L"Using default writer.");
+        writer = get_default_writer();
+        using_default_writer = true;
     }
     bool ret = true;
     wchar_t full_output_dir[MAX_PATH];
@@ -65,6 +69,7 @@ DLL_EXPORT bool save_preferences(bool commit,
     if (writer->setup && !writer->setup(writer, writing_to_stdout, full_output_dir)) {
         goto fail;
     }
+    writer_was_setup = true;
     const wchar_t *prior_stem = hk == HKEY_CLASSES_ROOT   ? L"HKCR" :
                                 hk == HKEY_CURRENT_CONFIG ? L"HKCC" :
                                 hk == HKEY_CURRENT_USER   ? L"HKCU" :
@@ -77,9 +82,6 @@ DLL_EXPORT bool save_preferences(bool commit,
         writer->write_output(writer, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written);
     }
     ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, prior_stem, format, writer);
-    if (writer->teardown) {
-        writer->teardown(writer);
-    }
     if (ret && commit && !writing_to_stdout) {
         git_commit(output_dir, deploy_key);
     }
@@ -87,6 +89,12 @@ DLL_EXPORT bool save_preferences(bool commit,
 fail:
     ret = false;
 cleanup:
+    if (writer_was_setup && writer->teardown) {
+        writer->teardown(writer);
+    }
+    if (using_default_writer) {
+        free(writer);
+    }
     return ret;
 }
 
@@ -94,9 +102,12 @@ DLL_EXPORT bool export_single_value(HKEY top_key,
                                     const wchar_t *reg_path,
                                     enum OUTPUT_FORMAT format,
                                     writer_t *writer) {
-    if (!writer) {
+    bool using_default_writer, writer_was_setup;
+    using_default_writer = writer_was_setup = false;
+    if (!writer || !writer->write_output) {
         debug_print(L"Using default writer.");
-        writer = &default_writer;
+        writer = get_default_writer();
+        using_default_writer = true;
     }
     bool ret = true;
     wchar_t *m_reg_path = nullptr;
@@ -152,6 +163,7 @@ DLL_EXPORT bool export_single_value(HKEY top_key,
     if (writer->setup && !writer->setup(writer, true, nullptr)) {
         goto fail;
     }
+    writer_was_setup = true;
     switch (format) {
     case OUTPUT_FORMAT_REG:
         if (!do_write_reg_command(writer, reg_path, value_name, data, buf_size, reg_type)) {
@@ -177,13 +189,16 @@ DLL_EXPORT bool export_single_value(HKEY top_key,
         errno = EINVAL;
         goto fail;
     }
-    if (writer->teardown) {
-        writer->teardown(writer);
-    }
     goto cleanup;
 fail:
     ret = false;
 cleanup:
+    if (writer_was_setup && writer->teardown) {
+        writer->teardown(writer);
+    }
+    if (using_default_writer) {
+        free(writer);
+    }
     free(m_reg_path);
     free(value_name);
     free(data);

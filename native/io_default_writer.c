@@ -49,8 +49,13 @@ static void default_writer_teardown(void *instance) {
     free(writer->user_args);
 }
 
-writer_t default_writer = {
-    .setup = default_writer_setup,
-    .write_output = default_writer_write_output,
-    .teardown = default_writer_teardown,
-};
+writer_t *get_default_writer() {
+    writer_t *out = malloc(sizeof(writer_t));
+    if (!out) { // LCOV_EXCL_START
+        return nullptr;
+    } // LCOV_EXCL_STOP
+    out->setup = default_writer_setup;
+    out->write_output = default_writer_write_output;
+    out->teardown = default_writer_teardown;
+    return out;
+}
