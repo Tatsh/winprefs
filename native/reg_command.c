@@ -27,7 +27,7 @@ fail: // LCOV_EXCL_START
     out = nullptr;
     // LCOV_EXCL_STOP
 cleanup:
-    free_if_not_null(escaped);
+    free(escaped);
     return out;
 }
 
@@ -96,8 +96,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
 fail:
     out = nullptr;
 cleanup:
-    free_if_not_null(bin);
-    free_if_not_null(s);
+    free(bin);
+    free(s);
     return out;
 }
 
@@ -179,11 +179,11 @@ bool do_write_reg_command(HANDLE out_fp,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(escaped_d);
+    free(escaped_d);
     if (v_heap) {
-        free_if_not_null(v_param);
+        free(v_param);
     }
-    free_if_not_null(out);
-    free_if_not_null(escaped_reg_key);
+    free(out);
+    free(escaped_reg_key);
     return ret;
 }

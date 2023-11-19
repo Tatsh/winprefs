@@ -33,7 +33,7 @@ fail: // LCOV_EXCL_START
     ret = false;
     // LCOV_EXCL_STOP
 cleanup:
-    free_if_not_null(mb_out);
+    free(mb_out);
     return ret && written > 0;
 }
 
@@ -107,7 +107,7 @@ bool do_writes(HANDLE out_fp,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(value);
+    free(value);
     return ret;
 }
 
@@ -222,7 +222,7 @@ bool write_key_filtered_recursive(HKEY hk,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(ach_key);
-    free_if_not_null(full_path);
+    free(ach_key);
+    free(full_path);
     return ret;
 }

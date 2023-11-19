@@ -165,13 +165,13 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(cwd);
-    free_if_not_null(date_buf);
-    free_if_not_null(git_dir);
-    free_if_not_null(git_dir_arg);
-    free_if_not_null(message_buf);
-    free_if_not_null(ssh_command);
-    free_if_not_null(time_buf);
-    free_if_not_null(work_tree_arg);
+    free(cwd);
+    free(date_buf);
+    free(git_dir);
+    free(git_dir_arg);
+    free(message_buf);
+    free(ssh_command);
+    free(time_buf);
+    free(work_tree_arg);
     return ret;
 }

@@ -209,9 +209,9 @@ int wmain(int argc, wchar_t *argv[]) {
 fail:
     ret = EXIT_FAILURE;
 cleanup:
-    free_if_not_null(as_char);
+    free(as_char);
     if (!output_dir_specified) {
-        free_if_not_null(output_dir);
+        free(output_dir);
     }
     print_leaks();
     return ret;

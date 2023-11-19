@@ -306,11 +306,11 @@ bool do_write_c_reg_code(HANDLE out_fp,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(escaped_key);
-    free_if_not_null(escaped_d);
-    free_if_not_null(escaped_prop);
-    free_if_not_null(top_key_s);
-    free_if_not_null(out);
+    free(escaped_key);
+    free(escaped_d);
+    free(escaped_prop);
+    free(top_key_s);
+    free(out);
     return ret;
 }
 
@@ -392,8 +392,8 @@ static wchar_t *convert_data_for_c_sharp(DWORD reg_type, const char *data, size_
 fail:
     out = nullptr;
 cleanup:
-    free_if_not_null(escaped);
-    free_if_not_null(strings);
+    free(escaped);
+    free(strings);
     return out;
 }
 
@@ -477,10 +477,10 @@ bool do_write_c_sharp_reg_code(HANDLE out_fp,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(escaped_d);
-    free_if_not_null(escaped_key);
-    free_if_not_null(escaped_prop);
-    free_if_not_null(out);
-    free_if_not_null(top_key_s);
+    free(escaped_d);
+    free(escaped_key);
+    free(escaped_prop);
+    free(out);
+    free(top_key_s);
     return ret;
 }

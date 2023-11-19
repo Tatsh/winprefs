@@ -1,12 +1,6 @@
 #ifndef UTILS_H
 #define UTILS_H
 
-static inline void free_if_not_null(void *p) {
-    if (p) {
-        free(p);
-    }
-}
-
 static inline size_t determine_multi_sz_size(wchar_t *w_data, size_t hint) {
     if (hint == 0) {
         return 0;

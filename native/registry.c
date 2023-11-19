@@ -175,8 +175,8 @@ export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT fo
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(m_reg_path);
-    free_if_not_null(value_name);
-    free_if_not_null(data);
+    free(m_reg_path);
+    free(value_name);
+    free(data);
     return ret;
 }

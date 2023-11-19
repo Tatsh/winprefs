@@ -82,7 +82,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
 fail:
     w_result = nullptr;
 cleanup:
-    free_if_not_null(cmd);
-    free_if_not_null(result);
+    free(cmd);
+    free(result);
     return w_result;
 }

@@ -135,11 +135,11 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
     }
     errno = EINVAL;
 fail:
-    free_if_not_null(out);
+    free(out);
 cleanup:
-    free_if_not_null(bin);
-    free_if_not_null(escaped);
-    free_if_not_null(strings_nl);
+    free(bin);
+    free(escaped);
+    free(strings_nl);
     return out;
 }
 
@@ -170,8 +170,8 @@ static wchar_t *add_colon_if_required(const wchar_t *path) {
 fail:
     escaped_reg_key = nullptr;
 cleanup:
-    free_if_not_null(full_path_ps);
-    free_if_not_null(top_key);
+    free(full_path_ps);
+    free(top_key);
     return escaped_reg_key;
 }
 
@@ -249,9 +249,9 @@ bool do_write_powershell_reg_code(HANDLE out_fp,
 fail:
     ret = false;
 cleanup:
-    free_if_not_null(escaped_d);
-    free_if_not_null(escaped_prop);
-    free_if_not_null(escaped_reg_key);
-    free_if_not_null(out);
+    free(escaped_d);
+    free(escaped_prop);
+    free(escaped_reg_key);
+    free(out);
     return ret;
 }
