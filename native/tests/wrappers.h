@@ -99,6 +99,7 @@ const enum REG_TYPES {
 #define HKEY_DYN_DATA (HKEY)6
 #define HKEY_LOCAL_MACHINE (HKEY)3
 #define HKEY_USERS (HKEY)5
+#define INFINITE 0xFFFFFFFF
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #define INVALID_HANDLE_VALUE (void *)3
 #define IsWindowsVistaOrGreater() 0
@@ -231,7 +232,6 @@ LSTATUS RegQueryValueEx(HKEY hKey,
                         LPDWORD lpcbData);
 HRESULT SHGetFolderPath(HWND hwnd, int csidl, HANDLE hToken, DWORD dwFlags, LPWSTR pszPath);
 wchar_t *_wfullpath(wchar_t *absPath, const wchar_t *relPath, size_t maxLength);
-intptr_t _wspawnlp(int mode, const wchar_t *cmd, const wchar_t *_ArgList, ...);
 wchar_t *_wgetcwd(wchar_t *buffer, int maxlen);
 int _wchdir(const wchar_t *dirname);
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);

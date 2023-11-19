@@ -38,10 +38,6 @@ LSTATUS __wrap_RegCloseKey(HKEY hKey) {
     return mock_type(LSTATUS);
 }
 
-intptr_t __wrap__wspawnlp(int mode, const wchar_t *cmd, const wchar_t *arg_list, ...) {
-    return mock_type(intptr_t);
-}
-
 int __wrap_GetTimeFormat(LCID Locale,
                          DWORD dwFlags,
                          const SYSTEMTIME *lpTime,
