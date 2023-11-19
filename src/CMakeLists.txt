@@ -21,5 +21,6 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
       WinPrefs.psd1
       "${NUGET_PACKAGES_DIR}/taskscheduler/${TASKSCHEDULER_VERSION}/lib/net6.0-windows7.0/Microsoft.Win32.TaskScheduler.dll"
     DESTINATION WinPrefs)
+  install(FILES PSWinPrefs.dll-help.xml DESTINATION WinPrefs/en-US)
   install(TARGETS PSWinPrefs prefs winprefsw DESTINATION WinPrefs)
 endif()
