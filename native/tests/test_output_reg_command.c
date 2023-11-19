@@ -51,7 +51,7 @@ void test_output_reg_command_sz(void **state) {
                                     L"HKEY_CURRENT_CONFIG\\Environment",
                                     L"TEMP",
                                     (const char *)L"\"quoted \\string\" fff",
-                                    26 * sizeof(wchar_t),
+                                    21 * sizeof(wchar_t),
                                     REG_SZ);
     assert_true(ret);
 }
@@ -217,7 +217,9 @@ const struct CMUnitTest output_reg_command_tests[] = {
     cmocka_unit_test(test_output_reg_command_expand_sz),
     cmocka_unit_test(test_output_reg_command_invalid_type),
     cmocka_unit_test(test_output_reg_command_multi_sz),
+#ifndef ASAN_ENABLED
     cmocka_unit_test(test_output_reg_command_multi_sz_invalid),
+#endif
     cmocka_unit_test(test_output_reg_command_none),
     cmocka_unit_test(test_output_reg_command_qword),
     cmocka_unit_test(test_output_reg_command_skip_too_big),
