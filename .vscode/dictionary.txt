@@ -1,4 +1,3 @@
-analyzer
 appdata
 asan
 autobuild
@@ -7,7 +6,6 @@ bindir
 buglist
 calloc
 cdecl
-cmder
 cmocka
 codefile
 codeql
@@ -16,6 +14,7 @@ colors
 colorstyle
 cond
 cpack
+cppdbg
 csidl
 ctest
 datarootdir
@@ -54,7 +53,6 @@ hkcu
 hkdd
 hkey
 hklm
-hkpd
 hresult
 hresult
 hwnd
@@ -112,7 +110,6 @@ popen
 pprocess
 priv
 proc
-psscriptanalyzer
 pwsh
 pylance
 qword
@@ -121,9 +118,6 @@ regsam
 regsetkeyvaluew
 rpath
 runtimes
-sarif
-seanmiddleditch
-securestring
 shlwapi
 snwprintf
 softprops
