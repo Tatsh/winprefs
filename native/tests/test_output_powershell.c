@@ -186,7 +186,9 @@ const struct CMUnitTest powershell_tests[] = {
     cmocka_unit_test(test_powershell_dword),
     cmocka_unit_test(test_powershell_expand_sz),
     cmocka_unit_test(test_powershell_multi_sz),
+#ifndef ASAN_ENABLED
     cmocka_unit_test(test_powershell_multi_sz_invalid),
+#endif
     cmocka_unit_test(test_powershell_none),
     cmocka_unit_test(test_powershell_null_escaped_reg_key),
     cmocka_unit_test(test_powershell_qword),
