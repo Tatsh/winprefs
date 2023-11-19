@@ -1,6 +1,5 @@
 enable_testing()
 if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
-
   set(test_linker_flags $<$<BOOL:${WIN32}>:-mconsole> $<$<BOOL:${ENABLE_COVERAGE}>:--coverage>)
   set(mocked_functions
       CloseHandle
@@ -97,6 +96,8 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       utils)
   foreach(category ${test_categories})
     add_executable(test-${category} test_${category}.c)
+    add_asan(test-${category})
+    add_ubsan(test-${category})
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
     target_compile_options(test-${category} PRIVATE ${test_c_flags})
     target_include_directories(test-${category} PRIVATE ${test_include_dirs})
@@ -106,7 +107,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       test-${category}
       PRIVATE
       ${test_linker_flags}
-      $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>
       $<$<STREQUAL:git_commit,${category}>:-Wl,--wrap,get_git_branch>
       $<$<OR:$<STREQUAL:io,${category}>,$<STREQUAL:export_single,${category}>>:-Wl,--wrap,do_write_reg_command
       -Wl,--wrap,do_write_c_reg_code
