@@ -142,6 +142,7 @@ tensin
 testlist
 tlbid
 todolist
+ubsan
 ucrt
 ucrtbase
 udvare

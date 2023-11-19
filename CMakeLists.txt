@@ -22,6 +22,7 @@ option(BUILD_DOCS "Build documentation." OFF)
 option(BUILD_TESTS "Build and run tests." OFF)
 option(ENABLE_ASAN "Enable address sanitiser." OFF)
 option(ENABLE_COVERAGE "Link tests with gcov." OFF)
+option(ENABLE_UBSAN "Enable undefined behaviour sanitiser." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
 set(TARGET_VERSION
     $<IF:$<CXX_COMPILER_ID:MSVC>,0x600,0x501>
