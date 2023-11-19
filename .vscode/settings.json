@@ -17,6 +17,7 @@
     "-DCMAKE_VERBOSE_MAKEFILE=ON",
     "-DENABLE_ASAN=ON",
     "-DENABLE_COVERAGE=ON",
+    "-DENABLE_UBSAN=ON",
     "-G",
     "Ninja"
   ],
