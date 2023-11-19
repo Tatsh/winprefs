@@ -79,7 +79,7 @@ endfunction()
 
 function(add_asan target)
   if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU" OR CMAKE_C_COMPILER MATCHES "/winegcc$")
-    target_compile_definitions(${target} PRIVATE $<$<BOOL:${ENABLE_UBSAN}>:ASAN_ENABLED>)
+    target_compile_definitions(${target} PRIVATE $<$<BOOL:${ENABLE_ASAN}>:ASAN_ENABLED>)
     target_compile_options(${target} PRIVATE $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
     target_link_options(${target} PRIVATE $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
   endif()
