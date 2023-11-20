@@ -3,7 +3,7 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 
 cmake_minimum_required(VERSION 3.26 FATAL_ERROR)
-set(version 0.3.0)
+set(version 0.3.1)
 project(
   winprefs
   DESCRIPTION "Dump a registry path to a series of 'reg add' commands."

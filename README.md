@@ -9,7 +9,7 @@
 [![PowerShell Gallery Platform Support](https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported)](https://www.powershellgallery.com/packages/WinPrefs)
 ![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/winprefs)
 ![GitHub](https://img.shields.io/github/license/Tatsh/winprefs)
-![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.3.0/master)
+![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.3.1/master)
 
 macOS users: please see [macprefs](https://github.com/Tatsh/macprefs) for an equivalent tool.
 

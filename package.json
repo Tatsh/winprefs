@@ -43,5 +43,5 @@
     "format": "yarn prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
-  "version": "0.3.0"
+  "version": "0.3.1"
 }
