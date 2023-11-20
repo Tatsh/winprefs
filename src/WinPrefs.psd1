@@ -26,7 +26,6 @@
     PSData = @{
       IconUri      = 'https://avatars.githubusercontent.com/u/724848?s=96&v=4'
       LicenseUri   = 'https://github.com/Tatsh/winprefs/blob/master/LICENSE.txt'
-      PreRelease   = 'beta'
       ProjectUri   = 'https://github.com/Tatsh/winprefs'
       ReleaseNotes = 'https://github.com/Tatsh/winprefs/blob/master/CHANGELOG.md'
       Tags         = @('admin', 'administrator', 'backup', 'batch', 'registry', 'windows')
