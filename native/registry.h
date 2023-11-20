@@ -16,6 +16,7 @@
  \param hk Starting registry key.
  \param specified_path A direct path to a key (and not a value name).
  \param format Output format.
+ \param writer Writer to use. Optional.
  \return Pointer to string with branch name. Must be freed on caller side.
  */
 DLL_EXPORT bool save_preferences(bool commit,
@@ -32,6 +33,7 @@ DLL_EXPORT bool save_preferences(bool commit,
  \param top_key Handle to the top key (such as `HKEY_CURRENT_USER`).
  \param reg_path Registry path to a key or a value name.
  \param format Output format.
+ \param writer Writer to use. Optional.
  \return `true` if successful, `false` otherwise.
  */
 DLL_EXPORT bool export_single_value(HKEY top_key,
