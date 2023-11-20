@@ -82,6 +82,7 @@ macprefs
 mainpage
 makelangid
 maml
+mandir
 mathjax
 mconsole
 mdfile

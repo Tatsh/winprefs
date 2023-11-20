@@ -1,0 +1,53 @@
+.TH winprefs 1 "November 2023" "winprefs 0.2.1" "User Commands"
+.SH Name
+.P
+winprefs \- a registry exporter for programmers.
+.SH SYNOPSIS
+.B winprefs [options] REG_PATH
+.SH DESCRIPTION
+.P
+Dumps or displays a registry path in various formats, such as PowerShell, C#, C, and "reg add"
+for use in cmd or similar contexts.
+.SH OPTIONS
+.P
+No options are required.
+
+-F, --format=FORMAT
+    Format to output. Options: c, cs, c#, ps, ps1, powershell, reg. Default: reg.
+
+-K, --deploy-key
+    Deploy key for committing and pushing. Requires -c/-commit.
+
+-c, --commit
+    Commit changes.
+
+-d, --debug
+    Enable debug logging.
+
+-f, --output-file
+    Output filename.
+
+-m, --max-depth=INT
+    Set maximum depth.
+
+-o, --output-dir
+    Output directory.
+
+-h, --help
+    Display help and exit.
+.SH EXAMPLES
+.B Dump WindowMetrics as C Code
+.P
+$ winprefs HKCU:\\Control Panel\\Desktop\\WindowMetrics
+
+data = { 0xee, 0xff, 0xff, 0xff, /* ... */}; RegSetKeyValue(HKEY_CURRENT_USER,
+  TEXT("Control Panel\\\\Desktop\\\\WindowMetrics"), TEXT("CaptionFont"), REG_BINARY,
+  (LPCVOID)&data, 92);
+.P
+Note that new lines are added here for display purposes only.
+.P
+.B Dump a single value
+.P
+$ winprefs HKCU:\\Environment\\OneDrive
+
+reg add "HKCU\\Environment\\OneDrive" /v "OneDrive" /t REG_EXPAND_SZ /d "%%USERPROFILE%%\\OneDrive" /f
