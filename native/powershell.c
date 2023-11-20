@@ -216,6 +216,9 @@ bool do_write_powershell_reg_code(writer_t *writer,
     case REG_QWORD:
         wcsncpy(reg_type, L"Qword", 5);
         break;
+    default: // LCOV_EXCL_START
+        goto cleanup;
+        // LCOV_EXCL_STOP
     }
     int req_size = _snwprintf(nullptr,
                               0,

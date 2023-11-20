@@ -202,6 +202,9 @@ bool do_write_c_reg_code(writer_t *writer,
     case REG_QWORD:
         wcsncpy(reg_type, L"REG_QWORD", 9);
         break;
+    default: // LCOV_EXCL_START
+        goto cleanup;
+        // LCOV_EXCL_STOP
     }
     if (type == REG_DWORD || type == REG_QWORD) {
         int req_size = _snwprintf(nullptr,
@@ -444,7 +447,7 @@ bool do_write_c_sharp_reg_code(writer_t *writer,
         wcsncpy(reg_type, L", RegistryValueKind.QWord", 25);
         break;
     default: // LCOV_EXCL_START
-        goto fail;
+        goto cleanup;
         // LCOV_EXCL_STOP
     }
     int req_size = _snwprintf(nullptr,

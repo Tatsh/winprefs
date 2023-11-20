@@ -146,7 +146,7 @@ bool do_write_reg_command(writer_t *writer,
         break;
     default:
         debug_print(L"Invalid registry data type.\n");
-        goto fail;
+        goto cleanup;
     }
     int req_size = _snwprintf(nullptr,
                               0,

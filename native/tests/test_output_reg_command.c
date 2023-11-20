@@ -114,7 +114,7 @@ void test_output_reg_command_invalid_type(void **state) {
                                     (const char *)MULTI_SZ_TEST_DATA,
                                     25 * sizeof(wchar_t),
                                     10240);
-    assert_false(ret);
+    assert_true(ret);
     assert_int_equal(errno, EINVAL);
 }
 
