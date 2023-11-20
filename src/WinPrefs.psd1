@@ -3,7 +3,7 @@
   CompanyName            = ''
   CompatiblePSEditions   = @('Windows')
   Copyright              = '(c) 2023 Tatsh. All rights reserved.'
-  Description            = 'Convert a registry path to a series of reg commands.'
+  Description            = 'Convert a registry path to a series of reg commands and more.'
   DotNetFrameworkVersion = '6.0'
   GUID                   = '57c33a4f-3d66-422b-8e2b-596231011201'
   HelpInfoURI            = 'https://github.com/Tatsh/winprefs'
