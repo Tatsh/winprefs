@@ -60,8 +60,8 @@ namespace WinPrefs {
             }
             Directory.CreateDirectory(OutputDirectory);
             if (!LibPrefs.SavePreferences(LibPrefs.GetTopKey(Path),
-                WriteObject,
-                OutputFile == "-",
+                                          WriteObject,
+                                          OutputFile == "-",
                                           Commit.ToBool(),
                                           DeployKey,
                                           OutputDirectory,

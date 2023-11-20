@@ -40,7 +40,7 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = @"HKCU:\";
 
-        private string getSuffix() {
+        private string GetSuffix() {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
@@ -49,15 +49,16 @@ namespace WinPrefs {
         }
 
         protected override void ProcessRecord() {
-            using (TaskService ts = new TaskService()) {
-                TaskFolder folder = ts.RootFolder.CreateFolder(@"tat.sh\WinPrefs", null, false);
-                TaskDefinition td = ts.NewTask();
-                td.RegistrationInfo.Description = $"Runs WinPrefs every 12 hours (path {Path}).";
-                DailyTrigger trigger = new DailyTrigger();
-                trigger.StartBoundary = DateTime.Today.AddDays(1);
-                trigger.Repetition.Interval = TimeSpan.FromHours(12);
-                td.Triggers.Add(trigger);
-                string[] args = {
+            using TaskService ts = new();
+            TaskFolder folder = ts.RootFolder.CreateFolder(@"tat.sh\WinPrefs", null, false);
+            TaskDefinition td = ts.NewTask();
+            td.RegistrationInfo.Description = $"Runs WinPrefs every 12 hours (path {Path}).";
+            DailyTrigger trigger = new() {
+                StartBoundary = DateTime.Today.AddDays(1)
+            };
+            trigger.Repetition.Interval = TimeSpan.FromHours(12);
+            td.Triggers.Add(trigger);
+            string[] args = {
                     Commit ? "-c" : "",
                     $"-m {MaxDepth}",
                     DeployKey != null ? $"-K \"{DeployKey}\"" : "",
@@ -66,30 +67,29 @@ namespace WinPrefs {
                     $"-F {Format}",
                     Path
                 };
-                td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(2);
-                td.Settings.StartWhenAvailable = true;
-                string appDataDir = IOPath.Combine(Environment.GetFolderPath(
-                      Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
-                string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
-                Directory.CreateDirectory(appDataDir);
-                if (File.Exists(winprefswPath)) {
-                    File.Delete(winprefswPath);
-                }
-                string? assemblyLoc = IOPath.GetDirectoryName(
-                    Assembly.GetExecutingAssembly().Location);
-                if (assemblyLoc == null) {
-                    ThrowTerminatingError(new ErrorRecord(
-                        new Exception("Failed to get assembly location."),
-                        "WinPrefs_RegisterTaskError", ErrorCategory.InvalidResult, null));
-                }
-                File.Copy(IOPath.Combine(assemblyLoc, "winprefsw.exe"), winprefswPath);
-                td.Actions.Add(new ExecAction(
-                    winprefswPath,
-                    Regex.Replace(String.Join(" ", args), @"\s+", " "),
-                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile
-                )));
-                folder.RegisterTaskDefinition($"WinPrefs-{getSuffix()}", td);
+            td.Settings.ExecutionTimeLimit = TimeSpan.FromHours(2);
+            td.Settings.StartWhenAvailable = true;
+            string appDataDir = IOPath.Combine(Environment.GetFolderPath(
+                  Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
+            string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
+            Directory.CreateDirectory(appDataDir);
+            if (File.Exists(winprefswPath)) {
+                File.Delete(winprefswPath);
             }
+            string? assemblyLoc = IOPath.GetDirectoryName(
+                Assembly.GetExecutingAssembly().Location);
+            if (assemblyLoc == null) {
+                ThrowTerminatingError(new ErrorRecord(
+                    new Exception("Failed to get assembly location."),
+                    "WinPrefs_RegisterTaskError", ErrorCategory.InvalidResult, null));
+            }
+            File.Copy(IOPath.Combine(assemblyLoc, "winprefsw.exe"), winprefswPath);
+            td.Actions.Add(new ExecAction(
+                winprefswPath,
+                Regex.Replace(String.Join(" ", args), @"\s+", " "),
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile
+            )));
+            folder.RegisterTaskDefinition($"WinPrefs-{GetSuffix()}", td);
         }
     }
 }

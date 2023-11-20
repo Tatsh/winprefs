@@ -38,7 +38,7 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
 
-        private string getSuffix() {
+        private string GetSuffix() {
             using var sha1 = SHA1.Create();
             return Convert.ToHexString(sha1.ComputeHash(
                 Encoding.UTF8.GetBytes(
@@ -47,39 +47,38 @@ namespace WinPrefs {
         }
 
         protected override void ProcessRecord() {
-            using (TaskService ts = new TaskService()) {
-                TaskFolderCollection rootColl = ts.RootFolder.SubFolders;
-                if (!rootColl.Exists("tat.sh")) {
-                    return;
+            using TaskService ts = new();
+            TaskFolderCollection rootColl = ts.RootFolder.SubFolders;
+            if (!rootColl.Exists("tat.sh")) {
+                return;
+            }
+            TaskFolder tatshFolder = ts.RootFolder.SubFolders["tat.sh"];
+            if (!tatshFolder.SubFolders.Exists("WinPrefs")) {
+                return;
+            }
+            TaskFolder winprefsFolder = tatshFolder.SubFolders["WinPrefs"];
+            string taskName = $"tat.sh\\WinPrefs\\WinPrefs-{GetSuffix()}";
+            Microsoft.Win32.TaskScheduler.Task task = ts.GetTask(taskName);
+            if (task == null) {
+                return;
+            }
+            winprefsFolder.DeleteTask(task.Name);
+            // If everything is empty under tat.sh\WinPrefs delete the directories.
+            if (winprefsFolder.Tasks.Count == 0) {
+                tatshFolder.DeleteFolder("WinPrefs");
+                string appDataDir = IOPath.Combine(Environment.GetFolderPath(
+                  Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
+                string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
+                if (File.Exists(winprefswPath)) {
+                    File.Delete(winprefswPath);
                 }
-                TaskFolder tatshFolder = ts.RootFolder.SubFolders["tat.sh"];
-                if (!tatshFolder.SubFolders.Exists("WinPrefs")) {
-                    return;
+                if (Directory.GetFiles(appDataDir).Length == 0) {
+                    Directory.Delete(appDataDir);
                 }
-                TaskFolder winprefsFolder = tatshFolder.SubFolders["WinPrefs"];
-                string taskName = $"tat.sh\\WinPrefs\\WinPrefs-{getSuffix()}";
-                Microsoft.Win32.TaskScheduler.Task task = ts.GetTask(taskName);
-                if (task == null) {
-                    return;
-                }
-                winprefsFolder.DeleteTask(task.Name);
-                // If everything is empty under tat.sh\WinPrefs delete the directories.
-                if (winprefsFolder.Tasks.Count == 0) {
-                    tatshFolder.DeleteFolder("WinPrefs");
-                    string appDataDir = IOPath.Combine(Environment.GetFolderPath(
-                      Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
-                    string winprefswPath = IOPath.Combine(appDataDir, "winprefsw.exe");
-                    if (File.Exists(winprefswPath)) {
-                        File.Delete(winprefswPath);
-                    }
-                    if (Directory.GetFiles(appDataDir).Length == 0) {
-                        Directory.Delete(appDataDir);
-                    }
-                }
-                // Again for tat.sh
-                if (tatshFolder.SubFolders.Count == 0 && tatshFolder.Tasks.Count == 0) {
-                    ts.RootFolder.DeleteFolder("tat.sh");
-                }
+            }
+            // Again for tat.sh
+            if (tatshFolder.SubFolders.Count == 0 && tatshFolder.Tasks.Count == 0) {
+                ts.RootFolder.DeleteFolder("tat.sh");
             }
         }
     }

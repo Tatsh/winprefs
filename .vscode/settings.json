@@ -9,6 +9,9 @@
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
+  "[xml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
   "cSpell.enabled": true,
   "cmake.configureArgs": [
     "-DBUILD_DOCS=OFF",

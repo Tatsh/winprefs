@@ -1,5 +1,4 @@
 using System.Management.Automation;
-using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
 using Microsoft.Win32;
@@ -60,7 +59,9 @@ namespace WinPrefs {
                                           maxDepth: MaxDepth,
                                           hk: hk,
                                           specifiedPath: Path,
-                                          format: LibPrefs.ToEnum(Format), writeStdOut: true, writeObjectIn: WriteObject)) {
+                                          format: LibPrefs.ToEnum(Format),
+                                          writeStdOut: true,
+                                          writeObjectIn: WriteObject)) {
                 ThrowTerminatingError(new ErrorRecord(
                     new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError",
                     ErrorCategory.InvalidResult, null));

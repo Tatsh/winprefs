@@ -31,24 +31,17 @@ namespace WinPrefs {
             [MarshalAs(UnmanagedType.FunctionPtr)] public WriterWriteOutputT write;
         }
 
-        public delegate void WriteObject(object sendToPipeline);
+        internal delegate void WriteObject(object sendToPipeline);
 
-        public static WriteObject? WriteObjectImpl;
+        private static WriteObject? WriteObjectImpl;
 
         public static OutputFormat ToEnum(string format) {
-            switch (format.ToLower()) {
-                case "c":
-                    return OutputFormat.C;
-                case "cs":
-                case "c#":
-                    return OutputFormat.CSharp;
-                case "powershell":
-                case "ps":
-                case "ps1":
-                    return OutputFormat.PowerShell;
-                default:
-                    return OutputFormat.Reg;
-            }
+            return format.ToLower() switch {
+                "c" => OutputFormat.C,
+                "cs" or "c#" => OutputFormat.CSharp,
+                "powershell" or "ps" or "ps1" => OutputFormat.PowerShell,
+                _ => OutputFormat.Reg,
+            };
         }
 
         private static IntPtr? ToUnsafeHandle(RegistryKey key) {
@@ -70,22 +63,13 @@ namespace WinPrefs {
         }
 
         public static RegistryKey GetTopKey(string RegPath) {
-            switch (RegPath.Split(":").First().ToUpper()) {
-                case "HKCC":
-                case "HKEY_CURRENT_CONFIG":
-                    return Registry.CurrentConfig;
-                case "HKCR":
-                case "HKEY_CLASSES_ROOT":
-                    return Registry.ClassesRoot;
-                case "HKCU":
-                case "HKEY_CURRENT_USER":
-                    return Registry.CurrentUser;
-                case "HKLM":
-                case "HKEY_LOCAL_MACHINE":
-                    return Registry.LocalMachine;
-                default:
-                    return Registry.Users;
-            }
+            return RegPath.Split(":").First().ToUpper() switch {
+                "HKCC" or "HKEY_CURRENT_CONFIG" => Registry.CurrentConfig,
+                "HKCR" or "HKEY_CLASSES_ROOT" => Registry.ClassesRoot,
+                "HKCU" or "HKEY_CURRENT_USER" => Registry.CurrentUser,
+                "HKLM" or "HKEY_LOCAL_MACHINE" => Registry.LocalMachine,
+                _ => Registry.Users,
+            };
         }
 
         [DllImport("prefs.dll",
@@ -104,18 +88,16 @@ namespace WinPrefs {
                                                        OutputFormat format,
                                                        ref Writer writer);
 
-        public static bool WriteOutputImpl(object instance,
+        internal static bool WriteOutputImpl(object instance,
                                            string mbOut,
                                            int totalSize,
                                            out uint written) {
-            if (WriteObjectImpl != null) {
-                WriteObjectImpl(mbOut.Substring(0, totalSize - 1));
-            }
+            WriteObjectImpl?.Invoke(mbOut[..(totalSize - 1)]);
             written = (uint)totalSize;
             return true;
         }
 
-        public unsafe static bool SavePreferences(RegistryKey hk,
+        internal unsafe static bool SavePreferences(RegistryKey hk,
             WriteObject writeObjectIn,
                                                   bool writeStdOut = false,
                                                   bool commit = false,
@@ -130,7 +112,7 @@ namespace WinPrefs {
             if (handle == null) {
                 return false;
             }
-            Writer writer = new Writer();
+            Writer writer = new();
             if (writeStdOut) {
                 writer.write = WriteOutputImpl;
             }
@@ -151,7 +133,7 @@ namespace WinPrefs {
                                                          OutputFormat format,
                                                          ref Writer writer);
 
-        public unsafe static bool ExportSingleValue(RegistryKey topKey,
+        internal unsafe static bool ExportSingleValue(RegistryKey topKey,
                                                     string regPath,
                                                     WriteObject writeObjectIn,
                                                     OutputFormat format = OutputFormat.Reg) {
@@ -160,8 +142,9 @@ namespace WinPrefs {
             if (handle == null) {
                 return false;
             }
-            Writer writer = new Writer();
-            writer.write = WriteOutputImpl;
+            Writer writer = new() {
+                write = WriteOutputImpl
+            };
             return ExportSingleValueImpl((UIntPtr)handle.Value.ToPointer(),
                                                           regPath, format, ref writer);
         }
@@ -169,6 +152,6 @@ namespace WinPrefs {
         [DllImport("prefs.dll",
                    CallingConvention = CallingConvention.Cdecl,
                    EntryPoint = "set_debug_print_enabled")]
-        public static extern void SetDebugPrintEnabled(bool enabled = true);
+        internal static extern void SetDebugPrintEnabled(bool enabled = true);
     }
 }
