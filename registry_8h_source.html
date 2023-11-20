@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.2.1</span>
+   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.3.0</span>
    </div>
    <div id="projectbrief">A registry exporter for programmers.</div>
   </td>
@@ -98,20 +98,23 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;macros.h&quot;</span></div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>DLL_EXPORT <span class="keywordtype">bool</span> <a class="code hl_function" href="registry_8h.html#a79781b26998a0a847977911358924db1">save_preferences</a>(<span class="keywordtype">bool</span> commit,</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *deploy_key,</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_dir,</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_file,</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                                 <span class="keywordtype">int</span> max_depth,</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                                 HKEY hk,</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *specified_path,</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                                 <span class="keyword">enum</span> OUTPUT_FORMAT format);</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>DLL_EXPORT <span class="keywordtype">bool</span></div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span><a class="code hl_function" href="registry_8h.html#a6a2892288440cad7f651f0b33aefef4d">export_single_value</a>(HKEY top_key, <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *reg_path, <span class="keyword">enum</span> OUTPUT_FORMAT format);</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span><span class="preprocessor">#endif </span><span class="comment">// REGISTRY_H</span></div>
-<div class="ttc" id="aregistry_8h_html_a6a2892288440cad7f651f0b33aefef4d"><div class="ttname"><a href="registry_8h.html#a6a2892288440cad7f651f0b33aefef4d">export_single_value</a></div><div class="ttdeci">DLL_EXPORT bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format)</div><div class="ttdoc">Print a single registry value name to standard output.</div><div class="ttdef"><b>Definition</b> <a href="registry_8c_source.html#l00097">registry.c:97</a></div></div>
-<div class="ttc" id="aregistry_8h_html_a79781b26998a0a847977911358924db1"><div class="ttname"><a href="registry_8h.html#a79781b26998a0a847977911358924db1">save_preferences</a></div><div class="ttdeci">DLL_EXPORT bool save_preferences(bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path, enum OUTPUT_FORMAT format)</div><div class="ttdoc">Starts the registry exporting process.</div><div class="ttdef"><b>Definition</b> <a href="registry_8c_source.html#l00036">registry.c:36</a></div></div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>DLL_EXPORT <span class="keywordtype">bool</span> <a class="code hl_function" href="registry_8h.html#adfa0ee4e801e6522d6e827f4b2af31b2">save_preferences</a>(<span class="keywordtype">bool</span> commit,</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *deploy_key,</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_dir,</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *output_file,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                                 <span class="keywordtype">int</span> max_depth,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                                 HKEY hk,</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                                 <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *specified_path,</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                                 <span class="keyword">enum</span> OUTPUT_FORMAT format,</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                                 writer_t *writer);</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>DLL_EXPORT <span class="keywordtype">bool</span> <a class="code hl_function" href="registry_8h.html#a0d4f8e158c7edec2f537e127652699ff">export_single_value</a>(HKEY top_key,</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                                    <span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *reg_path,</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>                                    <span class="keyword">enum</span> OUTPUT_FORMAT format,</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                                    writer_t *writer);</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span><span class="preprocessor">#endif </span><span class="comment">// REGISTRY_H</span></div>
+<div class="ttc" id="aregistry_8h_html_a0d4f8e158c7edec2f537e127652699ff"><div class="ttname"><a href="registry_8h.html#a0d4f8e158c7edec2f537e127652699ff">export_single_value</a></div><div class="ttdeci">DLL_EXPORT bool export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format, writer_t *writer)</div><div class="ttdoc">Print a single registry value name to standard output.</div><div class="ttdef"><b>Definition</b> <a href="registry_8c_source.html#l00105">registry.c:105</a></div></div>
+<div class="ttc" id="aregistry_8h_html_adfa0ee4e801e6522d6e827f4b2af31b2"><div class="ttname"><a href="registry_8h.html#adfa0ee4e801e6522d6e827f4b2af31b2">save_preferences</a></div><div class="ttdeci">DLL_EXPORT bool save_preferences(bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path, enum OUTPUT_FORMAT format, writer_t *writer)</div><div class="ttdoc">Starts the registry exporting process.</div><div class="ttdef"><b>Definition</b> <a href="registry_8c_source.html#l00037">registry.c:37</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

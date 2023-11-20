@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.2.1</span>
+   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.3.0</span>
    </div>
    <div id="projectbrief">A registry exporter for programmers.</div>
   </td>
@@ -87,11 +87,24 @@ $(function() {
   <div class="headertitle"><div class="title">debug.h File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
-  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
+<div class="textblock"><code>#include &quot;macros.h&quot;</code><br />
+</div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for debug.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
+<div class="center"><img src="debug_8h__incl.png" border="0" usemap="#adebug_8h" alt=""/></div>
+<map name="adebug_8h" id="adebug_8h">
+<area shape="rect" title=" " alt="" coords="7,5,81,35"/>
+<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="5,83,83,113"/>
+<area shape="poly" title=" " alt="" coords="47,36,47,67,41,67,41,36"/>
+</map>
+</div>
+</div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
+  <img id="dynsection-1-trigger" src="closed.png" alt="+"/> This graph shows which files directly or indirectly include this file:</div>
+<div id="dynsection-1-summary" class="dynsummary" style="display:block;">
+</div>
+<div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="debug_8h__dep__incl.png" border="0" usemap="#adebug_8hdep" alt=""/></div>
 <map name="adebug_8hdep" id="adebug_8hdep">
 <area shape="rect" title=" " alt="" coords="5,5,79,35"/>
@@ -107,6 +120,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abf2ba5f86727cacf80ee6ca78fb59fc9" id="r_abf2ba5f86727cacf80ee6ca78fb59fc9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="debug_8h.html#abf2ba5f86727cacf80ee6ca78fb59fc9">debug_print</a> (const wchar_t *format,...)</td></tr>
 <tr class="memdesc:abf2ba5f86727cacf80ee6ca78fb59fc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print only when debug logging is enabled.  <br /></td></tr>
 <tr class="separator:abf2ba5f86727cacf80ee6ca78fb59fc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e294ae4b51b1d1887823ea10019b9cd" id="r_a3e294ae4b51b1d1887823ea10019b9cd"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="debug_8h.html#a3e294ae4b51b1d1887823ea10019b9cd">set_debug_print_enabled</a> (bool enabled)</td></tr>
+<tr class="memdesc:a3e294ae4b51b1d1887823ea10019b9cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enable or disable debug printing.  <br /></td></tr>
+<tr class="separator:a3e294ae4b51b1d1887823ea10019b9cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="abf2ba5f86727cacf80ee6ca78fb59fc9" name="abf2ba5f86727cacf80ee6ca78fb59fc9"></a>
@@ -143,7 +159,35 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="debug_8c_source.html#l00003">3</a> of file <a class="el" href="debug_8c_source.html">debug.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="debug_8c_source.html#l00004">4</a> of file <a class="el" href="debug_8c_source.html">debug.c</a>.</p>
+
+</div>
+</div>
+<a id="a3e294ae4b51b1d1887823ea10019b9cd" name="a3e294ae4b51b1d1887823ea10019b9cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e294ae4b51b1d1887823ea10019b9cd">&#9670;&#160;</a></span>set_debug_print_enabled()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">DLL_EXPORT void set_debug_print_enabled </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>enabled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Enable or disable debug printing. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">enabled</td><td>Flag. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="debug_8c_source.html#l00012">12</a> of file <a class="el" href="debug_8c_source.html">debug.c</a>.</p>
 
 </div>
 </div>

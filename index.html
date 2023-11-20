@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.2.1</span>
+   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.3.0</span>
    </div>
    <div id="projectbrief">A registry exporter for programmers.</div>
   </td>
@@ -81,7 +81,7 @@ $(function() {
   <div class="headertitle"><div class="title">winprefs </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="md__r_e_a_d_m_e"></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg" alt="Build" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/tests.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/tests.yml/badge.svg" alt="Tests" style="pointer-events: none;" class="inline"/></a> <a href="https://coveralls.io/github/Tatsh/winprefs?branch=master"><img src="https://coveralls.io/repos/github/Tatsh/winprefs/badge.svg?branch=master" alt="Coverage Status" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/qa.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg" alt="QA" style="pointer-events: none;" class="inline"/></a> <a href="https://www.powershellgallery.com/packages/WinPrefs"><img src="https://img.shields.io/powershellgallery/v/WinPrefs" alt="PowerShell Gallery Version (including pre-releases)" class="inline"/></a> <a href="https://www.powershellgallery.com/packages/WinPrefs"><img src="https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported" alt="PowerShell Gallery Platform Support" class="inline"/></a> <img src="https://img.shields.io/github/v/tag/Tatsh/winprefs" alt="GitHub tag (with filter)" class="inline"/> <img src="https://img.shields.io/github/license/Tatsh/winprefs" alt="GitHub" class="inline"/> <img src="https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.2.1/master" alt="GitHub commits since latest release (by SemVer including pre-releases)" class="inline"/></p>
+<div class="textblock"><p><a class="anchor" id="md__r_e_a_d_m_e"></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg" alt="Build" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/tests.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/tests.yml/badge.svg" alt="Tests" style="pointer-events: none;" class="inline"/></a> <a href="https://coveralls.io/github/Tatsh/winprefs?branch=master"><img src="https://coveralls.io/repos/github/Tatsh/winprefs/badge.svg?branch=master" alt="Coverage Status" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/qa.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg" alt="QA" style="pointer-events: none;" class="inline"/></a> <a href="https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml"><img src="https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml/badge.svg" alt="CodeQL" style="pointer-events: none;" class="inline"/></a> <a href="https://www.powershellgallery.com/packages/WinPrefs"><img src="https://img.shields.io/powershellgallery/v/WinPrefs" alt="PowerShell Gallery Version (including pre-releases)" class="inline"/></a> <a href="https://www.powershellgallery.com/packages/WinPrefs"><img src="https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported" alt="PowerShell Gallery Platform Support" class="inline"/></a> <img src="https://img.shields.io/github/v/tag/Tatsh/winprefs" alt="GitHub tag (with filter)" class="inline"/> <img src="https://img.shields.io/github/license/Tatsh/winprefs" alt="GitHub" class="inline"/> <img src="https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.3.0/master" alt="GitHub commits since latest release (by SemVer including pre-releases)" class="inline"/></p>
 <p>macOS users: please see <a href="https://github.com/Tatsh/macprefs">macprefs</a> for an equivalent tool.</p>
 <p>This package dumps a registry path to equivalent <code>reg</code> commands. It contains two commands. <code>Save-Preferences</code> creates a batch script composed of <code>reg</code> commands for copying into a script. <code>Write-RegCommands</code> is effectively the same but requires a path argument and only writes to standard output.</p>
 <p>By default both commands default to a maximum depth of 20. <code>Save-Preferences</code> defaults to path <code>HKCU:</code>.</p>
@@ -101,8 +101,11 @@ $(function() {
 <div class="fragment"><div class="line">Save-Preferences</div>
 <div class="line"># or the alias:</div>
 <div class="line">prefs-export</div>
-</div><!-- fragment --><p><code>Save-Preferences</code> generates an <code>exec-reg.bat</code> file and saves to <code>${env:APPDATA}\prefs-export</code> by default. This can be changed by passing <code>-OutputDirectory DIR</code> (or <code>-o DIR</code>).</p>
-<p>It accepts switch <code>-Commit</code>/<code>-c</code> to initialise and commit to a Git repository in the output directory. It also accepts a <code>-DeployKey PATH</code> parameter and will push if this is specified. Any other Git management such as the branch name, etc must be managed in the output directory manually.</p>
+</div><!-- fragment --><p><code>Save-Preferences</code> generates an <code>exec-reg.bat</code> (default name) file and saves to <code>${env:APPDATA}\prefs-export</code> by default. This can be changed by passing <code>-OutputDirectory DIR</code> (or <code>-o DIR</code>). The file name can be changed by passing <code>-OutputFile FILE</code> (or <code>-f FILE</code>).</p>
+<p>The format can be changed with the <code>-Format</code> argument. Accepted format strings:</p>
+<ul>
+<li>It accepts switch <code>-Commit</code>/<code>-c</code> to initialise and commit to a Git repository in the output directory. It also accepts a <code>-DeployKey PATH</code> parameter and will push if this is specified. Any other Git management such as the branch name, etc must be managed in the output directory manually.</li>
+</ul>
 <div class="fragment"><div class="line">Write-RegCommands HKCU:</div>
 <div class="line"># or the alias</div>
 <div class="line">path2reg HKCU:</div>
@@ -120,12 +123,10 @@ $(function() {
 <div class="line">reg add &quot;HKCU\Control Panel\Desktop\Colors&quot; /v &quot;ActiveTitle&quot; /t REG_SZ /d &quot;10 36 106&quot; /f</div>
 <div class="line">REM ...</div>
 </div><!-- fragment --><h2>Export, commit with Git and push with a key</h2>
-<h3>Dump the local environment variables</h3>
-<div class="fragment"><div class="line">Write-RegCommands HKCU:\Environment</div>
+<h3>Dump WindowMetrics as C code</h3>
+<div class="fragment"><div class="line">Write-RegCommands HKCU:\Environment -Format c</div>
 </div><!-- fragment --><p>Output:</p>
-<div class="fragment"><div class="line">reg add &quot;HKCU\Environment&quot; /v &quot;OneDrive&quot; /t REG_EXPAND_SZ /d &quot;%%USERPROFILE%%\OneDrive&quot; /f</div>
-<div class="line">reg add &quot;HKCU\Environment&quot; /v &quot;Path&quot; /t REG_EXPAND_SZ /d &quot;%%USERPROFILE%%\AppData\Local\Microsoft\WindowsApps;C:\msys64\mingw64\bin;C:\tools\Cmder;&quot; /f</div>
-<div class="line">REM ...</div>
+<div class="fragment"><div class="line">data = { 0xee, 0xff, 0xff, 0xff, <span class="comment">/* ... */</span>}; RegSetKeyValue(HKEY_CURRENT_USER, TEXT(<span class="stringliteral">&quot;Control Panel\\Desktop\\WindowMetrics&quot;</span>), TEXT(<span class="stringliteral">&quot;CaptionFont&quot;</span>), REG_BINARY, (LPCVOID)&amp;data, 92);</div>
 </div><!-- fragment --><h3>Dump a single value</h3>
 <div class="fragment"><div class="line">Write-RegCommands HKCU:\Environment\OneDrive</div>
 </div><!-- fragment --><p>Output:</p>
@@ -134,19 +135,8 @@ $(function() {
 <div class="fragment"><div class="line">Write-RegCommands &#39;HKCU:\Control Panel\Desktop\WindowMetrics\StatusFont&#39;</div>
 </div><!-- fragment --><p>Output:</p>
 <div class="fragment"><div class="line">reg add &quot;HKCU\Control Panel\Desktop\WindowMetrics\StatusFont&quot; /v &quot;StatusFont&quot; /t REG_BINARY /d 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b /f</div>
-</div><!-- fragment --><h1>Development</h1>
-<p>Requirements:</p>
-<ul>
-<li>Windows</li>
-<li>Yarn</li>
-</ul>
-<h2>Tasks</h2>
-<ul>
-<li><code>yarn format</code>: to format the project's files.</li>
-<li><code>yarn qa</code>: Perform a QA check.</li>
-</ul>
-<h1>Native version</h1>
-<p>A native version is in the works and is much faster than PowerShell. Note that its output is <em>always</em> UTF-8 regardless of your set locale. It even works with Wine. Be aware that it may have bugs!</p>
+</div><!-- fragment --><h1>Native version</h1>
+<p>The PowerShell module makes use of the native code with <code>DllImport</code> to get a significant speed increase in making registry queries and performing I/O. A native binary <code>winprefs.exe</code> can also be built that can be used without needing PowerShell installed and it should work with XP and newer. If built as a a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It even works with Wine.</p>
 <p>Usage is similar to the PowerShell version:</p>
 <div class="fragment"><div class="line">Usage: winprefs.exe [OPTION...] [REG_PATH]</div>
 <div class="line"> </div>
@@ -167,20 +157,41 @@ $(function() {
 <li>C#: <code>cs</code>, <code>c#</code></li>
 <li>PowerShell: <code>ps</code>, <code>ps1</code>, <code>powershell</code></li>
 </ul>
+<h1>Development</h1>
+<p>Requirements:</p>
+<ul>
+<li>Windows</li>
+<li>Yarn</li>
+</ul>
 <h2>Building</h2>
 <h3>Visual Studio</h3>
-<p>On Windows with Visual Studio installed, using the <em>Developer Command Prompt</em>:</p>
+<p>On Windows with Visual Studio installed:</p>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake -Wno-dev ..</div>
+<div class="line">cmake -G &#39;Visual Studio 17 2022&#39; --build . -DCMAKE_BUILD_TYPE=Release</div>
+<div class="line">cmake --build . --config Release</div>
+</div><!-- fragment --><p>Using the VS developer environment shell is not required but it may help.</p>
+<p>After building <code>winprefs.exe</code> will be in <code>build\native\Release\winprefs.exe</code>.</p>
+<h3>MinGW</h3>
+<p>Note: The PowerShell module (C# code) is only buildable with Visual Studio 2022.</p>
+<div class="fragment"><div class="line">mkdir build</div>
+<div class="line">cd build</div>
+<div class="line">cmake -G Ninja -Wno-dev ..</div>
 <div class="line">cmake --build . --config Release --verbose</div>
-</div><!-- fragment --><h3>Cross-compiling</h3>
+</div><!-- fragment --><p>After building <code>winprefs.exe</code> will be in <code>build/native/winprefs.exe</code>.</p>
+<h3>Cross-compiling</h3>
 <div class="fragment"><div class="line">mkdir build</div>
 <div class="line">cd build</div>
 <div class="line">cmake -G Ninja -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=/usr/lib/mingw64-toolchain/bin/x86_64-w64-mingw32-gcc -DCMAKE_SYSTEM_NAME=Windows -Wno-dev ..</div>
 <div class="line">cmake --build . --config Release --verbose</div>
 </div><!-- fragment --><p>You may need to adjust paths above.</p>
-<p>After building <code>winprefs.exe</code> will be in <code>build/native/winprefs.exe</code>. </p>
+<p>After building <code>winprefs.exe</code> will be in <code>build/native/winprefs.exe</code>.</p>
+<h2>Tasks</h2>
+<ul>
+<li><code>yarn format</code>: to format the project's files.</li>
+<li><code>yarn qa</code>: Perform a QA check. </li>
+</ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->

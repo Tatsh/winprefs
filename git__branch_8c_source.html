@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.2.1</span>
+   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.3.0</span>
    </div>
    <div id="projectbrief">A registry exporter for programmers.</div>
   </td>
@@ -131,7 +131,7 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>        cmd, cmd_len, TEXT(<span class="stringliteral">&quot;git.exe %ls %ls branch --show-current&quot;</span>), git_dir_arg, work_tree_arg);</div>
 <div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>    cmd[cmd_len - 1] = L<span class="charliteral">&#39;\0&#39;</span>;</div>
 <div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>    <span class="keywordtype">bool</span> ret = CreateProcess(</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keyword">nullptr</span>, cmd, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>, <span class="keyword">true</span>, CREATE_NEW_CONSOLE, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>, &amp;si, &amp;pi);</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>        <span class="keyword">nullptr</span>, cmd, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>, <span class="keyword">true</span>, CREATE_NO_WINDOW, <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>, &amp;si, &amp;pi);</div>
 <div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    <span class="keywordflow">if</span> (!ret) {</div>
 <div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>        CloseHandle(pipe_write);</div>
 <div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>        CloseHandle(pipe_read);</div>
@@ -174,8 +174,8 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>fail:</div>
 <div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    w_result = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>cleanup:</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    free_if_not_null(cmd);</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    free_if_not_null(result);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    free(cmd);</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    free(result);</div>
 <div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keywordflow">return</span> w_result;</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>}</div>
 <div class="ttc" id="aconstants_8h_html"><div class="ttname"><a href="constants_8h.html">constants.h</a></div></div>

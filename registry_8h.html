@@ -29,7 +29,7 @@ MathJax.Hub.Config({
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.2.1</span>
+   <div id="projectname">winprefs<span id="projectnumber">&#160;v0.3.0</span>
    </div>
    <div id="projectbrief">A registry exporter for programmers.</div>
   </td>
@@ -96,11 +96,13 @@ $(function() {
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="registry_8h__incl.png" border="0" usemap="#aregistry_8h" alt=""/></div>
 <map name="aregistry_8h" id="aregistry_8h">
-<area shape="rect" title=" " alt="" coords="30,5,110,35"/>
-<area shape="rect" href="io_8h_source.html" title=" " alt="" coords="5,83,50,113"/>
-<area shape="poly" title=" " alt="" coords="64,37,45,70,41,68,60,34"/>
-<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="74,83,152,113"/>
-<area shape="poly" title=" " alt="" coords="81,34,100,68,95,70,76,37"/>
+<area shape="rect" title=" " alt="" coords="51,5,131,35"/>
+<area shape="rect" href="io_8h_source.html" title=" " alt="" coords="26,83,70,113"/>
+<area shape="poly" title=" " alt="" coords="85,37,66,70,61,68,80,34"/>
+<area shape="rect" href="macros_8h_source.html" title=" " alt="" coords="95,83,172,113"/>
+<area shape="poly" title=" " alt="" coords="101,34,120,68,115,70,96,37"/>
+<area shape="rect" href="io__writer_8h_source.html" title=" " alt="" coords="5,161,91,190"/>
+<area shape="poly" title=" " alt="" coords="51,113,51,145,45,145,45,113"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -140,16 +142,16 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a79781b26998a0a847977911358924db1" id="r_a79781b26998a0a847977911358924db1"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a79781b26998a0a847977911358924db1">save_preferences</a> (bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path, enum OUTPUT_FORMAT format)</td></tr>
-<tr class="memdesc:a79781b26998a0a847977911358924db1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the registry exporting process.  <br /></td></tr>
-<tr class="separator:a79781b26998a0a847977911358924db1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a2892288440cad7f651f0b33aefef4d" id="r_a6a2892288440cad7f651f0b33aefef4d"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a6a2892288440cad7f651f0b33aefef4d">export_single_value</a> (HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format)</td></tr>
-<tr class="memdesc:a6a2892288440cad7f651f0b33aefef4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a single registry value name to standard output.  <br /></td></tr>
-<tr class="separator:a6a2892288440cad7f651f0b33aefef4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adfa0ee4e801e6522d6e827f4b2af31b2" id="r_adfa0ee4e801e6522d6e827f4b2af31b2"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#adfa0ee4e801e6522d6e827f4b2af31b2">save_preferences</a> (bool commit, const wchar_t *deploy_key, const wchar_t *output_dir, const wchar_t *output_file, int max_depth, HKEY hk, const wchar_t *specified_path, enum OUTPUT_FORMAT format, writer_t *writer)</td></tr>
+<tr class="memdesc:adfa0ee4e801e6522d6e827f4b2af31b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Starts the registry exporting process.  <br /></td></tr>
+<tr class="separator:adfa0ee4e801e6522d6e827f4b2af31b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d4f8e158c7edec2f537e127652699ff" id="r_a0d4f8e158c7edec2f537e127652699ff"><td class="memItemLeft" align="right" valign="top">DLL_EXPORT bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="registry_8h.html#a0d4f8e158c7edec2f537e127652699ff">export_single_value</a> (HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format, writer_t *writer)</td></tr>
+<tr class="memdesc:a0d4f8e158c7edec2f537e127652699ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a single registry value name to standard output.  <br /></td></tr>
+<tr class="separator:a0d4f8e158c7edec2f537e127652699ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a6a2892288440cad7f651f0b33aefef4d" name="a6a2892288440cad7f651f0b33aefef4d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a2892288440cad7f651f0b33aefef4d">&#9670;&#160;</a></span>export_single_value()</h2>
+<a id="a0d4f8e158c7edec2f537e127652699ff" name="a0d4f8e158c7edec2f537e127652699ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d4f8e158c7edec2f537e127652699ff">&#9670;&#160;</a></span>export_single_value()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -170,7 +172,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">enum OUTPUT_FORMAT&#160;</td>
-          <td class="paramname"><em>format</em>&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">writer_t *&#160;</td>
+          <td class="paramname"><em>writer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -186,17 +194,18 @@ Functions</h2></td></tr>
     <tr><td class="paramname">top_key</td><td>Handle to the top key (such as <code>HKEY_CURRENT_USER</code>). </td></tr>
     <tr><td class="paramname">reg_path</td><td>Registry path to a key or a value name. </td></tr>
     <tr><td class="paramname">format</td><td>Output format. </td></tr>
+    <tr><td class="paramname">writer</td><td>Writer to use. Optional. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if successful, <code>false</code> otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00097">97</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00105">105</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
 
 </div>
 </div>
-<a id="a79781b26998a0a847977911358924db1" name="a79781b26998a0a847977911358924db1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a79781b26998a0a847977911358924db1">&#9670;&#160;</a></span>save_preferences()</h2>
+<a id="adfa0ee4e801e6522d6e827f4b2af31b2" name="adfa0ee4e801e6522d6e827f4b2af31b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adfa0ee4e801e6522d6e827f4b2af31b2">&#9670;&#160;</a></span>save_preferences()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +256,13 @@ Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">enum OUTPUT_FORMAT&#160;</td>
-          <td class="paramname"><em>format</em>&#160;</td>
+          <td class="paramname"><em>format</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">writer_t *&#160;</td>
+          <td class="paramname"><em>writer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -268,12 +283,13 @@ Functions</h2></td></tr>
     <tr><td class="paramname">hk</td><td>Starting registry key. </td></tr>
     <tr><td class="paramname">specified_path</td><td>A direct path to a key (and not a value name). </td></tr>
     <tr><td class="paramname">format</td><td>Output format. </td></tr>
+    <tr><td class="paramname">writer</td><td>Writer to use. Optional. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pointer to string with branch name. Must be freed on caller side. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00036">36</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="registry_8c_source.html#l00037">37</a> of file <a class="el" href="registry_8c_source.html">registry.c</a>.</p>
 
 </div>
 </div>
