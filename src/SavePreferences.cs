@@ -6,24 +6,24 @@ namespace WinPrefs {
     [Cmdlet("Save", "Preferences")]
     [SupportedOSPlatform("windows")]
     public class SavePreferences : PSCmdlet {
-        [Parameter(HelpMessage = "Commit the changes with Git.")]
         [Alias("c")]
+        [Parameter(HelpMessage = "Commit the changes with Git.")]
         public SwitchParameter Commit { get; set; } = false;
 
-        [Parameter(HelpMessage = "Deploy key file path.")]
         [Alias("K")]
+        [Parameter(HelpMessage = "Deploy key file path.")]
         public string? DeployKey;
 
         [Parameter(HelpMessage = "Output format.")]
         [ValidatePattern("^(reg|ps1?|powershell|cs|c#|c)$")]
         public string Format = "reg";
 
-        [Parameter(HelpMessage = "Depth limit.")]
         [Alias("m")]
+        [Parameter(HelpMessage = "Depth limit.")]
         public int MaxDepth = 20;
 
-        [Parameter(HelpMessage = "Output directory.")]
         [Alias("o")]
+        [Parameter(HelpMessage = "Output directory.")]
         public string? OutputDirectory;
 
         [Parameter(HelpMessage = "Output filename.")]

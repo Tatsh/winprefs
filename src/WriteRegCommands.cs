@@ -47,7 +47,8 @@ namespace WinPrefs {
             if (subkey.Length > 0) {
                 hk = hk.OpenSubKey(subkey);
                 if (hk == null) {
-                    if (!LibPrefs.ExportSingleValue(topKey, Path, WriteObject, LibPrefs.ToEnum(Format))) {
+                    if (!LibPrefs.ExportSingleValue(topKey, Path, WriteObject,
+                                                    LibPrefs.ToEnum(Format))) {
                         ThrowTerminatingError(new ErrorRecord(
                             new Exception($"Failed to export {Path} as a single value."),
                             "WinPrefs_ExportSingleValueError", ErrorCategory.InvalidResult, null));
@@ -55,13 +56,13 @@ namespace WinPrefs {
                     return;
                 }
             }
-            if (!LibPrefs.SavePreferences(outputFile: "-",
-                                          maxDepth: MaxDepth,
+            if (!LibPrefs.SavePreferences(format: LibPrefs.ToEnum(Format),
                                           hk: hk,
+                                          maxDepth: MaxDepth,
+                                          outputFile: "-",
                                           specifiedPath: Path,
-                                          format: LibPrefs.ToEnum(Format),
-                                          writeStdOut: true,
-                                          writeObjectIn: WriteObject)) {
+                                          writeObjectIn: WriteObject,
+                                          writeStdOut: true)) {
                 ThrowTerminatingError(new ErrorRecord(
                     new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError",
                     ErrorCategory.InvalidResult, null));

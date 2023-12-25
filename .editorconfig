@@ -2,6 +2,7 @@ root = true
 
 [*]
 charset = utf-8
+dotnet_diagnostic.IDE0055.severity = error
 end_of_line = lf
 indent_size = 2
 indent_style = space
@@ -17,6 +18,8 @@ csharp_new_line_before_members_in_anonymous_types = false
 csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_before_open_brace = none
 csharp_new_line_between_query_expression_clauses = false
+csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_blocks = false
 end_of_line = lf
 indent_size = 4
 indent_style = space

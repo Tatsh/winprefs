@@ -98,7 +98,7 @@ namespace WinPrefs {
         }
 
         internal unsafe static bool SavePreferences(RegistryKey hk,
-            WriteObject writeObjectIn,
+                                                  WriteObject writeObjectIn,
                                                   bool writeStdOut = false,
                                                   bool commit = false,
                                                   string? deployKey = null,
@@ -134,9 +134,9 @@ namespace WinPrefs {
                                                          ref Writer writer);
 
         internal unsafe static bool ExportSingleValue(RegistryKey topKey,
-                                                    string regPath,
-                                                    WriteObject writeObjectIn,
-                                                    OutputFormat format = OutputFormat.Reg) {
+                                                      string regPath,
+                                                      WriteObject writeObjectIn,
+                                                      OutputFormat format = OutputFormat.Reg) {
             WriteObjectImpl = writeObjectIn;
             IntPtr? handle = ToUnsafeHandle(topKey);
             if (handle == null) {
