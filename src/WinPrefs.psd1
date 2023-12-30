@@ -7,7 +7,7 @@
   DotNetFrameworkVersion = '6.0'
   GUID                   = '57c33a4f-3d66-422b-8e2b-596231011201'
   HelpInfoURI            = 'https://github.com/Tatsh/winprefs'
-  ModuleVersion          = '0.3.1'
+  ModuleVersion          = '0.3.2'
   PowerShellVersion      = '5.1'
   ProcessorArchitecture  = 'Amd64'
   NestedModules          = @()
