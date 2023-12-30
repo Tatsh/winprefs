@@ -62,8 +62,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
         size_t w_data_len = ((data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1);
         wchar_t *w_data = (wchar_t *)data;
-        size_t real_len = determine_multi_sz_size(w_data, w_data_len);
-        if (real_len <= 2) {
+        size_t real_len = reg_type == REG_MULTI_SZ ? determine_multi_sz_size(w_data, w_data_len) : wcslen(w_data);
+        if (reg_type == REG_MULTI_SZ && real_len <= 2) {
             goto fail;
         }
         s = escape_for_batch((wchar_t *)data, real_len);
@@ -72,7 +72,7 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
         } // LCOV_EXCL_STOP
         size_t s_size = (wcslen(s) + 8);
         out = calloc(s_size, WL);
-        if (!out) { // LCOV_EXCL_START
+        if (!unlikely(out)) { // LCOV_EXCL_START
             goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
