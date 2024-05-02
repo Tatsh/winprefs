@@ -10,7 +10,6 @@ endif()
 set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin)
 set(GCC_CLANG_DEBUG_C_FLAGS
     -ggdb
-    -O0
     -pedantic
     -Wall
     -Wdeprecated-declarations
