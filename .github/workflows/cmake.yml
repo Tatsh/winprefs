@@ -20,6 +20,7 @@ jobs:
         run: >-
           cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build
           --install-prefix ${{github.workspace}}/build/prefix
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${{matrix.lto}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
@@ -50,6 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
+        lto: ['FALSE', 'TRUE']
         os:
           - windows-2019
           - windows-2022
