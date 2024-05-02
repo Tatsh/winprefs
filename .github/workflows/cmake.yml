@@ -68,13 +68,14 @@ jobs:
           cmake -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
           -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-          -DCMAKE_SYSTEM_NAME=Windows
+          -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${{matrix.lto}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
     strategy:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
+        lto: ['FALSE', 'TRUE']
   build_msys:
     runs-on: windows-latest
     steps:

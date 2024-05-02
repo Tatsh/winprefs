@@ -57,6 +57,7 @@ hklm
 hresult
 hresult
 hwnd
+interprocedural
 isort
 itemproperty
 iwyu
