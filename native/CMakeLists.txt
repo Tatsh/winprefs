@@ -1,10 +1,10 @@
 include(GNUInstallDirs)
 
 if(CMAKE_BUILD_TYPE MATCHES "Debug|RelWithDebInfo" AND WITH_VLD)
-  find_library(VLD vld HINTS "C:/Program Files (x86)/Visual Leak Detector/lib/Win64"
-                             "C:/Program Files/Visual Leak Detector/lib/Win64" REQUIRED)
-  find_path(VLD_H vld.h HINTS "C:/Program Files (x86)/Visual Leak Detector/include"
-                              "C:/Program Files/Visual Leak Detector/include" REQUIRED)
+  find_library(VLD vld HINTS "$ENV{PROGRAMFILES(X86)}/Visual Leak Detector/lib/Win64"
+                             "$ENV{PROGRAMFILES}/Visual Leak Detector/lib/Win64" REQUIRED)
+  find_path(VLD_H vld.h HINTS "$ENV{PROGRAMFILES(X86)}/Visual Leak Detector/include"
+                              "$ENV{PROGRAMFILES}/Visual Leak Detector/include" REQUIRED)
 endif()
 
 set(GCC_CLANG_SHARED_C_FLAGS -fno-builtin)

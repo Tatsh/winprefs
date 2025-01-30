@@ -1,3 +1,4 @@
+analyzers
 apos
 appdata
 asan
@@ -5,6 +6,7 @@ autobuild
 autogen
 bindir
 buglist
+buildtransitive
 calloc
 cdecl
 cmocka
@@ -14,6 +16,7 @@ color
 colors
 colorstyle
 cond
+contentfiles
 cpack
 cppdbg
 csidl
@@ -54,7 +57,6 @@ hkcu
 hkdd
 hkey
 hklm
-hresult
 hresult
 hwnd
 interprocedural
@@ -134,6 +136,7 @@ struct
 structs
 sublang
 swprintf
+SYSTEMDRIVE
 taskscheduler
 tatsh
 teardown
@@ -178,3 +181,4 @@ wunreachable
 wunused
 wyrihaximus
 xapian
+Xunit
