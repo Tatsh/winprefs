@@ -2,7 +2,9 @@ Import-Module Pester
 Import-Module WinPrefs
 
 Describe "RegisterSavePreferencesScheduledTask" {
-  Mock -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "TaskService" {
+  Context "F" {
+  BeforeAll {
+  Mock -ModuleName "Microsoft.Win32.TaskScheduler" "TaskService" {
     return [PSCustomObject]@{
       RootFolder = [PSCustomObject]@{
         CreateFolder = { param($name, $securityDescriptor, $createIfMissing) return $null }
@@ -19,13 +21,13 @@ Describe "RegisterSavePreferencesScheduledTask" {
     }
   }
 
-  Mock -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "TaskFolder" {
+  Mock -ModuleName "Microsoft.Win32.TaskScheduler" "TaskFolder" {
     return [PSCustomObject]@{
       RegisterTaskDefinition = { param($name, $taskDefinition) return $null }
     }
   }
 
-  Mock -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "ExecAction" {
+  Mock -ModuleName "Microsoft.Win32.TaskScheduler" "ExecAction" {
     param($path, $arguments, $workingDirectory)
     return [PSCustomObject]@{
       Path = $path
@@ -33,9 +35,10 @@ Describe "RegisterSavePreferencesScheduledTask" {
       WorkingDirectory = $workingDirectory
     }
   }
+  }
 
   It "should create a scheduled task with correct properties" {
-    $task = [WinPrefs.RegisterSavePreferencesScheduledTask]::new()
+    $task = @{}
     $task.MaxDepth = 10
     $task.Commit = $true
     $task.DeployKey = "path\to\deploy-key"
@@ -44,22 +47,23 @@ Describe "RegisterSavePreferencesScheduledTask" {
     $task.Format = "ps1"
     $task.Path = "HKCU:\Software"
 
-    $task | Invoke-Command -ScriptBlock { $_.ProcessRecord() }
+    Register-SavePreferencesScheduledTask @task
 
-    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "TaskService" `
+    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" "TaskService" `
       -Exactly 1
-    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "TaskFolder" `
+    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" "TaskFolder" `
       -Exactly 1
-    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" -MemberName "ExecAction" `
+    Assert-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" "ExecAction" `
       -Exactly 1
 
     $taskDefinition = (Get-MockCalled -ModuleName "Microsoft.Win32.TaskScheduler" `
-      -MemberName "TaskService").NewTask()
+      "TaskService").NewTask()
     $taskDefinition.RegistrationInfo.Description | Should `
       -Be "Runs WinPrefs every 12 hours (path HKCU:\Software)."
     $taskDefinition.Triggers.Count | Should -Be 1
     $taskDefinition.Settings.ExecutionTimeLimit | Should -Be ([TimeSpan]::FromHours(2))
     $taskDefinition.Settings.StartWhenAvailable | Should -Be $true
     $taskDefinition.Actions.Count | Should -Be 1
+  }
   }
 }
