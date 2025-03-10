@@ -3,7 +3,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
   add_library(
     PSWinPrefs SHARED LibPrefs.cs RegisterSavePreferencesScheduledTask.cs SavePreferences.cs
                       UnregisterSavePreferencesScheduledTask.cs WriteRegCommands.cs)
-  set(TASKSCHEDULER_VERSION 2.11.0)
+  set(TASKSCHEDULER_VERSION 2.12.1)
   set_target_properties(
     PSWinPrefs
     PROPERTIES DOTNET_SDK "Microsoft.NET.Sdk"
