@@ -132,14 +132,7 @@ jobs:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-        exclude:
-          # Crashes in Release but not reproducible on Win11
-          - build-type: Release
-            sys:
-              name: clang32
         sys:
-          - env: clang-i686
-            name: clang32
           - env: clang-x86_64
             name: clang64
           - env: i686
