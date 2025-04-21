@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using System.Runtime.Versioning;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using Moq;
@@ -31,25 +32,31 @@ namespace WinPrefs.Tests {
                 MaxDepth = 10
             };
             var mockLibPrefs = new Mock<LibPrefs>();
-            mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<LibPrefs.OutputFormat>(),
-                                                        It.IsAny<RegistryKey>(),
+            mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
+                                                        It.IsAny<LibPrefs.WriteObject>(),
+                                                        It.IsAny<bool>(),
+                                                        It.IsAny<bool>(),
+                                                        It.IsAny<string>(),
+                                                        It.IsAny<string>(),
+                                                        It.IsAny<string>(),
                                                         It.IsAny<int>(),
                                                         It.IsAny<string>(),
-                                                        It.IsAny<string>(),
-                                                        It.IsAny<Action<object>>(),
-                                                        It.IsAny<bool>())).Returns(true);
+                                                        It.IsAny<LibPrefs.OutputFormat>())).Returns(true);
 
             // Act
             cmdlet.Invoke();
 
             // Assert
-            mockLibPrefs.Verify(lp => lp.SavePreferences(LibPrefs.OutputFormat.CSharp,
-                                                         It.IsAny<RegistryKey>(),
-                                                         10,
+            mockLibPrefs.Verify(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
+                                                         It.IsAny<LibPrefs.WriteObject>(),
+                                                         true,
+                                                         false,
+                                                         null,
+                                                         null,
                                                          "-",
+                                                         10,
                                                          "HKCU:\\Software",
-                                                         It.IsAny<Action<object>>(),
-                                                         true), Times.Once);
+                                                         LibPrefs.OutputFormat.CSharp));
         }
 
         [Fact]
@@ -59,13 +66,16 @@ namespace WinPrefs.Tests {
                 Path = "HKCU:\\Software"
             };
             var mockLibPrefs = new Mock<LibPrefs>();
-            mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<LibPrefs.OutputFormat>(),
-                                                        It.IsAny<RegistryKey>(),
+            mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
+                                                        It.IsAny<LibPrefs.WriteObject>(),
+                                                        It.IsAny<bool>(),
+                                                        It.IsAny<bool>(),
+                                                        It.IsAny<string>(),
+                                                        It.IsAny<string>(),
+                                                        It.IsAny<string>(),
                                                         It.IsAny<int>(),
                                                         It.IsAny<string>(),
-                                                        It.IsAny<string>(),
-                                                        It.IsAny<Action<object>>(),
-                                                        It.IsAny<bool>())).Returns(false);
+                                                        It.IsAny<LibPrefs.OutputFormat>())).Returns(false);
 
             // Act & Assert
             var exception = Assert.Throws<CmdletInvocationException>(() => cmdlet.Invoke());
@@ -82,7 +92,7 @@ namespace WinPrefs.Tests {
             var mockLibPrefs = new Mock<LibPrefs>();
             mockLibPrefs.Setup(lp => lp.ExportSingleValue(It.IsAny<RegistryKey>(),
                                                           It.IsAny<string>(),
-                                                          It.IsAny<Action<object>>(),
+                                                          It.IsAny<LibPrefs.WriteObject>(),
                                                           It.IsAny<LibPrefs.OutputFormat>())).Returns(true);
 
             // Act
@@ -91,7 +101,7 @@ namespace WinPrefs.Tests {
             // Assert
             mockLibPrefs.Verify(lp => lp.ExportSingleValue(It.IsAny<RegistryKey>(),
                                                            "HKCU:\\Software\\NonExistentSubKey",
-                                                           It.IsAny<Action<object>>(),
+                                                           It.IsAny<LibPrefs.WriteObject>(),
                                                            LibPrefs.OutputFormat.CSharp), Times.Once);
         }
 
@@ -105,7 +115,7 @@ namespace WinPrefs.Tests {
             var mockLibPrefs = new Mock<LibPrefs>();
             mockLibPrefs.Setup(lp => lp.ExportSingleValue(It.IsAny<RegistryKey>(),
                                                           It.IsAny<string>(),
-                                                          It.IsAny<Action<object>>(),
+                                                          It.IsAny<LibPrefs.WriteObject>(),
                                                           It.IsAny<LibPrefs.OutputFormat>())).Returns(false);
 
             // Act & Assert

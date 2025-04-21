@@ -43,11 +43,12 @@ namespace WinPrefs {
         protected override void ProcessRecord() {
             RegistryKey? hk = LibPrefs.GetTopKey(Path);
             RegistryKey topKey = hk;
+            LibPrefs prefs = new();
             string subkey = string.Join("\\", Path.Split("\\").Skip(1));
             if (subkey.Length > 0) {
                 hk = hk.OpenSubKey(subkey);
                 if (hk == null) {
-                    if (!LibPrefs.ExportSingleValue(topKey, Path, WriteObject,
+                    if (!prefs.ExportSingleValue(topKey, Path, WriteObject,
                                                     LibPrefs.ToEnum(Format))) {
                         ThrowTerminatingError(new ErrorRecord(
                             new Exception($"Failed to export {Path} as a single value."),
@@ -56,7 +57,7 @@ namespace WinPrefs {
                     return;
                 }
             }
-            if (!LibPrefs.SavePreferences(format: LibPrefs.ToEnum(Format),
+            if (!prefs.SavePreferences(format: LibPrefs.ToEnum(Format),
                                           hk: hk,
                                           maxDepth: MaxDepth,
                                           outputFile: "-",

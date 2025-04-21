@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Win32.TaskScheduler;
@@ -66,14 +67,14 @@ namespace WinPrefs.Tests {
             mockTatshFolder.Setup(tf => tf.SubFolders).Returns(mockSubFolders.Object);
             mockSubFolders.Setup(sf => sf.Exists("WinPrefs")).Returns(true);
             mockSubFolders.Setup(sf => sf["WinPrefs"]).Returns(mockWinPrefsFolder.Object);
-            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(new TaskCollection(mockWinPrefsFolder.Object));
+            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(It.IsAny<TaskCollection>());
             mockTaskService.Setup(ts => ts.GetTask(It.IsAny<string>())).Returns(mockTask.Object);
 
             // Act
             cmdlet.Invoke();
 
             // Assert
-            mockWinPrefsFolder.Verify(wpf => wpf.DeleteTask(It.IsAny<string>()), Times.Once);
+            mockWinPrefsFolder.Verify(wpf => wpf.DeleteTask(It.IsAny<string>(), false), Times.Once);
         }
 
         [Fact]
@@ -94,7 +95,7 @@ namespace WinPrefs.Tests {
             mockTatshFolder.Setup(tf => tf.SubFolders).Returns(mockSubFolders.Object);
             mockSubFolders.Setup(sf => sf.Exists("WinPrefs")).Returns(true);
             mockSubFolders.Setup(sf => sf["WinPrefs"]).Returns(mockWinPrefsFolder.Object);
-            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(new TaskCollection(mockWinPrefsFolder.Object));
+            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(It.IsAny<TaskCollection>());
             mockTaskService.Setup(ts => ts.GetTask(It.IsAny<string>())).Returns(mockTask.Object);
             mockWinPrefsFolder.Setup(wpf => wpf.Tasks.Count).Returns(0);
             mockTatshFolder.Setup(tf => tf.SubFolders.Count).Returns(0);
@@ -104,8 +105,8 @@ namespace WinPrefs.Tests {
             cmdlet.Invoke();
 
             // Assert
-            mockTatshFolder.Verify(tf => tf.DeleteFolder("WinPrefs"), Times.Once);
-            mockRootFolder.Verify(rf => rf.DeleteFolder("tat.sh"), Times.Once);
+            mockTatshFolder.Verify(tf => tf.DeleteFolder("WinPrefs", false), Times.Once);
+            mockRootFolder.Verify(rf => rf.DeleteFolder("tat.sh", false), Times.Once);
         }
 
         [Fact]
@@ -126,7 +127,7 @@ namespace WinPrefs.Tests {
             mockTatshFolder.Setup(tf => tf.SubFolders).Returns(mockSubFolders.Object);
             mockSubFolders.Setup(sf => sf.Exists("WinPrefs")).Returns(true);
             mockSubFolders.Setup(sf => sf["WinPrefs"]).Returns(mockWinPrefsFolder.Object);
-            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(new TaskCollection(mockWinPrefsFolder.Object));
+            mockWinPrefsFolder.Setup(wpf => wpf.Tasks).Returns(It.IsAny<TaskCollection>());
             mockTaskService.Setup(ts => ts.GetTask(It.IsAny<string>())).Returns(mockTask.Object);
             mockWinPrefsFolder.Setup(wpf => wpf.Tasks.Count).Returns(0);
             mockTatshFolder.Setup(tf => tf.SubFolders.Count).Returns(0);

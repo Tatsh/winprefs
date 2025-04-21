@@ -59,7 +59,8 @@ namespace WinPrefs {
                 OutputDirectory = $"{path}\\prefs-export";
             }
             Directory.CreateDirectory(OutputDirectory);
-            if (!LibPrefs.SavePreferences(LibPrefs.GetTopKey(Path),
+            LibPrefs prefs = new();
+            if (!prefs.SavePreferences(LibPrefs.GetTopKey(Path),
                                           WriteObject,
                                           OutputFile == "-",
                                           Commit.ToBool(),

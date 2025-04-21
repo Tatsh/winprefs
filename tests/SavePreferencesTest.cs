@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using System.Runtime.Versioning;
 using Microsoft.Win32;
 using Moq;
 using Xunit;
@@ -29,7 +30,7 @@ namespace WinPrefs.Tests {
             var cmdlet = new SavePreferences();
             var mockLibPrefs = new Mock<LibPrefs>();
             mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
-                                                        It.IsAny<Action<object>>(),
+                                                        It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<string>(),
@@ -63,7 +64,7 @@ namespace WinPrefs.Tests {
 
             // Assert
             mockLibPrefs.Verify(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
-                                                        It.IsAny<Action<object>>(),
+                                                        It.IsAny<LibPrefs.WriteObject>(),
                                                         false,
                                                         true,
                                                         "deployKeyPath",

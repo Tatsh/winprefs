@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Management.Automation;
+using System.Runtime.Versioning;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,10 +34,10 @@ namespace WinPrefs.Tests {
 
             mockTaskService.Setup(ts => ts.RootFolder).Returns(mockTaskFolder.Object);
             mockTaskService.Setup(ts => ts.NewTask()).Returns(mockTaskDefinition.Object);
-            mockTaskDefinition.Setup(td => td.Triggers).Returns(new TriggerCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Actions).Returns(new ActionCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(new RegistrationInfo(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Settings).Returns(new TaskSettings(mockTaskDefinition.Object));
+            mockTaskDefinition.Setup(td => td.Triggers).Returns(It.IsAny<TriggerCollection>());
+            mockTaskDefinition.Setup(td => td.Actions).Returns(It.IsAny<ActionCollection>());
+            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(It.IsAny<TaskRegistrationInfo>());
+            mockTaskDefinition.Setup(td => td.Settings).Returns(It.IsAny<TaskSettings>());
 
             // Act
             cmdlet.Invoke();
@@ -59,10 +60,10 @@ namespace WinPrefs.Tests {
 
             mockTaskService.Setup(ts => ts.RootFolder).Returns(mockTaskFolder.Object);
             mockTaskService.Setup(ts => ts.NewTask()).Returns(mockTaskDefinition.Object);
-            mockTaskDefinition.Setup(td => td.Triggers).Returns(new TriggerCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Actions).Returns(new ActionCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(new RegistrationInfo(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Settings).Returns(new TaskSettings(mockTaskDefinition.Object));
+            mockTaskDefinition.Setup(td => td.Triggers).Returns(It.IsAny<TriggerCollection>());
+            mockTaskDefinition.Setup(td => td.Actions).Returns(It.IsAny<ActionCollection>());
+            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(It.IsAny<TaskRegistrationInfo>());
+            mockTaskDefinition.Setup(td => td.Settings).Returns(It.IsAny<TaskSettings>());
 
             // Act & Assert
             var exception = Assert.Throws<CmdletInvocationException>(() => cmdlet.Invoke());
@@ -79,10 +80,10 @@ namespace WinPrefs.Tests {
 
             mockTaskService.Setup(ts => ts.RootFolder).Returns(mockTaskFolder.Object);
             mockTaskService.Setup(ts => ts.NewTask()).Returns(mockTaskDefinition.Object);
-            mockTaskDefinition.Setup(td => td.Triggers).Returns(new TriggerCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Actions).Returns(new ActionCollection(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(new RegistrationInfo(mockTaskDefinition.Object));
-            mockTaskDefinition.Setup(td => td.Settings).Returns(new TaskSettings(mockTaskDefinition.Object));
+            mockTaskDefinition.Setup(td => td.Triggers).Returns(It.IsAny<TriggerCollection>());
+            mockTaskDefinition.Setup(td => td.Actions).Returns(It.IsAny<ActionCollection>());
+            mockTaskDefinition.Setup(td => td.RegistrationInfo).Returns(It.IsAny<TaskRegistrationInfo>());
+            mockTaskDefinition.Setup(td => td.Settings).Returns(It.IsAny<TaskSettings>());
 
             string appDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinPrefs");
             string winprefswPath = Path.Combine(appDataDir, "winprefsw.exe");

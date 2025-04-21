@@ -1,22 +1,19 @@
-*~
-*.swp*
-*.kate-swp
-# OS generated files
-.directory
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100/
-.Trashes/
-ehthumbs.db
-Thumbs.db
-# Other
 *.cache
 *.db
 *.exe
+*.kate-swp
 *.pdb
 *.sqlite
+*.swp*
+*~
+.DS_Store
+.DS_Store?
+.Spotlight-V100/
+.Trashes/
+._*
 .cache/
+.directory
+.vs/
 /.vs/CMake Overview
 /.vs/CMakeWorkspaceSettings.json
 /.vs/ProjectSettings.json
@@ -24,9 +21,10 @@ Thumbs.db
 /.vs/tasks.vs.json
 /.vs/winprefs/
 /out/
-/src/.vs/
-/src/bin/
-/src/obj/
+Thumbs.db
+bin/
 build/
+ehthumbs.db
 exec-reg.bat
 node_modules/
+obj/

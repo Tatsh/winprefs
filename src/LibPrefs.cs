@@ -31,7 +31,7 @@ namespace WinPrefs {
             [MarshalAs(UnmanagedType.FunctionPtr)] public WriterWriteOutputT write;
         }
 
-        internal delegate void WriteObject(object sendToPipeline);
+        public delegate void WriteObject(object sendToPipeline);
 
         private static WriteObject? WriteObjectImpl;
 
@@ -97,16 +97,16 @@ namespace WinPrefs {
             return true;
         }
 
-        internal unsafe static bool SavePreferences(RegistryKey hk,
-                                                  WriteObject writeObjectIn,
-                                                  bool writeStdOut = false,
-                                                  bool commit = false,
-                                                  string? deployKey = null,
-                                                  string? outputDirectory = null,
-                                                  string outputFile = "exec-reg.bat",
-                                                  int maxDepth = 20,
-                                                  string? specifiedPath = null,
-                                                  OutputFormat format = OutputFormat.Reg) {
+        public unsafe bool SavePreferences(RegistryKey hk,
+                              WriteObject writeObjectIn,
+                              bool writeStdOut = false,
+                              bool commit = false,
+                              string? deployKey = null,
+                              string? outputDirectory = null,
+                              string outputFile = "exec-reg.bat",
+                              int maxDepth = 20,
+                              string? specifiedPath = null,
+                              OutputFormat format = OutputFormat.Reg) {
             WriteObjectImpl = writeObjectIn;
             IntPtr? handle = ToUnsafeHandle(hk);
             if (handle == null) {
@@ -133,7 +133,7 @@ namespace WinPrefs {
                                                          OutputFormat format,
                                                          ref Writer writer);
 
-        internal unsafe static bool ExportSingleValue(RegistryKey topKey,
+        public unsafe bool ExportSingleValue(RegistryKey topKey,
                                                       string regPath,
                                                       WriteObject writeObjectIn,
                                                       OutputFormat format = OutputFormat.Reg) {
