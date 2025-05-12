@@ -226,7 +226,7 @@ bool do_write_powershell_reg_code(writer_t *writer,
                               escaped_reg_key,
                               escaped_reg_key,
                               escaped_reg_key,
-                              escaped_prop ? escaped_prop : L"",
+                              escaped_prop ? escaped_prop : L"(Default)",
                               reg_type,
                               escaped_d ? escaped_d : L"$null");
     if ((size_t)req_size < POWERSHELL_MAX_COMMAND_LENGTH) {
@@ -241,7 +241,7 @@ bool do_write_powershell_reg_code(writer_t *writer,
                    escaped_reg_key,
                    escaped_reg_key,
                    escaped_reg_key,
-                   escaped_prop ? escaped_prop : L"",
+                   escaped_prop ? escaped_prop : L"(Default)",
                    reg_type,
                    escaped_d ? escaped_d : L"$null");
         ret = write_output(out, false, writer);
