@@ -1,3 +1,5 @@
+SYSTEMDRIVE
+Xunit
 analyzers
 apos
 appdata
@@ -5,6 +7,7 @@ asan
 autobuild
 autogen
 bindir
+bsky
 buglist
 buildtransitive
 calloc
@@ -136,7 +139,6 @@ struct
 structs
 sublang
 swprintf
-SYSTEMDRIVE
 taskscheduler
 tatsh
 teardown
@@ -181,4 +183,3 @@ wunreachable
 wunused
 wyrihaximus
 xapian
-Xunit
