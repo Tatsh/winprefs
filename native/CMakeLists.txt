@@ -177,7 +177,7 @@ if(WIN32)
         /SUBSYSTEM:WINDOWS>)
     endif()
     install(TARGETS ${exe} DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES ../winprefs.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/1)
+    install(FILES ../man/winprefs.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/1)
   endforeach()
 
 endif()
