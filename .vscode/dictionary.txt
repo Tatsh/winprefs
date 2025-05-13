@@ -14,12 +14,14 @@ calloc
 cdecl
 cmocka
 codefile
+codeowners
 codeql
 color
 colors
 colorstyle
 cond
 contentfiles
+coveragerc
 cpack
 cppdbg
 csidl

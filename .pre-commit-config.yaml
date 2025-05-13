@@ -27,10 +27,6 @@ repos:
     hooks:
       - id: clang-format
         types_or: [c]
-  - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v4.0.0-alpha.8
-    hooks:
-      - id: prettier
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:
@@ -41,3 +37,45 @@ repos:
     rev: v8.19.0
     hooks:
       - id: cspell
+  - hooks:
+      - entry: 'yarn install --check-cache --immutable'
+        files: "^package\\.json$"
+        id: 'yarn-check-lock'
+        language: 'system'
+        name: 'check yarn.lock is up-to-date'
+        pass_filenames: false
+      - always_run: true
+        entry: 'yarn install'
+        id: 'yarn-install'
+        language: 'system'
+        name: 'ensure Node packages are installed for this branch'
+        pass_filenames: false
+        stages:
+          - 'post-checkout'
+          - 'post-merge'
+      - entry: 'yarn prettier -w'
+        exclude: '((requirements|robots).txt|Dockerfile.*|..*ignore|.(coveragerc|gitattributes)|.*.(csv|lock|resource|robot)|CODEOWNERS|py.typed)$'
+        exclude_types:
+          - 'binary'
+          - 'dockerfile'
+          - 'pyi'
+          - 'python'
+          - 'rst'
+          - 'plain-text'
+          - 'shell'
+        id: 'fix-formatting-prettier'
+        language: 'system'
+        name: 'check files are formatted with Prettier'
+      - entry: "yarn markdownlint-cli2 --fix '#node_modules'"
+        id: 'fix-formatting-markdown'
+        language: 'system'
+        name: 'check Markdown files are formatted'
+        types_or:
+          - 'markdown'
+      - entry: 'yarn check-spelling --no-must-find-files --no-summary'
+        id: 'cspell'
+        language: 'node'
+        name: 'check spelling'
+        types:
+          - 'text'
+    repo: local

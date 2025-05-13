@@ -14,9 +14,7 @@
       "*": true
     },
     "enableGlobDot": true,
-    "files": [
-      "*"
-    ],
+    "files": ["*"],
     "ignorePaths": [
       "*.1",
       "*.har",
@@ -29,9 +27,7 @@
     "language": "en-GB",
     "languageSettings": [
       {
-        "dictionaries": [
-          "main"
-        ],
+        "dictionaries": ["main"],
         "languageId": "*"
       }
     ],
@@ -51,6 +47,7 @@
   },
   "license": "MIT",
   "name": "winprefs",
+  "packageManager": "yarn@4.9.1",
   "prettier": {
     "endOfLine": "lf",
     "iniSpaceAroundEquals": true,
@@ -64,9 +61,7 @@
         }
       },
       {
-        "files": [
-          "package.json"
-        ],
+        "files": ["package.json"],
         "options": {
           "parser": "json"
         }
@@ -89,6 +84,5 @@
     "format": "yarn prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
-  "version": "0.3.2",
-  "packageManager": "yarn@4.9.1"
+  "version": "0.3.2"
 }
