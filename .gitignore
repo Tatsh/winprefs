@@ -12,6 +12,7 @@
 .Trashes/
 ._*
 .cache/
+.cspellcache
 .directory
 .vs/
 /.vs/CMake Overview

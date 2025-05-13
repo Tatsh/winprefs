@@ -121,6 +121,7 @@ priv
 proc
 pwsh
 pylance
+pyright
 qword
 reflow
 regsam
