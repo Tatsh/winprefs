@@ -21,6 +21,7 @@
 /.vs/VSWorkspaceState.json
 /.vs/tasks.vs.json
 /.vs/winprefs/
+/.yarn/install-state.gz
 /out/
 Thumbs.db
 bin/

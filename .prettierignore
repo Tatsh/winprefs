@@ -1,0 +1,16 @@
+*.1
+*.j2
+*.lock
+*.log
+*~
+.*_cache/
+.coverage
+.cspellcache
+.directory
+.pnp.*
+/.yarn/**/*.cjs
+/.yarn/install-state.gz
+/dist/
+/docs/_build/
+/man/_static/
+node_modules/

@@ -14,7 +14,9 @@
       "*": true
     },
     "enableGlobDot": true,
-    "files": ["*"],
+    "files": [
+      "*"
+    ],
     "ignorePaths": [
       "*.1",
       "*.har",
@@ -27,7 +29,9 @@
     "language": "en-GB",
     "languageSettings": [
       {
-        "dictionaries": ["main"],
+        "dictionaries": [
+          "main"
+        ],
         "languageId": "*"
       }
     ],
@@ -60,7 +64,9 @@
         }
       },
       {
-        "files": ["package.json"],
+        "files": [
+          "package.json"
+        ],
         "options": {
           "parser": "json"
         }
@@ -83,5 +89,6 @@
     "format": "yarn prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
-  "version": "0.3.2"
+  "version": "0.3.2",
+  "packageManager": "yarn@4.9.1"
 }
