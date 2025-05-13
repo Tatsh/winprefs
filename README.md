@@ -3,6 +3,7 @@
 [![Build](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml)
 [![Tests](https://github.com/Tatsh/winprefs/actions/workflows/tests.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/tests.yml)
 [![Coverage Status](https://coveralls.io/repos/github/Tatsh/winprefs/badge.svg?branch=master)](https://coveralls.io/github/Tatsh/winprefs?branch=master)
+[![Documentation](https://img.shields.io/badge/docs-deployed-blue)](https://tatsh.github.io/winprefs/)
 [![QA](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 [![CodeQL](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml)
