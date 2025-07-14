@@ -35,7 +35,7 @@
   },
   "description": "Convert a registry path to a series of reg commands.",
   "devDependencies": {
-    "@prettier/plugin-xml": "^3.4.1",
+    "@prettier/plugin-xml": "^3.4.2",
     "cspell": "^9.1.5",
     "markdownlint-cli2": "^0.18.1",
     "prettier": "^3.6.2",
