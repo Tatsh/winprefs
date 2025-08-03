@@ -64,7 +64,7 @@ jobs:
       - name: Configure
         run: >-
           cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
-          -DBUILD_TESTS=ON -DENABLE_ASAN=ON
+          -DBUILD_TESTS=ON -DENABLE_ASAN=ON -DENABLE_UBSAN=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose
       - name: Run tests
