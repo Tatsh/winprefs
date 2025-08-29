@@ -7,6 +7,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [unreleased]
+
+## [0.3.2] - 2023-12-30
+
+### Changed
+
+- Adjusted printing to standard output.
+
+### Fixed
+
+- Fixed getting length of `REG_SZ` and `REG_EXPAND_SZ` data.
+
 ## [0.3.1] - 2023-11-19
 
 ### Fixed
@@ -69,6 +81,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[0.2.1]: https://github.com/Tatsh/winprefs/compare/v0.2.1...HEAD
-[0.2.0]: https://github.com/Tatsh/winprefs/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Tatsh/winprefs/compare/v0.0.2...v0.1.0
+[unreleased]: https://github.com/Tatsh/winprefs/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/Tatsh/winprefs/compare/v0.3.1...v0.3.2
+[0.3.1]: https://github.com/Tatsh/winprefs/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/Tatsh/winprefs/compare/v0.3.0-b0...v0.3.0
+[0.3.0-b0]: https://github.com/Tatsh/winprefs/compare/v0.2.1...v0.3.0-b0
+[0.2.1]: https://github.com/Tatsh/winprefs/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/Tatsh/winprefs/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/Tatsh/winprefs/releases/tag/v0.1.0
