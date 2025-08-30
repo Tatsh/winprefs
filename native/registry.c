@@ -92,9 +92,11 @@ DLL_EXPORT bool save_preferences(bool commit,
     goto cleanup;
 fail:
     ret = false;
-  cleanup:
+cleanup:
     if (!writer_was_torn_down && writer_was_setup && writer->teardown) {
+        // LCOV_EXCL_START
         writer->teardown(writer);
+        // LCOV_EXCL_STOP
     }
     if (using_default_writer) {
         free(writer);
@@ -165,7 +167,9 @@ DLL_EXPORT bool export_single_value(HKEY top_key,
         goto fail;
     }
     if (writer->setup && !writer->setup(writer, true, nullptr)) {
+        // LCOV_EXCL_START
         goto fail;
+        // LCOV_EXCL_STOP
     }
     writer_was_setup = true;
     switch (format) {

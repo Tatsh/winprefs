@@ -1,13 +1,17 @@
 {
   "commitizen": {
+    "name": "cz_path",
+    "remove_path_prefixes": ["include", "native", "src"],
     "tag_format": "v$version",
     "version_files": [
+      ".wiswa.jsonnet",
+      "CITATION.cff",
       "CMakeLists.txt",
-      "Doxyfile.in",
       "README.md",
+      "man/winprefs.1",
       "package.json",
       "src/WinPrefs.psd1",
-      "winprefs.1"
+      "vcpkg.json"
     ],
     "version_provider": "npm",
     "version_scheme": "semver"

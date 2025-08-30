@@ -299,8 +299,10 @@ bool do_write_c_reg_code(writer_t *writer,
                    escaped_prop ? escaped_prop : L"",
                    data_len);
     } else {
+        // LCOV_EXCL_START
         errno = EINVAL;
         ret = false;
+        // LCOV_EXCL_STOP
     }
     if (ret && out) {
         ret = write_output(out, false, writer);

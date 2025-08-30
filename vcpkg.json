@@ -1,0 +1,15 @@
+{
+  "dependencies": [
+    {
+      "name": "cmocka",
+      "platform": "linux|mingw"
+    }
+  ],
+  "description": "Tool to export registry paths to script and code formats (reg add, PowerShell, C, C#).",
+  "documentation": "https://winprefs.readthedocs.org",
+  "homepage": "https://tatsh.github.io/winprefs/",
+  "license": "MIT",
+  "maintainers": ["Andrew Udvare <audvare@gmail.com>"],
+  "name": "winprefs",
+  "version": "0.3.2"
+}

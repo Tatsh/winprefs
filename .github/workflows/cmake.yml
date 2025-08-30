@@ -10,7 +10,7 @@ jobs:
         run: >-
           echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
           -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - id: latest_tag
@@ -41,7 +41,7 @@ jobs:
           --verbose
       - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
         name: Upload package
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
@@ -61,7 +61,7 @@ jobs:
         uses: egor-tensin/setup-mingw@v2
         with:
           platform: x64
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Configure
@@ -95,7 +95,7 @@ jobs:
             ninja:p
             toolchain:p
           update: true
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Configure

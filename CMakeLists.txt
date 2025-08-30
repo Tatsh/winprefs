@@ -33,15 +33,12 @@ if(BUILD_TESTS)
 endif()
 
 if(BUILD_DOCS)
-  find_package(Doxygen REQUIRED)
-  set(DOXYGEN_OUT ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
-  add_custom_target(
-    doc ALL
-    COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/html
-          DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/doc/winprefs-${version})
+  set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_BINARY_DIR}/html/${CMAKE_PROJECT_NAME}.tags")
+  set(DOXYGEN_INTERACTIVE_SVG YES)
+  set(DOXYGEN_MARKDOWN_ID_STYLE GITHUB)
+  set(DOXYGEN_USE_MDFILE_AS_MAINPAGE "${CMAKE_SOURCE_DIR}/README.md")
+  find_package(Doxygen REQUIRED COMPONENTS dot)
+  doxygen_add_docs(docs README.md native src ALL)
 endif()
 
 if(NOT MSVC)
