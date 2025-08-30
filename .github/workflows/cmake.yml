@@ -41,7 +41,7 @@ jobs:
           --verbose
       - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
         name: Upload package
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
