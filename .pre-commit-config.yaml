@@ -1,42 +1,53 @@
+default_install_hook_types:
+  - 'pre-commit'
+  - 'pre-push'
+  - 'post-checkout'
+  - 'post-merge'
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-executables-have-shebangs
-      - id: check-json
-      - id: check-merge-conflict
-      - id: check-symlinks
-      - id: check-toml
-      - id: check-vcs-permalinks
-      - id: check-xml
-      - id: check-yaml
-      - id: destroyed-symlinks
-      - id: detect-aws-credentials
-      - id: detect-private-key
-      - id: end-of-file-fixer
-      - id: file-contents-sorter
-        files: '.vscode/dictionary.txt'
-      - id: fix-byte-order-marker
-      - id: forbid-submodules
-      - id: mixed-line-ending
-      - id: trailing-whitespace
-  - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v20.1.0
-    hooks:
-      - id: clang-format
-        types_or: [c]
-  - repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.13
-    hooks:
-      - id: cmake-format
-        args: [--check, -c, .cmake-format]
-      # - id: cmake-lint
-  - repo: https://github.com/streetsidesoftware/cspell-cli
-    rev: v8.19.0
-    hooks:
-      - id: cspell
+  - hooks:
+      - exclude: "yarn-\\d+.*\\.cjs$"
+        id: 'check-added-large-files'
+      - id: 'check-ast'
+      - id: 'check-builtin-literals'
+      - id: 'check-case-conflict'
+      - id: 'check-executables-have-shebangs'
+      - id: 'check-merge-conflict'
+      - id: 'check-shebang-scripts-are-executable'
+      - id: 'check-symlinks'
+      - id: 'check-toml'
+      - id: 'debug-statements'
+      - id: 'destroyed-symlinks'
+      - id: 'detect-aws-credentials'
+      - id: 'detect-private-key'
+      - id: 'end-of-file-fixer'
+      - files: "^(\\.(docker|eslint|prettier)ignore|CODEOWNERS|\\.gitattributes)$"
+        id: 'file-contents-sorter'
+      - id: 'fix-byte-order-marker'
+      - id: 'mixed-line-ending'
+    repo: 'https://github.com/pre-commit/pre-commit-hooks'
+    rev: 'v6.0.0'
+  - hooks:
+      - id: 'clang-format'
+        types_or:
+          - 'c'
+          - 'c++'
+    repo: 'https://github.com/pre-commit/mirrors-clang-format'
+    rev: 'v20.1.6'
+  - hooks:
+      - id: 'check-github-actions'
+      - id: 'check-github-workflows'
+      - args:
+          - '--schemafile'
+          - 'https://json.schemastore.org/package.json'
+        files: "^package\\.json$"
+        id: 'check-jsonschema'
+        name: 'validate package.json'
+    repo: 'https://github.com/python-jsonschema/check-jsonschema'
+    rev: '0.33.3'
+  - hooks:
+      - id: 'validate-cff'
+    repo: 'https://github.com/citation-file-format/cffconvert'
+    rev: 'b6045d7'
   - hooks:
       - entry: 'yarn install --check-cache --immutable'
         files: "^package\\.json$"
@@ -78,4 +89,4 @@ repos:
         name: 'check spelling'
         types:
           - 'text'
-    repo: local
+    repo: 'local'

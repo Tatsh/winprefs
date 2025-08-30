@@ -1,22 +1,23 @@
----
 jobs:
   qa:
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies (Yarn)
+      - uses: 'actions/checkout@v5'
+      - name: 'Install dependencies (Yarn)'
         run: |
           yarn
-          pipx install cmake-format --include-deps
-      - name: Check spelling
-        run: yarn check-spelling
-      - name: Check formatting
-        run: yarn check-formatting
-name: QA
+          pip install cmake-format pyyaml
+      - name: 'Check formatting'
+        run: 'yarn check-formatting'
+      - name: 'Check spelling'
+        run: 'yarn check-spelling'
+name: 'QA'
 'on':
   pull_request:
     branches:
-      - master
+      - 'master'
   push:
     branches:
-      - master
+      - 'master'
+permissions:
+  contents: 'read'

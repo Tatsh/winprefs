@@ -62,7 +62,8 @@ wchar_t *convert_data_for_reg(DWORD reg_type, const char *data, size_t data_len)
     if (reg_type == REG_EXPAND_SZ || reg_type == REG_SZ || reg_type == REG_MULTI_SZ) {
         size_t w_data_len = ((data_len % WL == 0) ? data_len / WL : (data_len / WL) + 1);
         wchar_t *w_data = (wchar_t *)data;
-        size_t real_len = reg_type == REG_MULTI_SZ ? determine_multi_sz_size(w_data, w_data_len) : wcslen(w_data);
+        size_t real_len =
+            reg_type == REG_MULTI_SZ ? determine_multi_sz_size(w_data, w_data_len) : wcslen(w_data);
         if (reg_type == REG_MULTI_SZ && real_len <= 2) {
             goto fail;
         }

@@ -1,5 +1,5 @@
 {
-  "author": "Andrew Udvare <audvare@gmail.com>",
+  "contributors": ["Andrew Udvare <audvare@gmail.com>"],
   "cspell": {
     "cache": {
       "useCache": true
@@ -22,6 +22,7 @@
       ".git/**",
       ".yarn/**/*.cjs",
       ".vscode/extensions.json",
+      "dist/**",
       "man/**"
     ],
     "language": "en-GB",
@@ -33,7 +34,7 @@
     ],
     "useGitignore": true
   },
-  "description": "Convert a registry path to a series of reg commands.",
+  "description": "Tool to export registry paths to script and code formats (reg add, PowerShell, C, C#).",
   "devDependencies": {
     "@prettier/plugin-xml": "^3.4.2",
     "cspell": "^9.2.0",
@@ -42,12 +43,39 @@
     "prettier-plugin-ini": "^1.3.0",
     "prettier-plugin-sort-json": "^4.1.1",
     "prettier-plugin-toml": "^2.0.6",
-    "pyright": "^1.1.404",
     "yarn-audit-fix": "^10.1.1"
   },
+  "files": ["LICENSE.txt", "README.md"],
+  "homepage": "https://tatsh.github.io/winprefs/",
+  "keywords": [
+    "backup",
+    "batch",
+    "c",
+    "csharp",
+    "customisation",
+    "customization",
+    "desktop",
+    "powershell",
+    "registry",
+    "win32",
+    "windows"
+  ],
   "license": "MIT",
+  "markdownlint-cli2": {
+    "config": {
+      "MD033": {
+        "allowed_elements": ["kbd"]
+      },
+      "default": true,
+      "line-length": {
+        "code_blocks": false,
+        "line_length": 100,
+        "tables": false
+      }
+    }
+  },
   "name": "winprefs",
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.9.4",
   "prettier": {
     "endOfLine": "lf",
     "iniSpaceAroundEquals": true,
@@ -65,6 +93,12 @@
         "options": {
           "parser": "json"
         }
+      },
+      {
+        "files": [".clang-format"],
+        "options": {
+          "parser": "yaml"
+        }
       }
     ],
     "plugins": [
@@ -74,14 +108,18 @@
       "prettier-plugin-toml"
     ],
     "printWidth": 100,
-    "singleQuote": true,
-    "xmlSortAttributesByKey": true
+    "reorderKeys": true,
+    "singleQuote": true
   },
-  "repository": "git@github.com:Tatsh/winprefs.git",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tatsh/winprefs.git"
+  },
   "scripts": {
-    "check-formatting": "prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
+    "build": "cmake --preset=default -DBUILD_DOCS=ON && cmake --build build",
+    "check-formatting": "cmake-format --check CMakeLists.txt native/CMakeLists.txt && clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
     "check-spelling": "cspell --no-progress .",
-    "format": "yarn prettier -w .",
+    "format": "cmake-format -i CMakeLists.txt native/CMakeLists.txt && clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
   "version": "0.3.2"

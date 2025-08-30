@@ -92,7 +92,7 @@ DLL_EXPORT bool save_preferences(bool commit,
     goto cleanup;
 fail:
     ret = false;
-  cleanup:
+cleanup:
     if (!writer_was_torn_down && writer_was_setup && writer->teardown) {
         writer->teardown(writer);
     }

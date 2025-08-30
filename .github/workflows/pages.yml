@@ -22,7 +22,7 @@ jobs:
         run: >-
           cmake -DCMAKE_BUILD_TYPE=Release -B ${{github.workspace}}/build -DBUILD_DOCS=ON
       - name: Build documentation
-        run: cmake --build ${{github.workspace}}/build --verbose --config Release --target doc
+        run: cmake --build ${{github.workspace}}/build --verbose --config Release --target docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

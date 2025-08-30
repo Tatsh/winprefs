@@ -176,8 +176,8 @@ if(WIN32)
         $<$<STREQUAL:winprefsw,${exe}>:/ENTRY:wmainCRTStartup
         /SUBSYSTEM:WINDOWS>)
     endif()
-    install(TARGETS ${exe} DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES ../man/winprefs.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/1)
+    install(TARGETS ${exe})
+    install(FILES ../man/winprefs.1 DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/man/man1)
   endforeach()
 
 endif()
