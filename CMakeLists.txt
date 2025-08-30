@@ -12,8 +12,7 @@ project(
   VERSION ${version})
 
 if((CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 19.37.0.0
-   )
-   OR CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
+   ) OR CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   set(CMAKE_C_STANDARD 23)
 endif()
 
@@ -67,28 +66,5 @@ add_subdirectory(src)
 
 set(CPACK_PACKAGE_NAME "winprefs")
 set(CPACK_PACKAGE_VENDOR "Tatsh")
-# FIXME include license file in zip
-
-# FIXME install path should not have version number
-
-# FIXME may need Visual C++ runtime
-
-# FIXME missing license in installer
-
-# FIXME Set publisher
-
-# FIXME Set 'file description'?
-
-# FIXME Set Product name
-
-# FIXME Set 'file version'?
-
-# FIXME Set Product version
-
-# FIXME Set Copyright
-
-# FIXME Set language
-
-# FIXME No UNIX-style packaging. Just have a single root.
 set(CPACK_GENERATOR "NSIS;ZIP")
 include(CPack)
