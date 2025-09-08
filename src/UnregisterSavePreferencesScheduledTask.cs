@@ -1,11 +1,12 @@
-using IOPath = System.IO.Path;
+using Microsoft.Win32.TaskScheduler;
 using System.Management.Automation;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using IOPath = System.IO.Path;
 
-using Microsoft.Win32.TaskScheduler;
-
+[assembly: InternalsVisibleTo("PSWinPrefsTests")]
 namespace WinPrefs {
     [Alias("winprefs-uninstall-job")]
     [Cmdlet("Unregister", "SavePreferencesScheduledTask")]
@@ -80,6 +81,11 @@ namespace WinPrefs {
             if (tatshFolder.SubFolders.Count == 0 && tatshFolder.Tasks.Count == 0) {
                 ts.RootFolder.DeleteFolder("tat.sh");
             }
+        }
+        internal void ProcessInternal() {
+            BeginProcessing();
+            ProcessRecord();
+            EndProcessing();
         }
     }
 }

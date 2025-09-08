@@ -1,8 +1,9 @@
+using Microsoft.Win32;
 using System.Management.Automation;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
-using Microsoft.Win32;
-
+[assembly: InternalsVisibleTo("PSWinPrefsTests")]
 namespace WinPrefs {
     [Alias("path2reg")]
     [Cmdlet(VerbsCommunications.Write, "RegCommands")]
@@ -21,11 +22,17 @@ namespace WinPrefs {
         [ValidatePattern("^HK(LM|CU|CR|U|CC):")]
         public string Path = "";
 
+        internal LibPrefs? prefs = null;
+
         private bool IsDebugMode() {
-            return MyInvocation.BoundParameters.ContainsKey("Debug") ?
-                ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
-                ((ActionPreference)GetVariableValue("DebugPreference")
-                    != ActionPreference.SilentlyContinue);
+            try {
+                return MyInvocation.BoundParameters.ContainsKey("Debug") ?
+                    ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
+                    ((ActionPreference)GetVariableValue("DebugPreference")
+                        != ActionPreference.SilentlyContinue);
+            } catch (NullReferenceException) {
+                return false;
+            }
         }
 
         protected override void BeginProcessing() {
@@ -43,7 +50,7 @@ namespace WinPrefs {
         protected override void ProcessRecord() {
             RegistryKey? hk = LibPrefs.GetTopKey(Path);
             RegistryKey topKey = hk;
-            LibPrefs prefs = new();
+            LibPrefs prefs = this.prefs ?? new();
             string subkey = string.Join("\\", Path.Split("\\").Skip(1));
             if (subkey.Length > 0) {
                 hk = hk.OpenSubKey(subkey);
@@ -68,6 +75,12 @@ namespace WinPrefs {
                     new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError",
                     ErrorCategory.InvalidResult, null));
             }
+        }
+
+        internal void ProcessInternal() {
+            BeginProcessing();
+            ProcessRecord();
+            EndProcessing();
         }
     }
 }

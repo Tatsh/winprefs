@@ -7,91 +7,6 @@ using Moq;
 using Xunit;
 
 namespace WinPrefs.Tests {
-    internal class PowershellEmulator : ICommandRuntime {
-        public List<object> OutputObjects { get; } = new List<object>();
-        public PSHost? Host {
-            get;
-        }
-        public PSTransactionContext? CurrentPSTransaction {
-            get;
-        }
-
-        public bool ShouldContinue(string? query, string? caption, ref bool yesToAll, ref bool noToAll) {
-            return true;
-        }
-
-        public bool ShouldContinue(string? query, string? caption) {
-            return true;
-        }
-
-        public bool TransactionAvailable() {
-            return true;
-        }
-
-        public bool ShouldProcess(string? verboseDescription, string? verboseWarning, string? caption,
-            out ShouldProcessReason shouldProcessReason) {
-            shouldProcessReason = ShouldProcessReason.None;
-            return true;
-        }
-
-        public bool ShouldProcess(string? verboseDescription, string? verboseWarning, string? caption) {
-            return true;
-        }
-
-        public bool ShouldProcess(string? target, string? action) {
-            return true;
-        }
-
-        public bool ShouldProcess(string? target) {
-            return true;
-        }
-
-        [DoesNotReturn]
-        public void ThrowTerminatingError(ErrorRecord errorRecord) {
-            throw new InvalidOperationException("Error in pipeline", errorRecord.Exception);
-        }
-
-        public void WriteCommandDetail(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteDebug(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteError(ErrorRecord errorRecord) {
-            throw new InvalidOperationException("Error in pipeline", errorRecord.Exception);
-        }
-
-        public void WriteObject(object? sendToPipeline, bool enumerateCollection) {
-            if (sendToPipeline != null) {
-                WriteObject(sendToPipeline);
-            }
-        }
-
-        public void WriteObject(object? sendToPipeline) {
-            if (sendToPipeline != null) {
-                OutputObjects.Add(sendToPipeline);
-            }
-        }
-
-        public void WriteProgress(long sourceId, ProgressRecord progressRecord) {
-            WriteObject(progressRecord);
-        }
-
-        public void WriteProgress(ProgressRecord progressRecord) {
-            WriteObject(progressRecord);
-        }
-
-        public void WriteVerbose(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteWarning(string text) {
-            WriteObject(text);
-        }
-    }
-
     [SupportedOSPlatform("windows")]
     public class SavePreferencesTest {
         [Fact]
@@ -99,7 +14,9 @@ namespace WinPrefs.Tests {
             // Arrange
             var cmdlet = new SavePreferences();
             var mockLibPrefs = new Mock<LibPrefs>();
-            string expectedOutputDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "prefs-export");
+            string expectedOutputDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "prefs-export");
 
             // Act
             cmdlet.ProcessInternal();

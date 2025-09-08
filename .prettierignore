@@ -1,6 +1,7 @@
 *.1
 *.c
 *.cpp
+*.cs
 *.h
 *.in
 *.info

@@ -14,13 +14,18 @@ namespace WinPrefs.Tests {
         public void Invoke_ShouldThrowError_WhenRegistryPathIsInvalid() {
             // Arrange
             var cmdlet = new WriteRegCommands {
-                Path = "InvalidPath"
+                Path = "HKCU:\\Software2\\Invalid"
             };
             var mockLibPrefs = new Mock<LibPrefs>();
+            mockLibPrefs.Setup(p => p.ExportSingleValue(It.IsAny<RegistryKey>(),
+                                                          It.IsAny<string>(),
+                                                          It.IsAny<LibPrefs.WriteObject>(),
+                                                          It.IsAny<LibPrefs.OutputFormat>())).Returns(false);
+            cmdlet.prefs = mockLibPrefs.Object;
 
             // Act & Assert
-            var exception = Assert.Throws<CmdletInvocationException>(() => cmdlet.Invoke());
-            Assert.Equal("Failed to export InvalidPath as a single value.", exception.Message);
+            var exception = Assert.Throws<Exception>(() => cmdlet.ProcessInternal());
+            Assert.Equal("Failed to export HKCU:\\Software2\\Invalid as a single value.", exception.Message);
         }
 
         [Fact]
@@ -42,9 +47,10 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<int>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<LibPrefs.OutputFormat>())).Returns(true);
+            cmdlet.prefs = mockLibPrefs.Object;
 
             // Act
-            cmdlet.Invoke();
+            cmdlet.ProcessInternal();
 
             // Assert
             mockLibPrefs.Verify(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
@@ -76,9 +82,10 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<int>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<LibPrefs.OutputFormat>())).Returns(false);
+            cmdlet.prefs = mockLibPrefs.Object;
 
             // Act & Assert
-            var exception = Assert.Throws<CmdletInvocationException>(() => cmdlet.Invoke());
+            var exception = Assert.Throws<Exception>(() => cmdlet.ProcessInternal());
             Assert.Equal("Failed to export HKCU:\\Software.", exception.Message);
         }
 
@@ -94,9 +101,10 @@ namespace WinPrefs.Tests {
                                                           It.IsAny<string>(),
                                                           It.IsAny<LibPrefs.WriteObject>(),
                                                           It.IsAny<LibPrefs.OutputFormat>())).Returns(true);
+            cmdlet.prefs = mockLibPrefs.Object;
 
             // Act
-            cmdlet.Invoke();
+            cmdlet.ProcessInternal();
 
             // Assert
             mockLibPrefs.Verify(lp => lp.ExportSingleValue(It.IsAny<RegistryKey>(),
@@ -119,7 +127,7 @@ namespace WinPrefs.Tests {
                                                           It.IsAny<LibPrefs.OutputFormat>())).Returns(false);
 
             // Act & Assert
-            var exception = Assert.Throws<CmdletInvocationException>(() => cmdlet.Invoke());
+            var exception = Assert.Throws<Exception>(() => cmdlet.ProcessInternal());
             Assert.Equal("Failed to export HKCU:\\Software\\NonExistentSubKey as a single value.", exception.Message);
         }
     }

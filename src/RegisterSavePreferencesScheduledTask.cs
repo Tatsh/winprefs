@@ -1,13 +1,14 @@
-using IOPath = System.IO.Path;
+using Microsoft.Win32.TaskScheduler;
 using System.Management.Automation;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using IOPath = System.IO.Path;
 
-using Microsoft.Win32.TaskScheduler;
-
+[assembly: InternalsVisibleTo("PSWinPrefsTests")]
 namespace WinPrefs {
     [Alias("winprefs-install-job")]
     [Cmdlet("Register", "SavePreferencesScheduledTask")]
@@ -90,6 +91,11 @@ namespace WinPrefs {
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile
             )));
             folder.RegisterTaskDefinition($"WinPrefs-{GetSuffix()}", td);
+        }
+        internal void ProcessInternal() {
+            BeginProcessing();
+            ProcessRecord();
+            EndProcessing();
         }
     }
 }

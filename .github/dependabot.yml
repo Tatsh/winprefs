@@ -7,10 +7,4 @@ updates:
     package-ecosystem: 'github-actions'
     schedule:
       interval: 'weekly'
-  - directory: /src
-    package-ecosystem: nuget
-    schedule:
-      interval: weekly
-    ignore:
-      - dependency-name: Microsoft.PowerShell.SDK
 version: 2

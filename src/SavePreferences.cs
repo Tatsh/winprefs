@@ -43,7 +43,7 @@ namespace WinPrefs {
                     ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
                     ((ActionPreference)GetVariableValue("DebugPreference")
                         != ActionPreference.SilentlyContinue);
-            } catch (NullReferenceException e) {
+            } catch (NullReferenceException) {
                 return false;
             }
         }

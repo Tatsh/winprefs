@@ -14,8 +14,10 @@ project(
 if((CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 19.37.0.0
    ) OR CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   set(CMAKE_C_STANDARD 23)
-  file(TO_CMAKE_PATH $ENV{USERPROFILE} USERPROFILE_DIR)
-  set(NUGET_PACKAGES_DIR "${USERPROFILE_DIR}/.nuget/packages")
+  if(WIN32 AND NOT ("$ENV{USERPROFILE}" STREQUAL ""))
+    file(TO_CMAKE_PATH $ENV{USERPROFILE} USERPROFILE_DIR)
+    set(NUGET_PACKAGES_DIR "${USERPROFILE_DIR}/.nuget/packages")
+  endif()
 endif()
 
 option(BUILD_DOCS "Build documentation." OFF)
@@ -28,9 +30,9 @@ set(TARGET_VERSION
     $<IF:$<CXX_COMPILER_ID:MSVC>,0x600,0x501>
     CACHE STRING "Version of Windows to target in 0x format.")
 
-#if(BUILD_TESTS)
-#  find_package(cmocka REQUIRED)
-#endif()
+if(BUILD_TESTS)
+  find_package(cmocka REQUIRED)
+endif()
 
 if(BUILD_DOCS)
   set(DOXYGEN_GENERATE_TAGFILE "${CMAKE_BINARY_DIR}/html/${CMAKE_PROJECT_NAME}.tags")
