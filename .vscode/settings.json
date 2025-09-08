@@ -30,6 +30,7 @@
     "-DENABLE_COVERAGE=ON",
     "-DENABLE_UBSAN=ON"
   ],
+  "dotnet.server.useOmnisharp": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
   },

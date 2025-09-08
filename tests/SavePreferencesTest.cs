@@ -7,113 +7,31 @@ using Moq;
 using Xunit;
 
 namespace WinPrefs.Tests {
-    internal class PowershellEmulator : ICommandRuntime {
-        public List<object> OutputObjects { get; } = new List<object>();
-        public PSHost? Host {
-            get;
-        }
-        public PSTransactionContext? CurrentPSTransaction {
-            get;
-        }
-
-        public bool ShouldContinue(string? query, string? caption, ref bool yesToAll, ref bool noToAll) {
-            return true;
-        }
-
-        public bool ShouldContinue(string? query, string? caption) {
-            return true;
-        }
-
-        public bool TransactionAvailable() {
-            return true;
-        }
-
-        public bool ShouldProcess(string? verboseDescription, string? verboseWarning, string? caption,
-            out ShouldProcessReason shouldProcessReason) {
-            shouldProcessReason = ShouldProcessReason.None;
-            return true;
-        }
-
-        public bool ShouldProcess(string? verboseDescription, string? verboseWarning, string? caption) {
-            return true;
-        }
-
-        public bool ShouldProcess(string? target, string? action) {
-            return true;
-        }
-
-        public bool ShouldProcess(string? target) {
-            return true;
-        }
-
-        [DoesNotReturn]
-        public void ThrowTerminatingError(ErrorRecord errorRecord) {
-            throw new InvalidOperationException("Error in pipeline", errorRecord.Exception);
-        }
-
-        public void WriteCommandDetail(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteDebug(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteError(ErrorRecord errorRecord) {
-            throw new InvalidOperationException("Error in pipeline", errorRecord.Exception);
-        }
-
-        public void WriteObject(object? sendToPipeline, bool enumerateCollection) {
-            if (sendToPipeline != null) {
-                WriteObject(sendToPipeline);
-            }
-        }
-
-        public void WriteObject(object? sendToPipeline) {
-            if (sendToPipeline != null) {
-                OutputObjects.Add(sendToPipeline);
-            }
-        }
-
-        public void WriteProgress(long sourceId, ProgressRecord progressRecord) {
-            WriteObject(progressRecord);
-        }
-
-        public void WriteProgress(ProgressRecord progressRecord) {
-            WriteObject(progressRecord);
-        }
-
-        public void WriteVerbose(string text) {
-            WriteObject(text);
-        }
-
-        public void WriteWarning(string text) {
-            WriteObject(text);
-        }
-    }
-
+    [ExcludeFromCodeCoverageAttribute]
     [SupportedOSPlatform("windows")]
     public class SavePreferencesTest {
         [Fact]
         public void Invoke_ShouldCreateOutputDirectory_WhenNotSpecified() {
             // Arrange
             var cmdlet = new SavePreferences();
-            var mockLibPrefs = new Mock<LibPrefs>();
-            string expectedOutputDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "prefs-export");
+            var mockLibPrefs = new Mock<LibPrefs>(new UnsafeHandleUtil());
+            string expectedOutputDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "prefs-export");
 
             // Act
             cmdlet.ProcessInternal();
 
             // Assert
-            Assert.Equal(expectedOutputDir, cmdlet.OutputDirectory);
-            Assert.True(Directory.Exists(expectedOutputDir));
+            Xunit.Assert.Equal(expectedOutputDir, cmdlet.OutputDirectory);
+            Xunit.Assert.True(Directory.Exists(expectedOutputDir));
         }
 
         [Fact]
         public void Invoke_ShouldThrowError_WhenSavePreferencesFails() {
             // Arrange
             var cmdlet = new SavePreferences();
-            var mockLibPrefs = new Mock<LibPrefs>();
+            var mockLibPrefs = new Mock<LibPrefs>(new UnsafeHandleUtil());
             mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
                                                         It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
@@ -132,8 +50,9 @@ namespace WinPrefs.Tests {
             cmdlet.prefs = mockLibPrefs.Object;
 
             // Act
-            var exception = Assert.Throws<InvalidOperationException>(() => cmdlet.ProcessInternal());
-            Assert.Equal("Failed to save.", exception.InnerException?.Message);
+            var exception = Xunit.Assert.Throws<InvalidOperationException>(
+                () => cmdlet.ProcessInternal());
+            Xunit.Assert.Equal("Failed to save.", exception.InnerException?.Message);
         }
 
         [Fact]
@@ -144,10 +63,10 @@ namespace WinPrefs.Tests {
                 DeployKey = "deployKeyPath",
                 Format = "cs",
                 OutputDirectory = "outputDir",
-                OutputFile = "outputFile.bat",
+                OutputFile = "-",
                 Path = @"HKCU:\SomePath"
             };
-            var mockLibPrefs = new Mock<LibPrefs>();
+            var mockLibPrefs = new Mock<LibPrefs>(new UnsafeHandleUtil());
             mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
                                                         It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
@@ -157,7 +76,8 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<string>(),
                                                         It.IsAny<int>(),
                                                         It.IsAny<string>(),
-                                                        It.IsAny<LibPrefs.OutputFormat>())).Returns(true);
+                                                        It.IsAny<LibPrefs.OutputFormat>()))
+                                                        .Returns(true);
             var psEmulator = new PowershellEmulator();
             cmdlet.CommandRuntime = psEmulator;
             cmdlet.prefs = mockLibPrefs.Object;
@@ -168,11 +88,11 @@ namespace WinPrefs.Tests {
             // Assert
             mockLibPrefs.Verify(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
                                                         It.IsAny<LibPrefs.WriteObject>(),
-                                                        false,
+                                                        true,
                                                         true,
                                                         "deployKeyPath",
                                                         "outputDir",
-                                                        "outputFile.bat",
+                                                        "-",
                                                         20,
                                                         @"HKCU:\SomePath",
                                                         LibPrefs.OutputFormat.CSharp), Times.Once);

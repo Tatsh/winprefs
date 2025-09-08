@@ -1,12 +1,11 @@
-using System.Reflection;
+using Microsoft.Win32;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-using Microsoft.Win32;
-
 namespace WinPrefs {
     [SupportedOSPlatform("windows")]
-    public class LibPrefs {
+    public partial class LibPrefs(IUnsafeHandleUtil unsafeHandleUtil) {
         public enum OutputFormat {
             C,
             CSharp,
@@ -28,12 +27,14 @@ namespace WinPrefs {
         public struct Writer {
             [MarshalAs(UnmanagedType.FunctionPtr)] public WriterSetupT? setup;
             [MarshalAs(UnmanagedType.FunctionPtr)] public WriterTeardownT? teardown;
-            [MarshalAs(UnmanagedType.FunctionPtr)] public WriterWriteOutputT write;
+            [MarshalAs(UnmanagedType.FunctionPtr)] public WriterWriteOutputT? write;
         }
 
         public delegate void WriteObject(object sendToPipeline);
 
         private static WriteObject? WriteObjectImpl;
+
+        private readonly IUnsafeHandleUtil unsafeUtil = unsafeHandleUtil;
 
         public static OutputFormat ToEnum(string format) {
             return format.ToLower() switch {
@@ -42,24 +43,6 @@ namespace WinPrefs {
                 "powershell" or "ps" or "ps1" => OutputFormat.PowerShell,
                 _ => OutputFormat.Reg,
             };
-        }
-
-        private static IntPtr? ToUnsafeHandle(RegistryKey key) {
-            FieldInfo? fieldInfo;
-            SafeHandle? handle;
-            Type registryKeyType = typeof(RegistryKey);
-            try {
-                fieldInfo = registryKeyType.GetField("_hkey",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-            } catch (ArgumentNullException) {
-                return null;
-            }
-            try {
-                handle = (SafeHandle?)fieldInfo?.GetValue(key);
-            } catch (Exception) {
-                return null;
-            }
-            return handle?.DangerousGetHandle();
         }
 
         public static RegistryKey GetTopKey(string RegPath) {
@@ -88,6 +71,7 @@ namespace WinPrefs {
                                                        OutputFormat format,
                                                        ref Writer writer);
 
+        [ExcludeFromCodeCoverageAttribute]
         internal static bool WriteOutputImpl(object instance,
                                            string mbOut,
                                            int totalSize,
@@ -108,14 +92,13 @@ namespace WinPrefs {
                               string? specifiedPath = null,
                               OutputFormat format = OutputFormat.Reg) {
             WriteObjectImpl = writeObjectIn;
-            IntPtr? handle = ToUnsafeHandle(hk);
+            IntPtr? handle = unsafeUtil.ToUnsafeHandle(hk);
             if (handle == null) {
                 return false;
             }
-            Writer writer = new();
-            if (writeStdOut) {
-                writer.write = WriteOutputImpl;
-            }
+            Writer writer = new() {
+                write = writeStdOut ? WriteOutputImpl : null
+            };
             return SavePreferencesImpl(commit, deployKey, outputDirectory,
                                                         outputFile, maxDepth,
                                                         (UIntPtr)handle.Value.ToPointer(),
@@ -138,7 +121,7 @@ namespace WinPrefs {
                                                       WriteObject writeObjectIn,
                                                       OutputFormat format = OutputFormat.Reg) {
             WriteObjectImpl = writeObjectIn;
-            IntPtr? handle = ToUnsafeHandle(topKey);
+            IntPtr? handle = unsafeUtil.ToUnsafeHandle(topKey);
             if (handle == null) {
                 return false;
             }
@@ -149,9 +132,8 @@ namespace WinPrefs {
                                                           regPath, format, ref writer);
         }
 
-        [DllImport("prefs.dll",
-                   CallingConvention = CallingConvention.Cdecl,
-                   EntryPoint = "set_debug_print_enabled")]
-        internal static extern void SetDebugPrintEnabled(bool enabled = true);
+        [LibraryImport("prefs.dll", EntryPoint = "set_debug_print_enabled")]
+        [UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+        internal static partial void SetDebugPrintEnabled([MarshalAs(UnmanagedType.Bool)] bool enabled);
     }
 }

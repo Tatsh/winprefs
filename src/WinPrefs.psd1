@@ -9,7 +9,7 @@
   HelpInfoURI            = 'https://github.com/Tatsh/winprefs'
   ModuleVersion          = '0.3.2'
   PowerShellVersion      = '5.1'
-  ProcessorArchitecture  = 'Amd64'
+  ProcessorArchitecture  = 'AMD64'
   NestedModules          = @()
   RequiredAssemblies     = @()
   RequiredModules        = @()

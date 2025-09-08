@@ -3,7 +3,7 @@ jobs:
   build:
     permissions:
       contents: write
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
       - id: fixed_workspace
         name: Fix path
@@ -39,7 +39,7 @@ jobs:
         run: >-
           cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
           --verbose
-      - if: matrix.os == 'windows-2022' && matrix.build-type == 'Release'
+      - if: matrix.build-type == 'Release'
         name: Upload package
         uses: softprops/action-gh-release@v2
         with:
@@ -52,8 +52,6 @@ jobs:
       matrix:
         build-type: [Debug, Release]
         lto: ['FALSE', 'TRUE']
-        os:
-          - windows-2022
   build_cross:
     runs-on: ubuntu-latest
     steps:

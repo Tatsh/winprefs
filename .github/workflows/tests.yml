@@ -9,6 +9,27 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
+      - uses: humbletim/vsdevenv-shell@v2
+      - name: Install dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage
+        shell: vsdevenv x64 powershell {0}
+      - name: Configure
+        run: >-
+          cmake -B ${{steps.fixed_workspace.outputs.out}}/build
+          --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
+          -DCMAKE_BUILD_TYPE=Debug -DBUILD_CSharp_TESTS=ON
+        shell: vsdevenv x64 powershell {0}
+      - name: Build
+        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        shell: vsdevenv x64 powershell {0}
+      - name: Run tests
+        run: >-
+          dotnet-coverage collect --nologo -o cobertura.xml --output-format cobertura
+          ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/tests
+          --output-on-failure -C Debug
+        shell: vsdevenv x64 powershell {0}
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
   native:
     runs-on: windows-latest
     steps:

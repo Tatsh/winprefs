@@ -39,20 +39,18 @@ namespace WinPrefs {
 
         private bool IsDebugMode() {
             try {
-                return MyInvocation.BoundParameters.ContainsKey("Debug") ?
-                    ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
+                return MyInvocation.BoundParameters.TryGetValue("Debug", out object? value) ?
+                    ((SwitchParameter)value).ToBool() :
                     ((ActionPreference)GetVariableValue("DebugPreference")
                         != ActionPreference.SilentlyContinue);
-            } catch (NullReferenceException e) {
+            } catch (NullReferenceException) {
                 return false;
             }
         }
 
         protected override void BeginProcessing() {
             base.BeginProcessing();
-            if (IsDebugMode()) {
-                LibPrefs.SetDebugPrintEnabled();
-            }
+            LibPrefs.SetDebugPrintEnabled(IsDebugMode());
         }
 
         protected override void EndProcessing() {
@@ -67,11 +65,7 @@ namespace WinPrefs {
                 OutputDirectory = $"{path}\\prefs-export";
             }
             Directory.CreateDirectory(OutputDirectory);
-#if DEBUG
-            LibPrefs prefs = this.prefs ?? new();
-#else
-            LibPrefs prefs = new();
-#endif
+            LibPrefs prefs = this.prefs ?? new(new UnsafeHandleUtil());
             if (!prefs.SavePreferences(LibPrefs.GetTopKey(Path),
                                           WriteObject,
                                           OutputFile == "-",
@@ -81,11 +75,10 @@ namespace WinPrefs {
                                           OutputFile,
                                           MaxDepth,
                                           Path,
-                                          LibPrefs.ToEnum(Format))) {
+                                          LibPrefs.ToEnum(Format)))
                 ThrowTerminatingError(new ErrorRecord(
                     new Exception("Failed to save."), "WinPrefs_SavePreferencesError",
                     ErrorCategory.NotSpecified, null));
-            }
         }
 
         internal void ProcessInternal() {

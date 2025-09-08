@@ -1,8 +1,23 @@
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREATER_EQUAL 19.37.0.0)
   enable_language(CSharp)
   add_library(
-    PSWinPrefs SHARED LibPrefs.cs RegisterSavePreferencesScheduledTask.cs SavePreferences.cs
-                      UnregisterSavePreferencesScheduledTask.cs WriteRegCommands.cs)
+    PSWinPrefs SHARED
+    CopyWinprefsw.cs
+    ICopyWinprefsw.cs
+    IScheduledTaskManager.cs
+    IUnsafeHandleUtil.cs
+    LibPrefs.cs
+    PSWinPrefs.dll-help.xml
+    PSWinPrefs.dll-SavePreferences-help.ps1
+    PSWinPrefs.dll-WriteRegCommands-help.ps1
+    RegisterSavePreferencesScheduledTask.cs
+    SavePreferences.cs
+    ScheduledTaskManager.cs
+    ScheduledTaskSuffix.cs
+    UnregisterSavePreferencesScheduledTask.cs
+    UnsafeHandleUtil.cs
+    WinPrefs.psd1
+    WriteRegCommands.cs)
   set(TASKSCHEDULER_VERSION 2.12.1)
   set_target_properties(
     PSWinPrefs
@@ -14,7 +29,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
                VS_PACKAGE_REFERENCES
                "Microsoft.PowerShell.SDK_7.5.0;TaskScheduler_${TASKSCHEDULER_VERSION}")
   target_compile_options(PSWinPrefs PRIVATE "/unsafe")
-  if (BUILD_TESTS)
+  if(BUILD_TESTS)
     target_compile_definitions(PSWinPrefs PRIVATE TESTING=1)
   endif()
   file(TO_CMAKE_PATH $ENV{USERPROFILE} USERPROFILE_DIR)

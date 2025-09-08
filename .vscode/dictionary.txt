@@ -1,3 +1,4 @@
+altcover
 analyzers
 apos
 asan
@@ -54,6 +55,7 @@ hkdd
 hklm
 hresult
 htmlcov
+humbletim
 ifdef
 interprocedural
 iwyu
@@ -83,10 +85,12 @@ msys
 msystem
 municode
 mwindows
+nologo
 nsis
 nullptr
 nxcompat
 olaf
+omnisharp
 pacboy
 pcwch
 pcwstr
@@ -125,6 +129,9 @@ undoc
 userprofile
 vcpkg
 versioninfo
+vsdevenv
+vsinstalldir
+vstest
 wchar
 wchdir
 wcsicmp

@@ -1,8 +1,9 @@
 using System.Management.Automation;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
-
 using Microsoft.Win32;
 
+[assembly: InternalsVisibleTo("PSWinPrefsTests")]
 namespace WinPrefs {
     [Alias("path2reg")]
     [Cmdlet(VerbsCommunications.Write, "RegCommands")]
@@ -21,18 +22,22 @@ namespace WinPrefs {
         [ValidatePattern("^HK(LM|CU|CR|U|CC):")]
         public string Path = "";
 
+        internal LibPrefs? prefs = null;
+
         private bool IsDebugMode() {
-            return MyInvocation.BoundParameters.ContainsKey("Debug") ?
-                ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
-                ((ActionPreference)GetVariableValue("DebugPreference")
-                    != ActionPreference.SilentlyContinue);
+            try {
+                return MyInvocation.BoundParameters.ContainsKey("Debug") ?
+                    ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
+                    ((ActionPreference)GetVariableValue("DebugPreference")
+                        != ActionPreference.SilentlyContinue);
+            } catch (NullReferenceException) {
+                return false;
+            }
         }
 
         protected override void BeginProcessing() {
             base.BeginProcessing();
-            if (IsDebugMode()) {
-                LibPrefs.SetDebugPrintEnabled();
-            }
+            LibPrefs.SetDebugPrintEnabled(IsDebugMode());
         }
 
         protected override void EndProcessing() {
@@ -43,17 +48,16 @@ namespace WinPrefs {
         protected override void ProcessRecord() {
             RegistryKey? hk = LibPrefs.GetTopKey(Path);
             RegistryKey topKey = hk;
-            LibPrefs prefs = new();
+            LibPrefs prefs = this.prefs ?? new(new UnsafeHandleUtil());
             string subkey = string.Join("\\", Path.Split("\\").Skip(1));
             if (subkey.Length > 0) {
                 hk = hk.OpenSubKey(subkey);
                 if (hk == null) {
                     if (!prefs.ExportSingleValue(topKey, Path, WriteObject,
-                                                    LibPrefs.ToEnum(Format))) {
+                                                    LibPrefs.ToEnum(Format)))
                         ThrowTerminatingError(new ErrorRecord(
                             new Exception($"Failed to export {Path} as a single value."),
                             "WinPrefs_ExportSingleValueError", ErrorCategory.InvalidResult, null));
-                    }
                     return;
                 }
             }
@@ -63,11 +67,16 @@ namespace WinPrefs {
                                           outputFile: "-",
                                           specifiedPath: Path,
                                           writeObjectIn: WriteObject,
-                                          writeStdOut: true)) {
+                                          writeStdOut: true))
                 ThrowTerminatingError(new ErrorRecord(
                     new Exception($"Failed to export {Path}."), "WinPrefs_WriteRegCommandsError",
                     ErrorCategory.InvalidResult, null));
-            }
+        }
+
+        internal void ProcessInternal() {
+            BeginProcessing();
+            ProcessRecord();
+            EndProcessing();
         }
     }
 }

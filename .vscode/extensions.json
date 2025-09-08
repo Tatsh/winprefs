@@ -32,5 +32,5 @@
     "zainchen.json",
     "zengxingxin.sort-js-object-keys"
   ],
-  "unwantedRecommendations": []
+  "unwantedRecommendations": ["ms-dotnettools.csdevkit"]
 }
