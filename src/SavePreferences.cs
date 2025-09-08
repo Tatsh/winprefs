@@ -1,6 +1,8 @@
 using System.Management.Automation;
+using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
 
+[assembly: InternalsVisibleTo("PSWinPrefsTests")]
 namespace WinPrefs {
     [Alias("prefs-export")]
     [Cmdlet("Save", "Preferences")]
@@ -33,11 +35,17 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
 
+        internal LibPrefs? prefs = null;
+
         private bool IsDebugMode() {
-            return MyInvocation.BoundParameters.ContainsKey("Debug") ?
-                ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
-                ((ActionPreference)GetVariableValue("DebugPreference")
-                    != ActionPreference.SilentlyContinue);
+            try {
+                return MyInvocation.BoundParameters.ContainsKey("Debug") ?
+                    ((SwitchParameter)MyInvocation.BoundParameters["Debug"]).ToBool() :
+                    ((ActionPreference)GetVariableValue("DebugPreference")
+                        != ActionPreference.SilentlyContinue);
+            } catch (NullReferenceException e) {
+                return false;
+            }
         }
 
         protected override void BeginProcessing() {
@@ -59,7 +67,11 @@ namespace WinPrefs {
                 OutputDirectory = $"{path}\\prefs-export";
             }
             Directory.CreateDirectory(OutputDirectory);
+#if DEBUG
+            LibPrefs prefs = this.prefs ?? new();
+#else
             LibPrefs prefs = new();
+#endif
             if (!prefs.SavePreferences(LibPrefs.GetTopKey(Path),
                                           WriteObject,
                                           OutputFile == "-",
@@ -75,6 +87,11 @@ namespace WinPrefs {
                     ErrorCategory.NotSpecified, null));
             }
         }
-    }
 
+        internal void ProcessInternal() {
+            BeginProcessing();
+            ProcessRecord();
+            EndProcessing();
+        }
+    }
 }

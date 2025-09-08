@@ -8,6 +8,7 @@
 .cspellcache
 .directory
 .pnp.*
+/.vs/
 /.yarn/install-state.gz
 /CMakeUserPresets.json
 /build/

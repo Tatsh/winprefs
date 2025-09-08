@@ -97,7 +97,7 @@ namespace WinPrefs {
             return true;
         }
 
-        public unsafe bool SavePreferences(RegistryKey hk,
+        public virtual unsafe bool SavePreferences(RegistryKey hk,
                               WriteObject writeObjectIn,
                               bool writeStdOut = false,
                               bool commit = false,
@@ -133,7 +133,7 @@ namespace WinPrefs {
                                                          OutputFormat format,
                                                          ref Writer writer);
 
-        public unsafe bool ExportSingleValue(RegistryKey topKey,
+        public virtual unsafe bool ExportSingleValue(RegistryKey topKey,
                                                       string regPath,
                                                       WriteObject writeObjectIn,
                                                       OutputFormat format = OutputFormat.Reg) {

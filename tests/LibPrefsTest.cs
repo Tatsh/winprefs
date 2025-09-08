@@ -1,11 +1,5 @@
-// FILE: src/LibPrefsTest.cs
-
-using System;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using Moq;
 using Xunit;
 
 namespace WinPrefs.Tests {

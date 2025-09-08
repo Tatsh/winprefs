@@ -1,5 +1,15 @@
 jobs:
-  tests:
+  managed:
+    runs-on: windows-latest
+    steps:
+      - id: fixed_workspace
+        name: Fix path
+        run: |
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+  native:
     runs-on: windows-latest
     steps:
       - id: fixed_workspace
