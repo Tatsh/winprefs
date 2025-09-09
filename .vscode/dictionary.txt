@@ -72,6 +72,7 @@ mainpage
 maml
 mconsole
 mdfile
+msbuild
 msvc
 msvcrt
 msys
@@ -117,6 +118,7 @@ ucrtbase
 udvare
 userprofile
 vcpkg
+vcxproj
 versioninfo
 vsdevenv
 vsinstalldir

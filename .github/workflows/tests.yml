@@ -20,7 +20,9 @@ jobs:
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_CSharp_TESTS=ON
         shell: vsdevenv x64 powershell {0}
       - name: Build
-        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        run: >-
+          msbuild ${{steps.fixed_workspace.outputs.out}}/build/ALL_BUILD.vcxproj /restore
+          /p:Configuration=${{matrix.build-type}} /p:platform=x64 /v:n
         shell: vsdevenv x64 powershell {0}
       - name: Run tests
         run: >-
@@ -66,10 +68,10 @@ jobs:
           -DENABLE_COVERAGE=ON
         shell: msys2 {0}
       - name: Build
-        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose --config ${{matrix.build-type}}
         shell: msys2 {0}
       - name: Run tests
-        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests --verbose
+        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests --verbose -C ${{matrix.build-type}}
         shell: msys2 {0}
       - name: Generate coverage information
         run: >-
