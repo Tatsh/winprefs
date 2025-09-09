@@ -17,7 +17,7 @@ jobs:
         run: >-
           cmake -B ${{steps.fixed_workspace.outputs.out}}/build
           --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
-          -DCMAKE_BUILD_TYPE=Debug -DBUILD_CSharp_TESTS=ON
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_CSharp_TESTS=ON
         shell: vsdevenv x64 powershell {0}
       - name: Build
         run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
@@ -26,10 +26,15 @@ jobs:
         run: >-
           dotnet-coverage collect --nologo -o cobertura.xml --output-format cobertura
           ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/tests
-          --output-on-failure -C Debug
+          --output-on-failure -C ${{matrix.build-type}}
         shell: vsdevenv x64 powershell {0}
-      - name: Coveralls
+      - if: matrix.build-type == 'Debug'
+        name: Coveralls
         uses: coverallsapp/github-action@v2
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
   native:
     runs-on: windows-latest
     steps:
@@ -69,6 +74,7 @@ jobs:
       - name: Generate coverage information
         run: >-
           lcov --capture --directory ${{steps.fixed_workspace.outputs.out}}/build
+          --exclude 'D:/*'
           --output-file coverage.lcov
         shell: msys2 {0}
       - if: matrix.build-type == 'Debug'

@@ -1,3 +1,4 @@
+
 altcover
 analyzers
 apos
@@ -13,6 +14,8 @@ cmocka
 codeowners
 colorstyle
 contentfiles
+conv
+convs
 coveragerc
 coverallsapp
 cpack
