@@ -5,7 +5,7 @@
 [![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/WinPrefs)](https://www.powershellgallery.com/packages/WinPrefs)
 [![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/winprefs)](https://github.com/Tatsh/winprefs/tags)
 [![License](https://img.shields.io/github/license/Tatsh/winprefs)](https://github.com/Tatsh/winprefs/blob/master/LICENSE.txt)
-[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.3.2/master)](https://github.com/Tatsh/winprefs/compare/v0.3.2...master)
+[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.3.3/master)](https://github.com/Tatsh/winprefs/compare/v0.3.3...master)
 [![Build](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml)
 [![CodeQL](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml)
 [![QA](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml)
