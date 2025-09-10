@@ -9,6 +9,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+## [0.3.3] - 2025-09-10
+
+### Changed
+
+- Managed: Bumped target framework to .NET 9.0.
+- Managed: Updated dependencies.
+
+### Fixed
+
+- Fixed outputting to PowerShell when `-Name` parameter is not set.
+
 ## [0.3.2] - 2023-12-30
 
 ### Changed
@@ -81,7 +92,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[unreleased]: https://github.com/Tatsh/winprefs/compare/v0.3.2...HEAD
+[unreleased]: https://github.com/Tatsh/winprefs/compare/v0.3.3...HEAD
+[0.3.3]: https://github.com/Tatsh/winprefs/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/Tatsh/winprefs/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Tatsh/winprefs/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Tatsh/winprefs/compare/v0.3.0-b0...v0.3.0
