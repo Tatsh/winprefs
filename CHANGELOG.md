@@ -9,6 +9,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+## [0.3.4] - 2025-09-10
+
+### Fixed
+
+- Fixed escaping arguments to Git when using a path (such as a path containing "User Name") that has
+  whitespace.
+- Fixed getting branch name.
+
 ## [0.3.3] - 2025-09-10
 
 ### Changed

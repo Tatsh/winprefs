@@ -107,6 +107,7 @@ startf
 stdbool
 strequal
 tagfile
+taskschd
 taskscheduler
 tatsh
 teardown

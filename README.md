@@ -99,6 +99,11 @@ replacement can be made.
 Any task can be uninstalled with `Unregister-SavePreferencesScheduledTask` (`winprefs-uninstall-job`)
 with the same `-Path` argument.
 
+## Uninstallation
+
+Delete `%APPDATA%\prefs-export`. Also be sure to delete tasks under `tat.sh\WinPrefs` in Task
+Scheduler (`taskschd.msc`).
+
 ### Examples
 
 #### Save `HKEY_LOCAL_MACHINE\Control Panel` with a depth of 1
@@ -161,6 +166,8 @@ increase in making registry queries and performing I/O. A native binary `winpref
 built that can be used without needing PowerShell installed and it should work with XP and newer. If
 built as a a 32-bit binary, the native binary should be compatible with Windows 2000 and newer. It
 even works with Wine.
+
+The path name should be of the form: `HIVE\Key\SubKey`. Do not leave a trailing `\`.
 
 Usage is similar to the PowerShell version:
 
