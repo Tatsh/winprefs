@@ -122,5 +122,5 @@
     "format": "cmake-format -i CMakeLists.txt native/CMakeLists.txt && clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
-  "version": "0.3.3"
+  "version": "0.3.4"
 }
