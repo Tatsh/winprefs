@@ -162,6 +162,9 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
             goto fail;
         }
         escaped_full_deploy_key_path = calloc(MAX_PATH + 2, WL);
+        if (!escaped_full_deploy_key_path) { // LCOV_EXCL_START
+            goto fail;
+        } // LCOV_EXCL_STOP
         wmemset(escaped_full_deploy_key_path, L'\0', MAX_PATH + 2);
         escaped_full_deploy_key_path[0] = L'\'';
         int i, j = 1;
@@ -186,7 +189,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
         _snwprintf(ssh_command,
                    ssh_command_len,
                    L"ssh -i %ls -F nul -o UserKnownHostsFile=nul -o StrictHostKeyChecking=no",
-                   full_deploy_key_path);
+                   escaped_full_deploy_key_path);
         if (!run_process_no_window(6,
                                    L"git.exe",
                                    git_dir_arg,
@@ -215,7 +218,6 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
 fail:
     ret = false;
 cleanup:
-    free(branch_arg);
     free(cwd);
     free(date_buf);
     free(escaped_full_deploy_key_path);
