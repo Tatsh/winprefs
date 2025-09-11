@@ -41,14 +41,14 @@ jobs:
         run: >-
           cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
           --verbose
-      - if: matrix.build-type == 'Release'
-        name: Upload package
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
-            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
-          tag_name: ${{ steps.latest_tag.outputs.tag }}
+      # - if: matrix.build-type == 'Release'
+      #   name: Upload package
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     files: |
+      #       ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
+      #       ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
+      #     tag_name: ${{ steps.latest_tag.outputs.tag }}
     strategy:
       fail-fast: false
       matrix:
