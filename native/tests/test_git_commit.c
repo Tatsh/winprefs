@@ -250,7 +250,7 @@ void test_git_commit_deploy_key(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    assert_true(git_commit(L"output-dir", L"key"));
+    assert_true(git_commit(L"output-dir", L"key's z"));
 }
 
 const struct CMUnitTest git_commit_tests[] = {

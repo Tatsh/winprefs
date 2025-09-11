@@ -100,7 +100,7 @@ const enum REG_TYPES {
 #define HKEY_LOCAL_MACHINE (HKEY)3
 #define HKEY_USERS (HKEY)5
 #define INFINITE 0xFFFFFFFF
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#define INVALID_FILE_ATTRIBUTES ((DWORD) - 1)
 #define INVALID_HANDLE_VALUE (void *)3
 #define IsWindowsVistaOrGreater() 0
 #define KEY_READ 0
@@ -245,5 +245,6 @@ DWORD FormatMessage(DWORD dwFlags,
                     DWORD nSize,
                     va_list *Arguments);
 bool GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
+bool StrTrimW(wchar_t *str, const wchar_t *trimChars);
 
 #endif // TESTS_WRAPPERS_H

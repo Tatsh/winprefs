@@ -27,7 +27,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
                       .hStdError = pipe_write,
                       .wShowWindow = SW_HIDE};
     PROCESS_INFORMATION pi = {0};
-    size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 30;
+    size_t cmd_len = git_dir_arg_len + work_tree_arg_len + 34;
     cmd = calloc(cmd_len, WL);
     if (!cmd) { // LCOV_EXCL_START
         CloseHandle(pipe_write);
@@ -35,9 +35,13 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         goto fail;
     } // LCOV_EXCL_STOP
     wmemset(cmd, L'\0', cmd_len);
-    _snwprintf(
-        cmd, cmd_len, TEXT("git.exe %ls %ls branch --show-current"), git_dir_arg, work_tree_arg);
+    _snwprintf(cmd,
+               cmd_len,
+               TEXT("git.exe \"%ls\" \"%ls\" branch --show-current"),
+               git_dir_arg,
+               work_tree_arg);
     cmd[cmd_len - 1] = L'\0';
+    debug_print(L"Executing: '%ls'\n", cmd);
     bool ret = CreateProcess(
         nullptr, cmd, nullptr, nullptr, true, CREATE_NO_WINDOW, nullptr, nullptr, &si, &pi);
     if (!ret) {
@@ -62,7 +66,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
             }
             buf[min(sizeof(buf) - 1, avail)] = L'\0';
             if (avail) {
-                strncat(result, buf, proc_ended ? avail - 1 : avail); // Strip newline
+                strncat(result, buf, avail);
             }
         }
     }
@@ -77,7 +81,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         goto fail;
     } // LCOV_EXCL_STOP
     MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
-    w_result[w_len] = L'\0';
+    StrTrimW(w_result, L"\r\n\t ");
     goto cleanup;
 fail:
     w_result = nullptr;

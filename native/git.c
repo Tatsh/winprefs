@@ -61,10 +61,10 @@ static inline bool dir_exists(wchar_t *path) {
 
 bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
     bool ret = true;
-    wchar_t *cwd, *date_buf, *git_dir, *git_dir_arg, *message_buf, *ssh_command, *time_buf,
-        *work_tree_arg;
-    cwd = date_buf = git_dir = git_dir_arg = message_buf = ssh_command = time_buf = work_tree_arg =
-        nullptr;
+    wchar_t *branch_arg, *cwd, *date_buf, *escaped_full_deploy_key_path, *git_dir, *git_dir_arg,
+        *message_buf, *ssh_command, *time_buf, *work_tree_arg;
+    branch_arg = cwd = date_buf = escaped_full_deploy_key_path = git_dir = git_dir_arg =
+        message_buf = ssh_command = time_buf = work_tree_arg = nullptr;
     if (!has_git()) {
         debug_print(L"Wanted to commit but git.exe is not in PATH or failed to run.\n");
         goto cleanup;
@@ -161,8 +161,23 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
         if (!_wfullpath(full_deploy_key_path, deploy_key, MAX_PATH)) {
             goto fail;
         }
-        debug_print(L"Deploy key: %ls\n", full_deploy_key_path);
-        size_t ssh_command_len = 68 + wcslen(full_deploy_key_path) + 3;
+        escaped_full_deploy_key_path = calloc(MAX_PATH + 2, WL);
+        wmemset(escaped_full_deploy_key_path, L'\0', MAX_PATH + 2);
+        escaped_full_deploy_key_path[0] = L'\'';
+        int i, j = 1;
+        for (i = 0; i < (int)wcslen(full_deploy_key_path) && j < MAX_PATH; i++, j++) {
+            if (full_deploy_key_path[i] == L'\'') {
+                if (j < (MAX_PATH - 1)) {
+                    escaped_full_deploy_key_path[j++] = L'\\';
+                } else { // LCOV_EXCL_START
+                    break;
+                } // LCOV_EXCL_STOP
+            }
+            escaped_full_deploy_key_path[j] = full_deploy_key_path[i];
+        }
+        escaped_full_deploy_key_path[j] = L'\'';
+        debug_print(L"Deploy key: %ls\n", escaped_full_deploy_key_path);
+        size_t ssh_command_len = 68 + wcslen(escaped_full_deploy_key_path) + 3;
         ssh_command = calloc(ssh_command_len, WL);
         if (!ssh_command) { // LCOV_EXCL_START
             goto fail;
@@ -181,8 +196,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
                                    ssh_command)) {
             goto fail;
         }
-        wchar_t *branch_arg =
-            get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
+        branch_arg = get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
         if (!run_process_no_window(10,
                                    L"git.exe",
                                    git_dir_arg,
@@ -201,8 +215,10 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
 fail:
     ret = false;
 cleanup:
+    free(branch_arg);
     free(cwd);
     free(date_buf);
+    free(escaped_full_deploy_key_path);
     free(git_dir);
     free(git_dir_arg);
     free(message_buf);

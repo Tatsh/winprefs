@@ -26,6 +26,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       RegQueryInfoKey
       RegQueryValueEx
       SHGetFolderPath
+      StrTrimW
       WaitForSingleObject
       WideCharToMultiByte
       WriteFile
