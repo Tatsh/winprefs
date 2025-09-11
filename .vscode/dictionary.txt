@@ -4,6 +4,7 @@ autosort
 bsky
 buildsystems
 cdecl
+choco
 cmocka
 codeowners
 conv

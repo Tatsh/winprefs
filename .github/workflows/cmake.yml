@@ -35,6 +35,8 @@ jobs:
         run: |
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
+      - name: Install NSIS
+        run: choco install nsis -y
       - name: Package
         run: >-
           cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
@@ -110,6 +112,8 @@ jobs:
           cmake --install ${{steps.fixed_workspace.outputs.out}}/build
           --config ${{matrix.build-type}} --verbose
         shell: msys2 {0}
+      - name: Install NSIS
+        run: choco install nsis -y
       - name: Package
         run: >-
           cpack -C ${{matrix.build-type}}
