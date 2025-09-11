@@ -244,8 +244,8 @@ void test_git_commit_deploy_key(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return(__wrap__wfullpath, L"");
-    will_return(__wrap__wfullpath, L"");
+    will_return(__wrap__wfullpath, L"key's z");
+    will_return(__wrap__wfullpath, L"key's z");
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);

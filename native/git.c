@@ -200,9 +200,9 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
             goto fail;
         }
         branch_arg = get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
-        if (!branch_arg) {
+        if (!branch_arg) { // LCOV_EXCL_START
             goto fail;
-        }
+        } // LCOV_EXCL_STOP
         if (!run_process_no_window(10,
                                    L"git.exe",
                                    git_dir_arg,
