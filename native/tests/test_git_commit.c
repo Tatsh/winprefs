@@ -219,7 +219,10 @@ void test_git_commit_deploy_key_push_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return(__wrap_get_git_branch, L"master");
+    wchar_t *branch = calloc(7, sizeof(wchar_t));
+    wmemset(branch, L'\0', 7);
+    wmemcpy(branch, L"master", 6);
+    will_return(__wrap_get_git_branch, branch);
     will_return(__wrap_CreateProcess, false);
     assert_false(git_commit(L"output-dir", L"key"));
 }
@@ -246,7 +249,10 @@ void test_git_commit_deploy_key(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return(__wrap_get_git_branch, L"master");
+    wchar_t *branch = calloc(7, sizeof(wchar_t));
+    wmemset(branch, L'\0', 7);
+    wmemcpy(branch, L"master", 6);
+    will_return(__wrap_get_git_branch, branch);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);

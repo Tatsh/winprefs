@@ -200,6 +200,9 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
             goto fail;
         }
         branch_arg = get_git_branch(git_dir_arg, git_dir_arg_len, work_tree_arg, work_tree_arg_len);
+        if (!branch_arg) {
+            goto fail;
+        }
         if (!run_process_no_window(10,
                                    L"git.exe",
                                    git_dir_arg,
@@ -218,6 +221,7 @@ bool git_commit(const wchar_t *output_dir, const wchar_t *deploy_key) {
 fail:
     ret = false;
 cleanup:
+    free(branch_arg);
     free(cwd);
     free(date_buf);
     free(escaped_full_deploy_key_path);

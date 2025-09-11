@@ -84,6 +84,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
     StrTrimW(w_result, L"\r\n\t ");
     goto cleanup;
 fail:
+    free(w_result);
     w_result = nullptr;
 cleanup:
     free(cmd);
