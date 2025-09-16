@@ -105,6 +105,7 @@ static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size
                                  nullptr);
         if (status == ERROR_SUCCESS && value_count > 0) {
             max_n_wide_chars++;
+            max_value_name_len++;
             DWORD i;
             size_t total_wide_chars = value_count * max_n_wide_chars;
             *buf_member_size = (size_t)max_n_wide_chars;
@@ -116,8 +117,8 @@ static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size
             wchar_t *wp = nullptr;
             value_name = calloc(max_value_name_len, WL);
             for (wp = wide_buf, i = 0; i < value_count; i++, wp += max_n_wide_chars) {
-                DWORD len = max_n_wide_chars * sizeof(wchar_t); // RegEnumValue expects bytes
-                DWORD name_len = max_value_name_len * sizeof(wchar_t);
+                DWORD len = max_n_wide_chars * (DWORD)WL; // RegEnumValue expects bytes.
+                DWORD name_len = max_value_name_len * (DWORD)WL;
                 status = RegEnumValue(filter_hkey,
                                       i,
                                       value_name,
@@ -135,7 +136,10 @@ static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size
                     continue;
                 }
                 // len is in bytes. Convert to wide chars.
-                size_t len_wide = len / sizeof(wchar_t);
+                size_t len_wide = len / WL;
+                if (len_wide > max_n_wide_chars) { // LCOV_EXCL_START
+                    len_wide = max_n_wide_chars;
+                } // LCOV_EXCL_STOP
                 if (len_wide > 0 && tmp_buf[len_wide - 1] == L'\0') {
                     len_wide--; // don't copy the null terminator
                 }

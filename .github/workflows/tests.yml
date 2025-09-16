@@ -27,8 +27,9 @@ jobs:
       - name: Run tests
         run: >-
           dotnet-coverage collect --nologo -o cobertura.xml --output-format cobertura
-          ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/tests
-          --output-on-failure -C ${{matrix.build-type}}
+          --include-files "src/*.cs" ctest --test-dir
+          ${{steps.fixed_workspace.outputs.out}}/build/tests --output-on-failure
+          -C ${{matrix.build-type}}
         shell: vsdevenv x64 powershell {0}
       - if: matrix.build-type == 'Debug'
         name: Coveralls
