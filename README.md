@@ -37,7 +37,7 @@ Keys/values are skipped under these conditions:
 - Key that cannot be read for any reason such as permissions.
 - Value contains newlines.
 - Value has type `REG_UNKNOWN`.
-- Value is filtered.
+- Value is filtered. Pass `-S` or `--no-settings` to disable filters.
 
 An example of an always skipped key under normal circumstances is `HKLM\SECURITY`, even if this is
 run as administrator.
