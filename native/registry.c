@@ -76,9 +76,7 @@ static void install_default_filters(HKEY top_key) {
             RegCloseKey(base_hkey);
         }
     }
-    if (filter_hkey) {
-        RegCloseKey(filter_hkey);
-    }
+    RegCloseKey(filter_hkey);
 }
 
 static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size, HKEY top_key) {
@@ -119,7 +117,7 @@ static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size
             value_name = calloc(max_value_name_len, WL);
             for (wp = wide_buf, i = 0; i < value_count; i++, wp += max_n_wide_chars) {
                 DWORD len = max_n_wide_chars * sizeof(wchar_t); // RegEnumValue expects bytes
-                DWORD name_len = max_value_name_len;
+                DWORD name_len = max_value_name_len * sizeof(wchar_t);
                 status = RegEnumValue(filter_hkey,
                                       i,
                                       value_name,
