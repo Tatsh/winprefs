@@ -45,6 +45,7 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
+                                                        It.IsAny<bool>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
@@ -63,6 +64,7 @@ namespace WinPrefs.Tests {
                                                          It.IsAny<LibPrefs.WriteObject>(),
                                                          true,
                                                          false,
+                                                         true,
                                                          null,
                                                          null,
                                                          "-",
@@ -80,6 +82,7 @@ namespace WinPrefs.Tests {
             var mockLibPrefs = new Mock<LibPrefs>(new UnsafeHandleUtil());
             mockLibPrefs.Setup(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
                                                         It.IsAny<LibPrefs.WriteObject>(),
+                                                        It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<string>(),

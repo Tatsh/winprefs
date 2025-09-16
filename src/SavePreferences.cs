@@ -35,6 +35,10 @@ namespace WinPrefs {
         [Parameter(HelpMessage = "Full registry path.")]
         public string Path = "HKCU:\\";
 
+        [Alias("S")]
+        [Parameter(HelpMessage = "Do not read settings.")]
+        public SwitchParameter NoSettings { get; set; } = false;
+
         internal LibPrefs? prefs = null;
 
         private bool IsDebugMode() {
@@ -70,6 +74,7 @@ namespace WinPrefs {
                                           WriteObject,
                                           OutputFile == "-",
                                           Commit.ToBool(),
+                                          !NoSettings.ToBool(),
                                           DeployKey,
                                           OutputDirectory,
                                           OutputFile,

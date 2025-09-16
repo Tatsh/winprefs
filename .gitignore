@@ -1,6 +1,7 @@
 *.info
 *.kate-swp
 *.log
+*.ps1
 *.psd1
 *~
 .*.swp

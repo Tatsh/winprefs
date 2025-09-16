@@ -41,7 +41,7 @@ void test_write_key_filtered_recursive_does_not_exceed_max_depth_inclusive(void 
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 20, nullptr, OUTPUT_FORMAT_REG, default_writer));
+        nullptr, nullptr, 20, 20, nullptr, OUTPUT_FORMAT_REG, default_writer, nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
     assert_int_equal(errno, EDOM);
@@ -63,21 +63,37 @@ void test_write_key_filtered_recursive_does_not_exceed_length_limitations(void *
         L"HKCR\\Software\\Microsoft\\Windows\\Windows\\CurrentVersion\\Windows\\CurrentVersion"
         L"\\Windows\\CurrentVersion\\Windows\\CurrentVersion",
         OUTPUT_FORMAT_REG,
-        default_writer));
+        default_writer,
+        nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
     assert_int_equal(errno, E2BIG);
 }
 
 void test_write_key_filtered_has_filters(void **state) {
+    expect_string(__wrap_PathMatchSpec, pszFile, L"HKCR\\Windows\\Shell\\MuiCache");
+    expect_string(__wrap_PathMatchSpec, pszSpec, L"HKCR\\Windows\\Shell\\MuiCache");
+    will_return(__wrap_PathMatchSpec, true);
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_true(write_key_filtered_recursive(
-        nullptr, L"MuiCache", 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    const size_t wl = sizeof(wchar_t);
+    wchar_t *filter_buf = calloc(21, wl);
+    wmemset(filter_buf, L'\0', 21);
+    wmemcpy(filter_buf, L"HKCR\\Windows\\Shell\\MuiCache", 20);
+    filter_t filter = {.buf = filter_buf, .buf_size = 21 * wl, .member_size = 21 * wl};
+    assert_true(write_key_filtered_recursive(nullptr,
+                                             L"MuiCache",
+                                             20,
+                                             4,
+                                             L"HKCR\\Windows\\Shell",
+                                             OUTPUT_FORMAT_REG,
+                                             default_writer,
+                                             &filter));
     assert_int_equal(errno, EKEYREJECTED);
     default_writer->teardown(default_writer);
     free(default_writer);
+    free(filter_buf);
 }
 
 void test_write_key_filtered_RegOpenKeyEx_fail(void **state) {
@@ -85,8 +101,14 @@ void test_write_key_filtered_RegOpenKeyEx_fail(void **state) {
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    assert_true(write_key_filtered_recursive(nullptr,
+                                             nullptr,
+                                             20,
+                                             4,
+                                             L"HKCR\\Windows\\Shell",
+                                             OUTPUT_FORMAT_REG,
+                                             default_writer,
+                                             nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
 }
@@ -94,12 +116,19 @@ void test_write_key_filtered_RegOpenKeyEx_fail(void **state) {
 void test_write_key_filtered_RegQueryInfoKey_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryInfoKey, 0);
+    will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_false(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    assert_false(write_key_filtered_recursive(nullptr,
+                                              nullptr,
+                                              20,
+                                              4,
+                                              L"HKCR\\Windows\\Shell",
+                                              OUTPUT_FORMAT_REG,
+                                              default_writer,
+                                              nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
 }
@@ -107,13 +136,20 @@ void test_write_key_filtered_RegQueryInfoKey_fail(void **state) {
 void test_write_key_filtered_RegQueryInfoKey_0_subkeys_returns_true(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryInfoKey, 0);
+    will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegCloseKey, 0);
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    assert_true(write_key_filtered_recursive(nullptr,
+                                             nullptr,
+                                             20,
+                                             4,
+                                             L"HKCR\\Windows\\Shell",
+                                             OUTPUT_FORMAT_REG,
+                                             default_writer,
+                                             nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
 }
@@ -121,6 +157,7 @@ void test_write_key_filtered_RegQueryInfoKey_0_subkeys_returns_true(void **state
 void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryInfoKey, 1);
+    will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegEnumKeyEx, 0);
     will_return(__wrap_RegEnumKeyEx, 0);
@@ -129,8 +166,14 @@ void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_true(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    assert_true(write_key_filtered_recursive(nullptr,
+                                             nullptr,
+                                             20,
+                                             4,
+                                             L"HKCR\\Windows\\Shell",
+                                             OUTPUT_FORMAT_REG,
+                                             default_writer,
+                                             nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
 }
@@ -138,18 +181,26 @@ void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
 void test_write_key_filtered_recursion_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryInfoKey, 1);
+    will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegEnumKeyEx, L"main");
     will_return(__wrap_RegEnumKeyEx, 4);
     will_return(__wrap_RegEnumKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
     will_return(__wrap_RegQueryInfoKey, 0);
+    will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
     will_return_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
-    assert_false(write_key_filtered_recursive(
-        nullptr, nullptr, 20, 4, L"HKCR\\Windows\\Shell", OUTPUT_FORMAT_REG, default_writer));
+    assert_false(write_key_filtered_recursive(nullptr,
+                                              nullptr,
+                                              20,
+                                              4,
+                                              L"HKCR\\Windows\\Shell",
+                                              OUTPUT_FORMAT_REG,
+                                              default_writer,
+                                              nullptr));
     default_writer->teardown(default_writer);
     free(default_writer);
 }

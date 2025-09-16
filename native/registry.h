@@ -9,6 +9,7 @@
 /*!
  \param commit If the changes should be commited with Git. Does not apply if output directory is `-`
    meaning standard output.
+ \param read_settings If the settings should be read.
  \param deploy_key Relative path to SSH deploy key.
  \param output_dir Output directory.
  \param output_file Output filename.
@@ -20,6 +21,7 @@
  \return Pointer to string with branch name. Must be freed on caller side.
  */
 DLL_EXPORT bool save_preferences(bool commit,
+                                 bool read_settings,
                                  const wchar_t *deploy_key,
                                  const wchar_t *output_dir,
                                  const wchar_t *output_file,

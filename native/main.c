@@ -61,6 +61,7 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *output_dir = nullptr;
     wchar_t *output_file = nullptr;
     bool output_dir_specified = false;
+    bool read_settings = true;
     ARG_BEGIN {
         if (ARG_LONG("deploy-key"))
         case 'K': {
@@ -96,6 +97,10 @@ int wmain(int argc, wchar_t *argv[]) {
             wcstombs(as_char, val, w_len);
             max_depth = atoi(as_char);
         }
+        else if (ARG_LONG("no-settings")) case 'S': {
+            read_settings = false;
+            ARG_FLAG();
+        }
         else if (ARG_LONG("help")) case 'h':
         case '?': {
             PathStripPath(argv0);
@@ -111,6 +116,7 @@ int wmain(int argc, wchar_t *argv[]) {
             puts("  -f, --output-file   Output filename.");
             puts("  -m, --max-depth=INT Set maximum depth.");
             puts("  -o, --output-dir    Output directory.");
+            puts("  -S, --no-settings   Do not read settings.");
             puts("  -h, --help          Display this help and exit.");
             return EXIT_SUCCESS;
         }
@@ -180,6 +186,7 @@ int wmain(int argc, wchar_t *argv[]) {
     debug_print_enabled = debug;
     bool success = save_preferences(
         commit,
+        read_settings,
         deploy_key,
         output_dir,
         output_file ? output_file :

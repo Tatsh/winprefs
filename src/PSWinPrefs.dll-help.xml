@@ -47,6 +47,9 @@
         <command:parameter position="named" required="false">
           <maml:name>Commit</maml:name>
         </command:parameter>
+        <command:parameter position="named" required="false">
+          <maml:name>NoSettings</maml:name>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -54,6 +57,12 @@
         <maml:name>Commit</maml:name>
         <maml:description>
           <maml:para>If set, commits to Git repository at output directory.</maml:para>
+        </maml:description>
+      </command:parameter>
+      <command:parameter position="named" required="false">
+        <maml:name>NoSettings</maml:name>
+        <maml:description>
+          <maml:para>If set, do not read settings.</maml:para>
         </maml:description>
       </command:parameter>
       <command:parameter position="named" required="false">
@@ -115,9 +124,10 @@
 
   Keys are skipped under these conditions:
 
-  - Depth limit (20); this can be changed by passing -MaxDepth or -m
+  - Depth limit (20); this can be changed by passing -MaxDepth or -m.
   - Key that cannot be read for any reason such as permissions.
-  - Value contains newlines
+  - Value contains newlines.
+  - Value is filtered. Pass -NoSettings or -S to disable filtering.
 
   An example of an always skipped key under normal circumstances is HKLM\SECURITY, even if this is run as administrator.</maml:para>
     </maml:description>
@@ -135,6 +145,9 @@
         <command:parameter position="named" required="false">
           <maml:name>MaxDepth</maml:name>
           <command:parameterValue required="true">Int32</command:parameterValue>
+        </command:parameter>
+        <command:parameter position="named" required="false">
+          <maml:name>NoSettings</maml:name>
         </command:parameter>
       </command:syntaxItem>
     </command:syntax>
@@ -155,6 +168,12 @@
         <maml:name>Path</maml:name>
         <maml:description>
           <maml:para>Registry path.</maml:para>
+        </maml:description>
+      </command:parameter>
+      <command:parameter position="named" required="false">
+        <maml:name>NoSettings</maml:name>
+        <maml:description>
+          <maml:para>If set, do not read settings.</maml:para>
         </maml:description>
       </command:parameter>
     </command:parameters>

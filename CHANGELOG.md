@@ -9,6 +9,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+### Added
+
+- Ability to use custom filters.
+
+### Fixed
+
+- .NET framework version in manifest.
+
 ## [0.3.4] - 2025-09-10
 
 ### Fixed

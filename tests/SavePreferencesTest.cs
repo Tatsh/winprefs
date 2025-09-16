@@ -36,6 +36,7 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
+                                                        It.IsAny<bool>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
@@ -71,6 +72,7 @@ namespace WinPrefs.Tests {
                                                         It.IsAny<LibPrefs.WriteObject>(),
                                                         It.IsAny<bool>(),
                                                         It.IsAny<bool>(),
+                                                        It.IsAny<bool>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
                                                         It.IsAny<string>(),
@@ -88,6 +90,7 @@ namespace WinPrefs.Tests {
             // Assert
             mockLibPrefs.Verify(lp => lp.SavePreferences(It.IsAny<RegistryKey>(),
                                                         It.IsAny<LibPrefs.WriteObject>(),
+                                                        true,
                                                         true,
                                                         true,
                                                         "deployKeyPath",

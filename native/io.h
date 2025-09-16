@@ -10,6 +10,11 @@ enum OUTPUT_FORMAT {
     OUTPUT_FORMAT_REG,
     OUTPUT_FORMAT_UNKNOWN
 };
+typedef struct _filter_t {
+    wchar_t *buf;
+    size_t buf_size;    // Total wide characters, not bytes.
+    size_t member_size; // Size of each member, in wide characters, not bytes.
+} filter_t;
 
 bool write_output(wchar_t *out, bool use_crlf, writer_t *writer);
 bool do_writes(HKEY hk,
@@ -23,9 +28,10 @@ bool do_writes(HKEY hk,
  \param stem Subkey.
  \param max_depth Maximum key depth.
  \param depth Current depth. Used internally. Should be `0` at start.
- \param out_fp File handle.
- \param prior_stem Last subkey. Used internally. Should be `NULL`.
+ \param prior_stem Last subkey. Used internally. Should be `nullptr`.
  \param format Output format.
+ \param writer Writer to use. Optional.
+ \param filter Filter information. Optional.
  \return `true` if successful, `false` otherwise.
  */
 bool write_key_filtered_recursive(HKEY hk,
@@ -34,6 +40,7 @@ bool write_key_filtered_recursive(HKEY hk,
                                   int depth,
                                   const wchar_t *prior_stem,
                                   enum OUTPUT_FORMAT format,
-                                  writer_t *writer);
+                                  writer_t *writer,
+                                  filter_t *filter);
 
 #endif // IO_H

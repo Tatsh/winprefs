@@ -22,6 +22,10 @@ namespace WinPrefs {
         [ValidatePattern("^HK(LM|CU|CR|U|CC):")]
         public string Path = "";
 
+        [Alias("S")]
+        [Parameter(HelpMessage = "Do not read settings.")]
+        public SwitchParameter NoSettings { get; set; } = false;
+
         internal LibPrefs? prefs = null;
 
         private bool IsDebugMode() {
@@ -66,6 +70,7 @@ namespace WinPrefs {
                                           maxDepth: MaxDepth,
                                           outputFile: "-",
                                           specifiedPath: Path,
+                                          readSettings: !NoSettings.ToBool(),
                                           writeObjectIn: WriteObject,
                                           writeStdOut: true))
                 ThrowTerminatingError(new ErrorRecord(

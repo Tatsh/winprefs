@@ -3,11 +3,14 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
   set(test_linker_flags $<$<BOOL:${WIN32}>:-mconsole> $<$<BOOL:${ENABLE_COVERAGE}>:--coverage>)
   set(mocked_functions
       CloseHandle
+      AllocateAndInitializeSid
+      CheckTokenMembership
       CreateDirectory
       CreateFile
       CreatePipe
       CreateProcess
       FormatMessage
+      FreeSid
       GetDateFormat
       GetExitCodeProcess
       GetFileAttributes
@@ -16,17 +19,20 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
       GetTimeFormat
       MultiByteToWideChar
       PathAppend
+      PathMatchSpec
       PathStripPath
       PeekNamedPipe
       ReadFile
       RegCloseKey
+      RegCreateKeyEx
       RegEnumKeyEx
       RegEnumValue
       RegOpenKeyEx
       RegQueryInfoKey
       RegQueryValueEx
+      RegSetValueEx
       SHGetFolderPath
-      StrTrimW
+      StrTrim
       WaitForSingleObject
       WideCharToMultiByte
       WriteFile

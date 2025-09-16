@@ -85,6 +85,7 @@ static void test_main_max_depth_conversion(void **state) {
 
     expect_value(__wrap_save_preferences, max_depth, 50);
     expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -131,6 +132,7 @@ static void test_main_commit_arg(void **state) {
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_value(__wrap_save_preferences, commit, true);
+    expect_value(__wrap_save_preferences, read_settings, true);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -160,7 +162,8 @@ static void test_main_commit_arg(void **state) {
 
 static void test_main_output_dir_arg(void **state) {
     expect_any(__wrap_save_preferences, max_depth);
-    expect_any(__wrap_save_preferences, commit);
+    expect_value(__wrap_save_preferences, commit, false);
+    expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -205,6 +208,7 @@ static void test_main_debug_arg(void **state) {
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -250,6 +254,7 @@ void test_main_deploy_key_arg(void **state) {
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_memory(__wrap_save_preferences, deploy_key, L"file.key", 8);
     expect_any(__wrap_save_preferences, hk);
@@ -297,6 +302,7 @@ void test_main_output_file_arg(void **state) {
 
     expect_any(__wrap_save_preferences, max_depth);
     expect_any(__wrap_save_preferences, commit);
+    expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -342,6 +348,7 @@ static void test_main_format_arg_c_sharp(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -459,6 +466,7 @@ static void test_main_format_arg_reg(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -505,6 +513,7 @@ static void test_main_format_arg_default(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -543,6 +552,7 @@ static void test_main_save_prefs_failed(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -582,6 +592,7 @@ static void test_main_format_arg_powershell(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -633,6 +644,7 @@ static void test_main_format_arg_c(void **state) {
 
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, hk);
     expect_any_always(__wrap_save_preferences, output_dir);
@@ -674,6 +686,7 @@ static void test_main_format_arg_c(void **state) {
 void test_main_top_key_only(void **state) {
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, format);
     expect_any_always(__wrap_save_preferences, hk);
@@ -710,6 +723,7 @@ void test_main_top_key_only(void **state) {
 void test_main_top_key_only_2(void **state) {
     expect_any_always(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
+    expect_any_always(__wrap_save_preferences, read_settings);
     expect_any_always(__wrap_save_preferences, deploy_key);
     expect_any_always(__wrap_save_preferences, format);
     expect_any_always(__wrap_save_preferences, hk);

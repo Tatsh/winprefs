@@ -34,7 +34,149 @@ static inline bool create_dir_recursive(wchar_t *path) {
     return true;
 }
 
+static void install_default_filters(HKEY top_key) {
+    HKEY filter_hkey = nullptr;
+    LSTATUS status =
+        RegOpenKeyEx(top_key, L"Software\\Tatsh\\WinPrefs\\Filters", 0, KEY_READ, &filter_hkey);
+    if (status != ERROR_SUCCESS) {
+        HKEY base_hkey = nullptr;
+        status = RegCreateKeyEx(top_key,
+                                L"Software\\Tatsh\\WinPrefs\\Filters",
+                                0,
+                                nullptr,
+                                0,
+                                KEY_WRITE,
+                                nullptr,
+                                &base_hkey,
+                                nullptr);
+        if (status == ERROR_SUCCESS) {
+            const wchar_t *default_filters[] = {
+                L"*\\*MRU",
+                L"*\\Cache",
+                L"*\\Classes\\Extensions\\ContractId\\Windows.BackgroundTasks\\PackageId",
+                L"*\\CurrentVersion\\Authentication\\LogonUI\\Notifications\\BackgroundCapability",
+                L"*\\CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\*",
+                L"*\\Microsoft\\Windows\\Shell\\Bags",
+                L"*\\Windows\\Shell\\MuiCache",
+            };
+            for (size_t i = 0; i < sizeof(default_filters) / sizeof(default_filters[0]); i++) {
+                RegSetValueEx(base_hkey,
+                              (LPCWSTR)(i == 0 ? L"0" :
+                                        i == 1 ? L"1" :
+                                        i == 2 ? L"2" :
+                                        i == 3 ? L"3" :
+                                        i == 4 ? L"4" :
+                                        i == 5 ? L"5" :
+                                                 L"6"),
+                              0,
+                              REG_SZ,
+                              (const BYTE *)default_filters[i],
+                              (DWORD)((wcslen(default_filters[i]) + 1) * WL));
+            }
+            RegCloseKey(base_hkey);
+        }
+    } else {
+        RegCloseKey(filter_hkey);
+    }
+}
+
+static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size, HKEY top_key) {
+    install_default_filters(top_key);
+    wchar_t *tmp_buf = nullptr;
+    wchar_t *wide_buf = nullptr;
+    wchar_t *value_name = nullptr;
+    HKEY filter_hkey = nullptr;
+    LSTATUS status =
+        RegOpenKeyEx(top_key, L"Software\\Tatsh\\WinPrefs\\Filters", 0, KEY_READ, &filter_hkey);
+    if (status == ERROR_SUCCESS) {
+        DWORD value_count = 0, max_n_wide_chars = 0;
+        DWORD max_value_name_len = 0;
+        DWORD value_type = REG_NONE;
+        status = RegQueryInfoKey(filter_hkey,
+                                 nullptr,
+                                 nullptr,
+                                 nullptr,
+                                 nullptr,
+                                 nullptr,
+                                 nullptr,
+                                 &value_count,        // lpcValues
+                                 &max_value_name_len, // lpcbMaxValueNameLen
+                                 &max_n_wide_chars,   // lpcbMaxValueLen
+                                 nullptr,
+                                 nullptr);
+        if (status == ERROR_SUCCESS && value_count > 0) {
+            max_n_wide_chars++;
+            DWORD i;
+            size_t total_wide_chars = value_count * max_n_wide_chars;
+            *buf_member_size = (size_t)max_n_wide_chars;
+            *buf_total_wide_chars = total_wide_chars;
+            wide_buf = calloc(*buf_total_wide_chars, WL);
+            wmemset(wide_buf, L'\0', total_wide_chars);
+            tmp_buf = calloc(max_n_wide_chars, WL);
+            wmemset(tmp_buf, L'\0', max_n_wide_chars);
+            wchar_t *wp = nullptr;
+            value_name = calloc(max_value_name_len, WL);
+            for (wp = wide_buf, i = 0; i < value_count; i++, wp += max_n_wide_chars) {
+                DWORD len = max_n_wide_chars * sizeof(wchar_t); // RegEnumValue expects bytes
+                DWORD name_len = max_value_name_len;
+                status = RegEnumValue(filter_hkey,
+                                      i,
+                                      value_name,
+                                      &name_len,
+                                      nullptr,
+                                      &value_type,
+                                      (LPBYTE)tmp_buf,
+                                      &len);
+                if ((status != ERROR_SUCCESS && status != ERROR_NO_MORE_ITEMS) ||
+                    value_type != REG_SZ) {
+                    debug_print(L"Skipping invalid filter value (name = \"%ls\", status = %d).\n",
+                                value_name,
+                                status);
+                    wmemset(tmp_buf, 0, max_n_wide_chars);
+                    continue;
+                }
+                // len is in bytes. Convert to wide chars.
+                size_t len_wide = len / sizeof(wchar_t);
+                if (len_wide > 0 && tmp_buf[len_wide - 1] == L'\0') {
+                    len_wide--; // don't copy the null terminator
+                }
+                debug_print(L"Read filter value: `%ls`, len = %zu\n", tmp_buf, len_wide);
+                wmemcpy(wp, tmp_buf, len_wide);
+                wmemset(tmp_buf, 0, max_n_wide_chars);
+            }
+            free(value_name);
+        }
+        free(tmp_buf);
+        RegCloseKey(filter_hkey);
+    }
+    return wide_buf;
+}
+
+static bool is_user_admin() {
+    BOOL is_admin = false;
+    PSID admin_group = nullptr;
+    SID_IDENTIFIER_AUTHORITY nt_authority = SECURITY_NT_AUTHORITY;
+    if (AllocateAndInitializeSid(&nt_authority,
+                                 2,
+                                 SECURITY_BUILTIN_DOMAIN_RID,
+                                 DOMAIN_ALIAS_RID_ADMINS,
+                                 0,
+                                 0,
+                                 0,
+                                 0,
+                                 0,
+                                 0,
+                                 &admin_group)) {
+        if (!CheckTokenMembership(nullptr, admin_group, &is_admin)) {
+            is_admin = false;
+        }
+        FreeSid(admin_group);
+    }
+    return is_admin;
+}
+
 DLL_EXPORT bool save_preferences(bool commit,
+                                 bool read_settings,
                                  const wchar_t *deploy_key,
                                  const wchar_t *output_dir,
                                  const wchar_t *output_file,
@@ -43,6 +185,13 @@ DLL_EXPORT bool save_preferences(bool commit,
                                  const wchar_t *specified_path,
                                  enum OUTPUT_FORMAT format,
                                  writer_t *writer) {
+    size_t filter_buf_size = 0;
+    size_t filter_member_size = 0;
+    wchar_t *filter = read_settings ?
+                          get_filter(&filter_buf_size,
+                                     &filter_member_size,
+                                     is_user_admin() ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER) :
+                          nullptr;
     bool using_default_writer, writer_was_setup, writer_was_torn_down;
     using_default_writer = writer_was_setup = writer_was_torn_down = false;
     if (!writer || !writer->write_output) {
@@ -81,7 +230,10 @@ DLL_EXPORT bool save_preferences(bool commit,
         DWORD written;
         writer->write_output(writer, C_PREAMBLE, (DWORD)SIZEOF_C_PREAMBLE, &written);
     }
-    ret = write_key_filtered_recursive(hk, nullptr, max_depth, 0, prior_stem, format, writer);
+    filter_t filter_info = {
+        .buf = filter, .buf_size = filter_buf_size, .member_size = filter_member_size};
+    ret = write_key_filtered_recursive(
+        hk, nullptr, max_depth, 0, prior_stem, format, writer, &filter_info);
     if (writer_was_setup && writer->teardown) {
         writer->teardown(writer);
         writer_was_torn_down = true;
@@ -101,6 +253,7 @@ cleanup:
     if (using_default_writer) {
         free(writer);
     }
+    free(filter);
     return ret;
 }
 

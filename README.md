@@ -33,16 +33,28 @@ and must be under the appropriate name such as `HKU` for `HKEY_USERS`.
 
 Keys/values are skipped under these conditions:
 
-- Depth limit (default: 20); this can be changed by passing `-MaxDepth LIMIT` or `-m LIMIT`
-- Key that cannot be read for any reason such as permissions
-- Value contains newlines
-- Value has type `REG_UNKNOWN`
+- Depth limit (default: 20); this can be changed by passing `-MaxDepth LIMIT` or `-m LIMIT`.
+- Key that cannot be read for any reason such as permissions.
+- Value contains newlines.
+- Value has type `REG_UNKNOWN`.
+- Value is filtered.
 
 An example of an always skipped key under normal circumstances is `HKLM\SECURITY`, even if this is
 run as administrator.
 
 Be sure to set up Git with your user name and email (`git config --global user.email`, etc) before
 using the commit feature.
+
+Values can be filtered by adding wildcard strings to `HKCU\Software\Tatsh\WinPrefs\Filters`
+(`HKLM` will be used for users in the administrator group). Example to ignore all values that have
+`Cache` in the path:
+
+```batch
+reg add "HKLM\Software\Tatsh\WinPrefs\Filters" /v ThisCanBeAnything /t REG_SZ /d "*\Cache\*" /f
+```
+
+On first launch, a default set of filters will be added. If you do not want these, delete the values
+under the key but do not delete the key `HKLM\Software\Tatsh\WinPrefs\Filters`.
 
 WARNING: If you save an entire tree such as `HKLM:` to a file and attempt to run said script, you
 probably will break your OS. The output of this tool is meant for getting a single command at a

@@ -7,6 +7,7 @@
 typedef short WORD;
 typedef char CHAR;
 typedef CHAR *LPSTR, *LPCCH;
+typedef bool BOOL;
 typedef struct _SYSTEMTIME {
     WORD wYear;
     WORD wMonth;
@@ -76,6 +77,10 @@ const enum REG_TYPES {
     REG_QWORD,
     REG_SZ,
 };
+typedef struct _SID_IDENTIFIER_AUTHORITY {
+    BYTE Value[6];
+} SID_IDENTIFIER_AUTHORITY, *PSID_IDENTIFIER_AUTHORITY;
+typedef void *PSID;
 
 #define CP_UTF8 0
 #define CREATE_ALWAYS 2
@@ -104,6 +109,7 @@ const enum REG_TYPES {
 #define INVALID_HANDLE_VALUE (void *)3
 #define IsWindowsVistaOrGreater() 0
 #define KEY_READ 0
+#define KEY_WRITE 1
 #define LOCALE_USER_DEFAULT 0
 #define MAKELANGID(x, y) 0
 #define MAX_PATH 260
@@ -114,6 +120,9 @@ const enum REG_TYPES {
 #define SUCCEEDED(x) x == 0
 #define SW_HIDE 0
 #define WAIT_OBJECT_0 0
+#define SECURITY_NT_AUTHORITY {0, 0, 0, 0, 0, 5}
+#define SECURITY_BUILTIN_DOMAIN_RID 0x00000020
+#define DOMAIN_ALIAS_RID_ADMINS 0x00000220
 
 #ifndef min
 #define min(a, b) (((a) < (b)) ? (a) : (b))
@@ -245,6 +254,31 @@ DWORD FormatMessage(DWORD dwFlags,
                     DWORD nSize,
                     va_list *Arguments);
 bool GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode);
-bool StrTrimW(wchar_t *str, const wchar_t *trimChars);
+bool StrTrim(wchar_t *str, const wchar_t *trimChars);
+bool PathMatchSpec(const wchar_t *pszFile, const wchar_t *pszSpec);
+LSTATUS RegSetValueEx(
+    HKEY hKey, LPCWSTR lpValueName, DWORD Reserved, DWORD dwType, const BYTE *lpData, DWORD cbData);
+LSTATUS RegCreateKeyEx(HKEY hKey,
+                       LPCWSTR lpSubKey,
+                       DWORD Reserved,
+                       LPWSTR lpClass,
+                       DWORD dwOptions,
+                       REGSAM samDesired,
+                       LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                       PHKEY phkResult,
+                       LPDWORD disposition);
+bool AllocateAndInitializeSid(PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority,
+                              BYTE nSubAuthorityCount,
+                              DWORD nSubAuthority0,
+                              DWORD nSubAuthority1,
+                              DWORD nSubAuthority2,
+                              DWORD nSubAuthority3,
+                              DWORD nSubAuthority4,
+                              DWORD nSubAuthority5,
+                              DWORD nSubAuthority6,
+                              DWORD nSubAuthority7,
+                              PSID *pSid);
+bool CheckTokenMembership(HANDLE TokenHandle, PSID SidToCheck, bool *IsMember);
+void FreeSid(PSID pSid);
 
 #endif // TESTS_WRAPPERS_H

@@ -112,13 +112,30 @@ cleanup:
     return ret;
 }
 
+static bool passes_filter(const wchar_t *full_path, const filter_t *filter) {
+    if (!filter || !filter->buf || filter->buf_size == 0 || filter->member_size == 0) {
+        debug_print(L"%ls: No filter or empty filter, passing all.\n", full_path);
+        return true;
+    }
+    wchar_t *p = filter->buf;
+    size_t member_count = filter->buf_size / filter->member_size;
+    for (size_t i = 0; i < member_count; i++, p += filter->member_size) {
+        if (p[0] != L'\0' && PathMatchSpec(full_path, p)) {
+            debug_print(L"`%ls` filter matched key `%ls`.\n", full_path, p);
+            return false;
+        }
+    }
+    return true;
+}
+
 bool write_key_filtered_recursive(HKEY hk,
                                   const wchar_t *stem,
                                   int max_depth,
                                   int depth,
                                   const wchar_t *prior_stem,
                                   enum OUTPUT_FORMAT format,
-                                  writer_t *writer) {
+                                  writer_t *writer,
+                                  filter_t *filter) {
     bool ret = true;
     wchar_t *ach_key, *full_path;
     ach_key = full_path = nullptr;
@@ -146,19 +163,7 @@ bool write_key_filtered_recursive(HKEY hk,
         wcsncat(full_path, L"\\", 1);
         wcsncat(full_path, stem, stem_len);
     }
-    if (wcsstr(full_path, L"Classes\\Extensions\\ContractId\\Windows.BackgroundTasks\\PackageId") ||
-        wcsstr(full_path, L"CloudStore\\Store\\Cache\\") ||
-        wcsstr(full_path,
-               L"CurrentVersion\\Authentication\\LogonUI\\Notifications\\BackgroundCapability") ||
-        wcsstr(full_path, L"CurrentVersion\\CloudStore\\Store\\DefaultAccount\\Current\\") ||
-        wcsstr(full_path, L"Explorer\\ComDlg32\\CIDSizeMRU") ||
-        wcsstr(full_path, L"Explorer\\ComDlg32\\FirstFolder") ||
-        wcsstr(full_path, L"Explorer\\ComDlg32\\LastVisitedPidlMRU") ||
-        wcsstr(full_path, L"Explorer\\ComDlg32\\OpenSavePidlMRU") ||
-        wcsstr(full_path, L"IrisService\\Cache") ||
-        wcsstr(full_path, L"Microsoft\\Windows\\Shell\\Bags") ||
-        wcsstr(full_path, L"Windows\\Shell\\BagMRU") ||
-        wcsstr(full_path, L"Windows\\Shell\\MuiCache")) {
+    if (!passes_filter(full_path, filter)) {
         debug_print(L"%ls: Skipping %ls due to filter.\n", prior_stem, stem);
         errno = EKEYREJECTED;
         goto cleanup;
@@ -195,8 +200,14 @@ bool write_key_filtered_recursive(HKEY hk,
                 ret_code = RegEnumKeyEx(
                     hk_out, i, ach_key, (LPDWORD)&ach_key_len, nullptr, nullptr, nullptr, nullptr);
                 if (ret_code == ERROR_SUCCESS) {
-                    if (!write_key_filtered_recursive(
-                            hk_out, ach_key, max_depth, depth + 1, full_path, format, writer)) {
+                    if (!write_key_filtered_recursive(hk_out,
+                                                      ach_key,
+                                                      max_depth,
+                                                      depth + 1,
+                                                      full_path,
+                                                      format,
+                                                      writer,
+                                                      filter)) {
                         goto fail;
                     }
                 } else {

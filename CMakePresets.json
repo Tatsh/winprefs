@@ -7,6 +7,11 @@
       },
       "generator": "Visual Studio 17 2022",
       "name": "vcpkg"
+    },
+    {
+      "binaryDir": "${sourceDir}/build",
+      "generator": "Ninja",
+      "name": "ninja"
     }
   ],
   "version": 2

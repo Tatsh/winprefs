@@ -10,6 +10,7 @@
     DeployKey       = 'Key for pushing to Git repository. Requires -Commit.'
     Format          = 'Output format. Acceptable values: c, c#, ps, ps1, powershell.'
     MaxDepth        = 'Depth limit.'
+    NoSettings      = 'Do not read settings.'
     OutputDirectory = 'Where to store the exported data.'
     OutputFile      = 'Output file. If not set, a file with the prefix exec-reg will be made with an appropriate extension.'
     Path            = 'Registry path.'

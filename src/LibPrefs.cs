@@ -1,7 +1,7 @@
-using Microsoft.Win32;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace WinPrefs {
     [SupportedOSPlatform("windows")]
@@ -62,6 +62,7 @@ namespace WinPrefs {
                    SetLastError = true,
                    ThrowOnUnmappableChar = true)]
         private static extern bool SavePreferencesImpl(bool commit,
+                                                       bool readSettings,
                                                        string? deployKey,
                                                        string? outputDirectory,
                                                        string outputFile,
@@ -85,6 +86,7 @@ namespace WinPrefs {
                               WriteObject writeObjectIn,
                               bool writeStdOut = false,
                               bool commit = false,
+                              bool readSettings = true,
                               string? deployKey = null,
                               string? outputDirectory = null,
                               string outputFile = "exec-reg.bat",
@@ -99,7 +101,7 @@ namespace WinPrefs {
             Writer writer = new() {
                 write = writeStdOut ? WriteOutputImpl : null
             };
-            return SavePreferencesImpl(commit, deployKey, outputDirectory,
+            return SavePreferencesImpl(commit, readSettings, deployKey, outputDirectory,
                                                         outputFile, maxDepth,
                                                         (UIntPtr)handle.Value.ToPointer(),
                                                         specifiedPath, format, ref writer);

@@ -6,7 +6,7 @@
       "configurationProvider": "ms-vscode.cmake-tools",
       "cppStandard": "gnu++23",
       "defines": [],
-      "includePath": ["${workspaceFolder}/native/**"],
+      "includePath": ["${workspaceFolder}/native/**", "/usr/include/wine"],
       "name": "Default"
     }
   ],

@@ -2,6 +2,7 @@
 #include "io.h"
 
 bool __wrap_save_preferences(bool commit,
+                             bool read_settings,
                              const wchar_t *deploy_key,
                              const wchar_t *output_dir,
                              const wchar_t *output_file,
@@ -10,6 +11,7 @@ bool __wrap_save_preferences(bool commit,
                              const wchar_t *specified_path,
                              enum OUTPUT_FORMAT format) {
     check_expected(commit);
+    check_expected(read_settings);
     check_expected(format);
     check_expected(max_depth);
     check_expected_ptr(deploy_key);
@@ -38,7 +40,7 @@ LSTATUS __wrap_RegCloseKey(HKEY hKey) {
     return mock_type(LSTATUS);
 }
 
-bool __wrap_StrTrimW(wchar_t *str, const wchar_t *trimChars) {
+bool __wrap_StrTrim(wchar_t *str, const wchar_t *trimChars) {
     return false;
 }
 
@@ -144,6 +146,15 @@ LSTATUS __wrap_RegEnumValue(HKEY hKey,
                             LPDWORD lpType,
                             LPBYTE lpData,
                             LPDWORD lpcbData) {
+    if (lpType != nullptr) {
+        *lpType = mock_type(DWORD);
+    }
+    if (lpData != nullptr) {
+        lpData = mock_ptr_type(BYTE *);
+    }
+    if (lpcbData != nullptr) {
+        *lpcbData = mock_type(DWORD);
+    }
     return mock_type(LSTATUS);
 }
 
@@ -209,7 +220,15 @@ LSTATUS __wrap_RegQueryInfoKey(HKEY hKey,
                                LPDWORD lpcbMaxValueLen,
                                LPDWORD lpcbSecurityDescriptor,
                                PFILETIME lpftLastWriteTime) {
-    *lpcSubKeys = mock_type(DWORD);
+    if (lpcSubKeys != nullptr) {
+        *lpcSubKeys = mock_type(DWORD);
+    }
+    if (lpcValues != nullptr) {
+        *lpcValues = mock_type(DWORD);
+    }
+    if (lpcbMaxValueLen != nullptr) {
+        *lpcbMaxValueLen = mock_type(DWORD);
+    }
     return mock_type(LSTATUS);
 }
 
@@ -338,7 +357,8 @@ bool __wrap_write_key_filtered_recursive(HKEY hk,
                                          int depth,
                                          const wchar_t *prior_stem,
                                          enum OUTPUT_FORMAT format,
-                                         writer_t *writer) {
+                                         writer_t *writer,
+                                         filter_t *filter) {
     return mock_type(bool);
 }
 
@@ -349,4 +369,58 @@ bool __wrap_git_commit(wchar_t *output_dir, wchar_t *deploy_key) {
 bool __wrap_GetExitCodeProcess(HANDLE hProcess, LPDWORD lpExitCode) {
     *lpExitCode = mock_type(DWORD);
     return mock_type(bool);
+}
+
+bool __wrap_PathMatchSpec(const wchar_t *pszFile, const wchar_t *pszSpec) {
+    check_expected_ptr(pszFile);
+    check_expected_ptr(pszSpec);
+    return mock_type(bool);
+}
+
+LSTATUS __wrap_RegSetValueEx(HKEY hKey,
+                             LPCWSTR lpValueName,
+                             DWORD Reserved,
+                             DWORD dwType,
+                             const BYTE *lpData,
+                             DWORD cbData) {
+    return mock_type(LSTATUS);
+}
+
+LSTATUS __wrap_RegCreateKeyEx(HKEY hKey,
+                              LPCWSTR lpSubKey,
+                              DWORD Reserved,
+                              LPWSTR lpClass,
+                              DWORD dwOptions,
+                              REGSAM samDesired,
+                              LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+                              PHKEY phkResult,
+                              LPDWORD disposition) {
+    check_expected_ptr(lpSubKey);
+    return mock_type(LSTATUS);
+}
+
+bool __wrap_is_user_admin() {
+    return mock_type(bool);
+}
+
+bool __wrap_AllocateAndInitializeSid(PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority,
+                                     BYTE nSubAuthorityCount,
+                                     DWORD nSubAuthority0,
+                                     DWORD nSubAuthority1,
+                                     DWORD nSubAuthority2,
+                                     DWORD nSubAuthority3,
+                                     DWORD nSubAuthority4,
+                                     DWORD nSubAuthority5,
+                                     DWORD nSubAuthority6,
+                                     DWORD nSubAuthority7,
+                                     PSID *pSid) {
+    return mock_type(bool);
+}
+
+bool __wrap_CheckTokenMembership(HANDLE TokenHandle, PSID SidToCheck, bool *IsMember) {
+    *IsMember = mock_type(bool);
+    return mock_type(bool);
+}
+
+void __wrap_FreeSid(PSID pSid) {
 }

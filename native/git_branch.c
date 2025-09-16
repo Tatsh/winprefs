@@ -81,7 +81,7 @@ wchar_t *get_git_branch(const wchar_t *git_dir_arg,
         goto fail;
     } // LCOV_EXCL_STOP
     MultiByteToWideChar(CP_UTF8, 0, result, (int)res_len, w_result, w_len);
-    StrTrimW(w_result, L"\r\n\t ");
+    StrTrim(w_result, L"\r\n\t ");
     goto cleanup;
 fail:
     free(w_result);
