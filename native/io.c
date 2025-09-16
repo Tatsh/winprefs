@@ -117,15 +117,17 @@ static bool passes_filter(const wchar_t *full_path, const filter_t *filter) {
         debug_print(L"%ls: No filter or empty filter, passing all.\n", full_path);
         return true;
     }
+    bool ret = true;
     wchar_t *p = filter->buf;
     size_t member_count = filter->buf_size / filter->member_size;
     for (size_t i = 0; i < member_count; i++, p += filter->member_size) {
         if (p[0] != L'\0' && PathMatchSpec(full_path, p)) {
             debug_print(L"`%ls` filter matched key `%ls`.\n", full_path, p);
-            return false;
+            ret = false;
+            break;
         }
     }
-    return true;
+    return ret;
 }
 
 bool write_key_filtered_recursive(HKEY hk,

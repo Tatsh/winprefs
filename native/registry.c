@@ -75,7 +75,8 @@ static void install_default_filters(HKEY top_key) {
             }
             RegCloseKey(base_hkey);
         }
-    } else {
+    }
+    if (filter_hkey) {
         RegCloseKey(filter_hkey);
     }
 }
@@ -129,7 +130,7 @@ static wchar_t *get_filter(size_t *buf_total_wide_chars, size_t *buf_member_size
                                       &len);
                 if ((status != ERROR_SUCCESS && status != ERROR_NO_MORE_ITEMS) ||
                     value_type != REG_SZ) {
-                    debug_print(L"Skipping invalid filter value (name = \"%ls\", status = %d).\n",
+                    debug_print(L"Skipping invalid filter value (name = \"%ls\", status = %ld).\n",
                                 value_name,
                                 status);
                     wmemset(tmp_buf, 0, max_n_wide_chars);

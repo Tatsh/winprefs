@@ -399,10 +399,6 @@ LSTATUS __wrap_RegCreateKeyEx(HKEY hKey,
     return mock_type(LSTATUS);
 }
 
-bool __wrap_is_user_admin() {
-    return mock_type(bool);
-}
-
 bool __wrap_AllocateAndInitializeSid(PSID_IDENTIFIER_AUTHORITY pIdentifierAuthority,
                                      BYTE nSubAuthorityCount,
                                      DWORD nSubAuthority0,

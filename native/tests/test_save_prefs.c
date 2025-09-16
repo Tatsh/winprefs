@@ -162,8 +162,8 @@ void test_save_prefs_commit(void **state) {
 
 void test_save_prefs_read_settings(void **state) {
     will_return(__wrap_AllocateAndInitializeSid, true);
-    will_return(__wrap_CheckTokenMembership, true);
-    will_return(__wrap_CheckTokenMembership, true);
+    will_return(__wrap_CheckTokenMembership, false);
+    will_return(__wrap_CheckTokenMembership, false);
 
     will_return(__wrap_RegOpenKeyEx, -1);
     expect_memory(__wrap_RegCreateKeyEx,
@@ -172,21 +172,25 @@ void test_save_prefs_read_settings(void **state) {
                   sizeof(L"Software\\Tatsh\\WinPrefs\\Filters"));
     will_return(__wrap_RegCreateKeyEx, ERROR_SUCCESS);
     will_return_always(__wrap_RegSetValueEx, ERROR_SUCCESS);
+    will_return_always(__wrap_RegCloseKey, ERROR_SUCCESS);
 
     const wchar_t *filter_str = L"Some\\Filter";
     will_return(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
-    will_return(__wrap_RegQueryInfoKey, 2);
+    will_return(__wrap_RegQueryInfoKey, 3);
     will_return(__wrap_RegQueryInfoKey, 128);
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegEnumValue, REG_SZ);
+    will_return(__wrap_RegEnumValue, filter_str);
+    will_return(__wrap_RegEnumValue, 32);
     will_return(__wrap_RegEnumValue, ERROR_SUCCESS);
-    will_return(__wrap_RegEnumValue, REG_BINARY);
+    will_return(__wrap_RegEnumValue, REG_BINARY); // Skipped.
+    will_return(__wrap_RegEnumValue, filter_str);
+    will_return(__wrap_RegEnumValue, 32);
     will_return(__wrap_RegEnumValue, ERROR_SUCCESS);
     will_return(__wrap_RegEnumValue, REG_SZ);
     will_return(__wrap_RegEnumValue, filter_str);
-    will_return(__wrap_RegEnumValue, 24);
+    will_return(__wrap_RegEnumValue, 32);
     will_return(__wrap_RegEnumValue, ERROR_SUCCESS);
-    will_return_always(__wrap_RegCloseKey, ERROR_SUCCESS);
 
     will_return(__wrap__wfullpath, OUTPUT_DIR);
     will_return(__wrap__wfullpath, true);
