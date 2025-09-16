@@ -9,6 +9,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+## [0.4.0] - 2025-09-16
+
 ### Added
 
 - Ability to use custom filters.
@@ -108,7 +110,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Update documentation
 - Format code
 
-[unreleased]: https://github.com/Tatsh/winprefs/compare/v0.3.4...HEAD
+[unreleased]: https://github.com/Tatsh/winprefs/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Tatsh/winprefs/compare/v0.3.4...v0.4.0
 [0.3.4]: https://github.com/Tatsh/winprefs/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/Tatsh/winprefs/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/Tatsh/winprefs/compare/v0.3.1...v0.3.2
