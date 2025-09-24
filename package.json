@@ -75,19 +75,12 @@
     }
   },
   "name": "winprefs",
-  "packageManager": "yarn@4.9.4",
+  "packageManager": "yarn@4.10.2",
   "prettier": {
     "endOfLine": "lf",
     "iniSpaceAroundEquals": true,
     "jsonRecursiveSort": true,
     "overrides": [
-      {
-        "files": "*.csproj",
-        "options": {
-          "parser": "xml",
-          "xmlWhitespaceSensitivity": "ignore"
-        }
-      },
       {
         "files": ["package.json"],
         "options": {
@@ -98,6 +91,13 @@
         "files": [".clang-format"],
         "options": {
           "parser": "yaml"
+        }
+      },
+      {
+        "files": "*.csproj",
+        "options": {
+          "parser": "xml",
+          "xmlWhitespaceSensitivity": "ignore"
         }
       }
     ],

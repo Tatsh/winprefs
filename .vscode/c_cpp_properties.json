@@ -5,9 +5,8 @@
       "compilerPath": "/usr/bin/gcc",
       "configurationProvider": "ms-vscode.cmake-tools",
       "cppStandard": "gnu++23",
-      "defines": [],
       "includePath": ["${workspaceFolder}/native/**", "/usr/include/wine"],
-      "name": "Default"
+      "name": "Linux"
     }
   ],
   "version": 4

@@ -14,7 +14,6 @@
     "github.vscode-pull-request-github",
     "henriiik.vscode-sort",
     "jmredfern.sort-selection",
-    "ms-vscode.powershell",
     "naumovs.color-highlight",
     "nhoizey.gremlins",
     "pascalreitermann93.vscode-yaml-sort",
@@ -30,7 +29,8 @@
     "wayou.vscode-todo-highlight",
     "wmaurer.change-case",
     "zainchen.json",
-    "zengxingxin.sort-js-object-keys"
+    "zengxingxin.sort-js-object-keys",
+    "ms-vscode.powershell"
   ],
   "unwantedRecommendations": ["ms-dotnettools.csdevkit"]
 }

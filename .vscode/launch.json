@@ -5,9 +5,14 @@
       "name": "Run tests",
       "program": "${workspaceRoot}/build/native/tests/test-output_reg_command",
       "request": "launch",
-      "setupCommands": [{ "text": "-gdb-set follow-fork-mode child" }],
+      "setupCommands": [
+        {
+          "text": "-gdb-set follow-fork-mode child"
+        }
+      ],
       "type": "cppdbg"
     }
   ],
+  "inputs": [],
   "version": "0.2.0"
 }

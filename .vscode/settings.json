@@ -43,8 +43,7 @@
   "editor.tabSize": 2,
   "editor.wordWrapColumn": 100,
   "files.associations": {
-    "*.h": "c",
-    ".cmake-format": "yaml"
+    "*.h": "c"
   },
   "files.eol": "\n",
   "files.insertFinalNewline": true,

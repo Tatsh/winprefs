@@ -7,6 +7,7 @@ cdecl
 choco
 cmocka
 codeowners
+commitizen
 conv
 convs
 coveragerc
@@ -14,6 +15,7 @@ coverallsapp
 cpack
 cppdbg
 cpptools
+csdevkit
 csidl
 ctest
 datarootdir
@@ -90,7 +92,6 @@ pacboy
 pcwch
 pcwstr
 phkey
-pidl
 productversion
 pwsh
 pycache
@@ -120,7 +121,6 @@ ucrtbase
 udvare
 userprofile
 vcpkg
-vcxproj
 versioninfo
 vsdevenv
 vsinstalldir
