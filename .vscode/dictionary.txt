@@ -121,6 +121,7 @@ ucrtbase
 udvare
 userprofile
 vcpkg
+vedantmgoyal
 versioninfo
 vsdevenv
 vsinstalldir
@@ -135,6 +136,7 @@ werror
 wfullpath
 wgetcwd
 winegcc
+winget
 winprefs
 winprefsw
 wiswa
