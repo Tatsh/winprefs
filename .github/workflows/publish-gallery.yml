@@ -1,0 +1,31 @@
+---
+jobs:
+  publish:
+    env:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Build module
+        run: |
+          Remove-Item -Force -Recurse build -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory build
+          Set-Location build
+          cmake -G "Visual Studio 17 2022" -A x64 "-DCMAKE_INSTALL_PREFIX=$PWD/prefix" -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release -v
+          cmake --install . --config Release -v
+          Set-Location prefix
+          Remove-Item -Path WinPrefs\*.deps.json -ErrorAction SilentlyContinue
+          Remove-Item -Path WinPrefs\*.lib -ErrorAction SilentlyContinue
+          Remove-Item -Path WinPrefs\*.pdb -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Path WinPrefs\ref -ErrorAction SilentlyContinue
+          Remove-Item -Recurse -Path WinPrefs\runtimes -ErrorAction SilentlyContinue
+        shell: pwsh
+      - name: Publish to PowerShell Gallery
+        run: Publish-Module -Name .\WinPrefs -NuGetApiKey $env:NUGET_API_KEY
+        shell: pwsh
+name: Publish to PowerShell Gallery
+'on':
+  push:
+    tags:
+      - v*
