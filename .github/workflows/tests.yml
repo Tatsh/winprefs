@@ -6,7 +6,7 @@ jobs:
         name: Fix path
         run: |
           echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: humbletim/vsdevenv-shell@v2
@@ -58,7 +58,7 @@ jobs:
             ninja:p
             toolchain:p
           update: true
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Configure
@@ -90,7 +90,7 @@ jobs:
   asan-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Install tools
