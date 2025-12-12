@@ -60,6 +60,7 @@ jsonnet
 jsonschema
 libcmocka
 libjsonnet
+localappdata
 lmcstr
 lpcb
 lpcch
