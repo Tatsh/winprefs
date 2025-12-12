@@ -75,4 +75,8 @@ endif()
 set(CPACK_PACKAGE_NAME "winprefs")
 set(CPACK_PACKAGE_VENDOR "Tatsh")
 set(CPACK_GENERATOR "NSIS;ZIP")
+# Remove version from install path.
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
+# Allow non-admin installation by using LOCALAPPDATA instead of Program Files.
+set(CPACK_NSIS_INSTALL_ROOT "$LOCALAPPDATA\\\\Programs")
 include(CPack)
