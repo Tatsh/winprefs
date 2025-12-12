@@ -77,6 +77,7 @@ set(CPACK_PACKAGE_VENDOR "Tatsh")
 set(CPACK_GENERATOR "NSIS;ZIP")
 # Remove version from install path.
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
-# Allow non-admin installation by using LOCALAPPDATA instead of Program Files.
-set(CPACK_NSIS_INSTALL_ROOT "$LOCALAPPDATA\\\\Programs")
+# Allow non-admin installation by requesting user-level execution.
+set(CPACK_NSIS_DEFINES "RequestExecutionLevel user")
+set(CPACK_NSIS_INSTALL_ROOT "$LOCALAPPDATA")
 include(CPack)
