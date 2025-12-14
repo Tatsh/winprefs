@@ -75,9 +75,23 @@ endif()
 set(CPACK_PACKAGE_NAME "winprefs")
 set(CPACK_PACKAGE_VENDOR "Tatsh")
 set(CPACK_GENERATOR "NSIS;ZIP")
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 # Remove version from install path.
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 # Allow non-admin installation by requesting user-level execution.
 set(CPACK_NSIS_DEFINES "RequestExecutionLevel user")
 set(CPACK_NSIS_INSTALL_ROOT "$COMMONPROGRAMDATA")
+set(CPACK_NSIS_CONTACT "https://bsky.app/profile/tatsh.bsky.social")
+set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
+set(CPACK_NSIS_URL_INFO_ABOUT ${PROJECT_HOMEPAGE_URL}/issues) # Support link in 'Programs and
+                                                              # Features'.
+set(CPACK_NSIS_MODIFY_PATH ON)
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+  set(__cpack_system_name win64)
+else()
+  set(__cpack_system_name win32)
+endif()
+set(CPACK_THREADS 0)
+set(CPACK_PACKAGE_FILE_NAME
+    ${CMAKE_PROJECT_NAME}-${CMAKE_PROJECT_VERSION}-${__cpack_system_name}-${CMAKE_BUILD_TYPE})
 include(CPack)
