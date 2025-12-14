@@ -8,6 +8,7 @@ choco
 cmocka
 codeowners
 commitizen
+commonprogramdata
 conv
 convs
 coveragerc
@@ -60,8 +61,8 @@ jsonnet
 jsonschema
 libcmocka
 libjsonnet
-localappdata
 lmcstr
+localappdata
 lpcb
 lpcch
 lpcvoid
