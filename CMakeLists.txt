@@ -79,5 +79,5 @@ set(CPACK_GENERATOR "NSIS;ZIP")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 # Allow non-admin installation by requesting user-level execution.
 set(CPACK_NSIS_DEFINES "RequestExecutionLevel user")
-set(CPACK_NSIS_INSTALL_ROOT "$LOCALAPPDATA")
+set(CPACK_NSIS_INSTALL_ROOT "$COMMONPROGRAMDATA")
 include(CPack)
