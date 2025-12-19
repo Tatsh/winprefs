@@ -1,8 +1,6 @@
 ---
 jobs:
   build:
-    permissions:
-      contents: write
     runs-on: windows-latest
     steps:
       - id: fixed_workspace
@@ -13,14 +11,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - id: latest_tag
-        name: Get Latest Tag
-        uses: WyriHaximus/github-action-get-previous-tag@v1
       - name: Configure
         run: >-
           cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build
           --install-prefix ${{github.workspace}}/build/prefix
-          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${{matrix.lto}}
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
@@ -41,19 +36,31 @@ jobs:
         run: >-
           cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
           --verbose
-      - if: matrix.build-type == 'Release'
+      - name: 'Upload Artifacts'
+        uses: 'actions/upload-artifact@v6'
+        with:
+          if-no-files-found: error
+          name: 'winprefs-official-${{ matrix.build-type }}'
+          path: |
+            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
+            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
+      - name: Attest
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
+            ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
+      - if: ${{ matrix.build-type == 'Release' && github.ref_type == 'tag' }}
         name: Upload package
         uses: softprops/action-gh-release@v2
         with:
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
-          tag_name: ${{ steps.latest_tag.outputs.tag }}
     strategy:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-        lto: ['FALSE', 'TRUE']
   build_cross:
     runs-on: ubuntu-latest
     steps:
@@ -69,14 +76,31 @@ jobs:
           cmake -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
           -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-          -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=${{matrix.lto}}
+          -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
+      - name: Package
+        run: >-
+          cpack -G ZIP -C ${{matrix.build-type}} --config
+          ${{github.workspace}}/build/CPackConfig.cmake --verbose
+      - name: 'Upload Artifacts'
+        uses: 'actions/upload-artifact@v6'
+        with:
+          if-no-files-found: error
+          name: 'winprefs-cross-${{ matrix.build-type }}'
+          path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
+      - name: Attest
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
     strategy:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-        lto: ['FALSE', 'TRUE']
   build_msys:
     runs-on: windows-latest
     steps:
@@ -129,6 +153,20 @@ jobs:
         run: |
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
+      - name: 'Upload Artifacts'
+        uses: 'actions/upload-artifact@v6'
+        with:
+          if-no-files-found: error
+          name: 'winprefs-msys-${{matrix.sys.name}}-${{ matrix.build-type }}'
+          path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
+      - name: Attest
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
     strategy:
       fail-fast: false
       matrix:
@@ -152,3 +190,7 @@ name: Build
       - master
     tags:
       - 'v*.*.*'
+permissions:
+  attestations: write
+  contents: write
+  id-token: write
