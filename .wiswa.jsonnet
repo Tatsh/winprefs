@@ -36,8 +36,8 @@ local utils = import 'utils.libjsonnet';
       }],
     },
     scripts+: {
-      'check-formatting': "cmake-format --check CMakeLists.txt native/CMakeLists.txt && clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
-      format: 'cmake-format -i CMakeLists.txt native/CMakeLists.txt && clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .',
+      'check-formatting': "clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
+      format: 'cmake-format -i CMakeLists.txt native/CMakeLists.txt; clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .',
 
     },
   },
