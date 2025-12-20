@@ -79,7 +79,16 @@ set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 # Remove version from install path.
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_NAME}")
 # Allow non-admin installation by requesting user-level execution.
-set(CPACK_NSIS_DEFINES "RequestExecutionLevel user")
+  set(CPACK_NSIS_DEFINES "RequestExecutionLevel user
+!define /date CURRENT_YEAR \\\"%Y\\\"
+VIProductVersion \\\"${PROJECT_VERSION}.0\\\"
+VIAddVersionKey \\\"ProductName\\\" \\\"${DISPLAY_NAME}\\\"
+VIAddVersionKey \\\"CompanyName\\\" \\\"Tatsh\\\"
+VIAddVersionKey \\\"FileDescription\\\" \\\"${DISPLAY_NAME} installer.\\\"
+VIAddVersionKey \\\"FileVersion\\\" \\\"${PROJECT_VERSION}\\\"
+VIAddVersionKey \\\"ProductVersion\\\" \\\"${PROJECT_VERSION}.0\\\"
+VIAddVersionKey \\\"LegalCopyright\\\" \\\"Copyright © \\\${CURRENT_YEAR} Tatsh.\\\"
+VIAddVersionKey \\\"Comments\\\" \\\"${PROJECT_HOMEPAGE_URL}\\\"")
 set(CPACK_NSIS_INSTALL_ROOT "$COMMONPROGRAMDATA")
 set(CPACK_NSIS_CONTACT "https://bsky.app/profile/tatsh.bsky.social")
 set(CPACK_NSIS_MANIFEST_DPI_AWARE ON)
