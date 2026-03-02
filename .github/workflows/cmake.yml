@@ -37,7 +37,7 @@ jobs:
           cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
           --verbose
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: 'winprefs-official-${{ matrix.build-type }}'
@@ -84,7 +84,7 @@ jobs:
           cpack -G ZIP -C ${{matrix.build-type}} --config
           ${{github.workspace}}/build/CPackConfig.cmake --verbose
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: 'winprefs-cross-${{ matrix.build-type }}'
@@ -154,7 +154,7 @@ jobs:
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
       - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v6'
+        uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
           name: 'winprefs-msys-${{matrix.sys.name}}-${{ matrix.build-type }}'
