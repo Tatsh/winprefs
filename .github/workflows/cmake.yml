@@ -45,7 +45,7 @@ jobs:
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
@@ -92,7 +92,7 @@ jobs:
             ${{github.workspace}}/winprefs-*.exe
             ${{github.workspace}}/winprefs-*.zip
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{github.workspace}}/winprefs-*.exe
@@ -162,7 +162,7 @@ jobs:
             ${{github.workspace}}/winprefs-*.exe
             ${{github.workspace}}/winprefs-*.zip
       - name: Attest
-        uses: actions/attest-build-provenance@v3
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: |
             ${{github.workspace}}/winprefs-*.exe
