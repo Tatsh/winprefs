@@ -1,5 +1,21 @@
 jobs:
+  changes:
+    outputs:
+      cpp: '${{ steps.filter.outputs.cpp }}'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: 'actions/checkout@v6'
+      - id: 'filter'
+        uses: 'dorny/paths-filter@v4'
+        with:
+          filters: |
+            cpp:
+              - '**/*.c'
+              - '**/*.cpp'
+              - '**/*.h'
+              - '**/*.hpp'
   qa:
+    needs: 'changes'
     runs-on: 'ubuntu-latest'
     steps:
       - uses: 'actions/checkout@v6'
@@ -13,6 +29,7 @@ jobs:
         run: 'yarn'
       - continue-on-error: true
         id: 'clang-format'
+        if: "needs.changes.outputs.cpp == 'true'"
         name: 'Check formatting (clang-format)'
         run: 'clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h'
       - continue-on-error: true
@@ -30,7 +47,7 @@ jobs:
       - if: 'always()'
         name: 'Check results'
         run: |
-          [ "${{ steps.clang-format.outcome }}" = "success" ] &&
+          ([ "${{ needs.changes.outputs.cpp }}" != "true" ] || [ "${{ steps.clang-format.outcome }}" = "success" ]) &&
           [ "${{ steps.prettier.outcome }}" = "success" ] &&
           [ "${{ steps.markdownlint.outcome }}" = "success" ] &&
           [ "${{ steps.spelling.outcome }}" = "success" ]
