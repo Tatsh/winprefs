@@ -5,13 +5,8 @@
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
       },
-      "generator": "Visual Studio 17 2022",
-      "name": "vcpkg"
-    },
-    {
-      "binaryDir": "${sourceDir}/build",
       "generator": "Ninja",
-      "name": "ninja"
+      "name": "vcpkg"
     }
   ],
   "version": 2

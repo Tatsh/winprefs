@@ -37,7 +37,7 @@ local utils = import 'utils.libjsonnet';
     },
     scripts+: {
       'check-formatting': "clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
-      format: 'cmake-format -i CMakeLists.txt native/CMakeLists.txt; clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .',
+      format: 'clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .',
 
     },
   },
@@ -92,6 +92,39 @@ local utils = import 'utils.libjsonnet';
       },
     },
   },
+  custom_project_badges: [
+    {
+      anchor: '[![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/WinPrefs)]',
+      href: 'https://www.powershellgallery.com/packages/WinPrefs',
+      priority: -1,
+    },
+    {
+      anchor: '[![PowerShell Gallery Platform Support](https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported)]',
+      href: 'https://www.powershellgallery.com/packages/WinPrefs',
+      priority: -1,
+    },
+    {
+      anchor: '[![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/WinPrefs)]',
+      href: 'https://www.powershellgallery.com/packages/WinPrefs',
+      priority: -1,
+    },
+    {
+      anchor: '[![Build](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg)]',
+      href: 'https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml',
+    },
+    {
+      anchor: '[![CodeQL](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml/badge.svg)]',
+      href: 'https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml',
+    },
+    {
+      anchor: '[![Tests](https://github.com/Tatsh/winprefs/actions/workflows/tests.yml/badge.svg)]',
+      href: 'https://github.com/Tatsh/winprefs/actions/workflows/tests.yml',
+    },
+    {
+      anchor: '[![Coverage Status](https://coveralls.io/repos/github/Tatsh/winprefs/badge.svg?branch=master)]',
+      href: 'https://coveralls.io/github/Tatsh/winprefs?branch=master',
+    },
+  ],
   // C/C++ only
   vcpkg+: {
     dependencies: [{
