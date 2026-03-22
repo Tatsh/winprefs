@@ -28,15 +28,20 @@ If any changed files are under `src/` or `include/`, run the following agents **
 
 ### When user-facing changes are being committed
 
-- **changelog** - update `CHANGELOG.md` with entries for the changes. After it completes, check if
-  `CHANGELOG.md` was modified (`git diff CHANGELOG.md`). If it was, it will be staged together with
-  the relevant commit. **Only run when changes affect users**: files under `winprefs/`, `src/`, `include/`,
-  or dependency/version changes in `CMakeLists.txt` or `vcpkg.json`. **Skip for**: workflows, CI config, `.claude/`,
-  `.cursor/`, `.github/instructions/`, documentation-only changes, and other non-user-facing files.
+- **changelog** - update `CHANGELOG.md` with entries for the changes.
+  After it completes, check if `CHANGELOG.md` was modified
+  (`git diff CHANGELOG.md`). If it was, it will be staged together
+  with the relevant commit. **Only run when changes affect users**:
+  files under `winprefs/`, `src/`,
+  `include/`, or dependency/version changes in `CMakeLists.txt`
+  or `vcpkg.json`. **Skip for**: workflows, CI config, `.claude/`,
+  `.cursor/`, `.github/instructions/`, documentation-only changes,
+  and other non-user-facing files.
 
 ## Analysing changes
 
-Group changed files by component. Determine if one commit or multiple logical commits are needed.
+Group changed files by component. Determine if one commit or multiple
+logical commits are needed.
 
 ### Incidental files
 
@@ -46,8 +51,8 @@ file in a commit:
 - `CHANGELOG.md`
 - `.vscode/dictionary.txt`
 
-For example, if a commit contains `winprefs/src/main.cpp`, and `CHANGELOG.md`, the component is determined by
-the source files only. `CHANGELOG.md` is simply staged alongside them.
+For example, if a commit contains `winprefs/src/main.cpp`, and `CHANGELOG.md`, the component is
+determined by the source files only. `CHANGELOG.md` is simply staged alongside them.
 
 If `CHANGELOG.md` is the only file being committed, use the `changelog:` prefix. If
 `.vscode/dictionary.txt` is the only file, use `dictionary:` prefix.
@@ -63,10 +68,11 @@ If `CHANGELOG.md` is the only file being committed, use the `changelog:` prefix.
 
 ### Cruft updates
 
-When all changes are from re-running Wiswa (the project generator) and no hand-written code changed,
-this is a **cruft update**. Indicators:
+When all changes are from re-running Wiswa (the project generator) and
+no hand-written code changed, this is a **cruft update**. Indicators:
 
-- Only Wiswa-managed files changed (workflows, `package.json`, `CMakeLists.txt`, `.pre-commit-config.yaml`, `.claude/agents/`, `.cursor/rules/`, `.github/instructions/`,
+- Only Wiswa-managed files changed (workflows, `package.json`, `CMakeLists.txt`,
+  `.pre-commit-config.yaml`, `.claude/agents/`, `.cursor/rules/`, `.github/instructions/`,
   `CITATION.cff`, `.vscode/dictionary.txt`, `.wiswa.jsonnet`, etc.).
 - No files under the primary module or `src/` changed.
 

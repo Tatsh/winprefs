@@ -7,6 +7,7 @@ local utils = import 'utils.libjsonnet';
   version: '0.4.0',
   description: 'Tool to export registry paths to script and code formats (reg add, PowerShell, C, C#).',
   keywords: ['backup', 'batch', 'c', 'csharp', 'customisation', 'customization', 'desktop', 'powershell', 'registry', 'win32', 'windows'],
+  clang_format_args: 'native/*.c native/*.h native/tests/*.c native/tests/*.h',
   want_main: false,
   want_codeql: false,
   want_tests: false,
@@ -34,11 +35,6 @@ local utils = import 'utils.libjsonnet';
           xmlWhitespaceSensitivity: 'ignore',
         },
       }],
-    },
-    scripts+: {
-      'check-formatting': "clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
-      format: 'clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .',
-
     },
   },
   vscode+: {

@@ -135,10 +135,10 @@
   },
   "scripts": {
     "build": "cmake --preset=default -DBUILD_DOCS=ON && cmake --build build",
-    "check-formatting": "clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 '**/*.md' '#node_modules'",
+    "check-formatting": "clang-format -n native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -c . && markdownlint-cli2 --config package.json --configPointer /markdownlint-cli2",
     "check-spelling": "cspell --no-progress .",
     "dict:update": "rm -f .vscode/dictionary.txt && cspell --no-progress './**/*' './**/.*' 2>&1 | grep -oP '(?<=Unknown word \\()\\S+(?=\\))' | python3 -c \"import sys; print('\\n'.join(sorted(set(l.strip().lower() for l in sys.stdin if l.strip()))))\" > .vscode/dictionary.txt",
-    "format": "clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && yarn prettier -w .",
+    "format": "clang-format -i native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier -w .",
     "qa": "yarn check-spelling && yarn check-formatting"
   },
   "version": "0.4.0"
