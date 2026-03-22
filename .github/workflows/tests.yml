@@ -112,8 +112,28 @@ name: Tests
   pull_request:
     branches:
       - master
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/tests.yml'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
   push:
     branches:
       - master
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/tests.yml'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
 permissions:
   contents: 'read'

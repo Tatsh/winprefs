@@ -50,7 +50,27 @@ name: CodeQL
 'on':
   pull_request:
     branches: ['master']
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/codeql.yml'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
   push:
     branches: ['master']
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/codeql.yml'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
   schedule:
     - cron: 15 21 * * 6

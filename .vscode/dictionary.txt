@@ -26,6 +26,7 @@ denable
 docstrings
 dorny
 dotnettools
+doxyfile
 dunicode
 dwith
 dynamicbase
