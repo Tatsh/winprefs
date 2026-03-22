@@ -86,9 +86,8 @@ prefs-export
 `${env:APPDATA}\prefs-export` by default. This can be changed by passing `-OutputDirectory DIR`
 (or `-o DIR`). The file name can be changed by passing `-OutputFile FILE` (or `-f FILE`).
 
-The format can be changed with the `-Format` argument. Accepted format strings:
-
--
+The format can be changed with the `-Format` argument. Accepted format strings: `c`, `cs`, `c#`,
+`ps`, `ps1`, `powershell`, `reg` (default).
 
 It accepts switch `-Commit`/`-c` to initialise and commit to a Git repository in the output
 directory. It also accepts a `-DeployKey PATH` parameter and will push if this is specified. Any
