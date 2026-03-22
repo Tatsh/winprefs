@@ -185,9 +185,33 @@ name: Build
   pull_request:
     branches:
       - master
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/cmake.yml'
+      - 'CMakePresets.json'
+      - 'CMakeSettings.json'
+      - 'vcpkg-configuration.json'
+      - 'vcpkg.json'
   push:
     branches:
       - master
+    paths:
+      - '**/*.c'
+      - '**/*.cmake'
+      - '**/*.cpp'
+      - '**/*.cs'
+      - '**/*.h'
+      - '**/CMakeLists.txt'
+      - '.github/workflows/cmake.yml'
+      - 'CMakePresets.json'
+      - 'CMakeSettings.json'
+      - 'vcpkg-configuration.json'
+      - 'vcpkg.json'
     tags:
       - 'v*.*.*'
 permissions:
