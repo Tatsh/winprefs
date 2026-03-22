@@ -1,6 +1,7 @@
 apos
 asan
 autosort
+behavior
 bsky
 buildsystems
 cdecl
