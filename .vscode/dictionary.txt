@@ -24,6 +24,7 @@ dbuild
 dcmake
 denable
 docstrings
+dorny
 dotnettools
 dunicode
 dwith
