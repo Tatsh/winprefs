@@ -51,8 +51,9 @@ file in a commit:
 - `CHANGELOG.md`
 - `.vscode/dictionary.txt`
 
-For example, if a commit contains `winprefs/src/main.cpp`, and `CHANGELOG.md`, the component is
-determined by the source files only. `CHANGELOG.md` is simply staged alongside them.
+For example, if a commit contains `winprefs/src/main.cpp`, and `CHANGELOG.md`,
+the component is determined by the source files only. `CHANGELOG.md` is simply
+staged alongside them.
 
 If `CHANGELOG.md` is the only file being committed, use the `changelog:` prefix. If
 `.vscode/dictionary.txt` is the only file, use `dictionary:` prefix.
@@ -71,8 +72,9 @@ If `CHANGELOG.md` is the only file being committed, use the `changelog:` prefix.
 When all changes are from re-running Wiswa (the project generator) and
 no hand-written code changed, this is a **cruft update**. Indicators:
 
-- Only Wiswa-managed files changed (workflows, `package.json`, `CMakeLists.txt`,
-  `.pre-commit-config.yaml`, `.claude/agents/`, `.cursor/rules/`, `.github/instructions/`,
+- Only Wiswa-managed files changed (workflows,
+  `package.json`, `CMakeLists.txt`, `.pre-commit-config.yaml`, `.claude/agents/`,
+  `.cursor/rules/`, `.github/instructions/`,
   `CITATION.cff`, `.vscode/dictionary.txt`, `.wiswa.jsonnet`, etc.).
 - No files under the primary module or `src/` changed.
 

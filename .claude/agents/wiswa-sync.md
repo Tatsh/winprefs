@@ -95,8 +95,8 @@ For example, if a dependency is added to `vcpkg.json`, the override in `.wiswa.j
 
 1. **Read the current `.wiswa.jsonnet`** to understand existing overrides.
 
-2. **Read the changed managed files** (e.g. `CMakeLists.txt`, `vcpkg.json`, `package.json`) to
-   identify what changed.
+2. **Read the changed managed files** (e.g. `CMakeLists.txt`, `vcpkg.json`,
+   `package.json`) to identify what changed.
 
 3. **Read the relevant defaults** (`defaults.libjsonnet`, etc.)
    to determine what is already provided by Wiswa.
