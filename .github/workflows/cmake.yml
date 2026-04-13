@@ -52,7 +52,7 @@ jobs:
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
       - if: ${{ matrix.build-type == 'Release' && github.ref_type == 'tag' }}
         name: Upload package
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
