@@ -1,5 +1,7 @@
 # winprefs
 
+<!-- WISWA-GENERATED-README:START -->
+
 [![PowerShell Gallery Version (including pre-releases)](https://img.shields.io/powershellgallery/v/WinPrefs)](https://www.powershellgallery.com/packages/WinPrefs)
 [![PowerShell Gallery Platform Support](https://img.shields.io/powershellgallery/p/WinPrefs?label=powershell+platforms+supported)](https://www.powershellgallery.com/packages/WinPrefs)
 [![PowerShell Gallery Downloads](https://img.shields.io/powershellgallery/dt/WinPrefs)](https://www.powershellgallery.com/packages/WinPrefs)
@@ -9,11 +11,11 @@
 [![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.4.0/master)](https://github.com/Tatsh/winprefs/compare/v0.4.0...master)
 [![QA](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/qa.yml)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-blue?logo=dependabot)](https://github.com/dependabot)
-[![GitHub Pages](https://github.com/Tatsh/winprefs/actions/workflows/pages.yml/badge.svg)](https://Tatsh.github.io/winprefs/)
+[![GitHub Pages](https://github.com/Tatsh/winprefs/actions/workflows/pages.yml/badge.svg)](https://tatsh.github.io/winprefs/)
 [![Stargazers](https://img.shields.io/github/stars/Tatsh/winprefs?logo=github&style=flat)](https://github.com/Tatsh/winprefs/stargazers)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://pre-commit.com/)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![CMake](https://img.shields.io/badge/CMake-6E6E6E?logo=cmake)](https://cmake.org/)
-[![Prettier](https://img.shields.io/badge/Prettier-enabled-black?logo=prettier)](https://prettier.io/)
+[![Prettier](https://img.shields.io/badge/Prettier-black?logo=prettier)](https://prettier.io/)
 [![Build](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/cmake.yml)
 [![CodeQL](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/codeql.yml)
 [![Tests](https://github.com/Tatsh/winprefs/actions/workflows/tests.yml/badge.svg)](https://github.com/Tatsh/winprefs/actions/workflows/tests.yml)
@@ -24,6 +26,8 @@
 [![Libera.Chat](https://img.shields.io/badge/Libera.Chat-Tatsh-black?logo=liberadotchat)](irc://irc.libera.chat/Tatsh)
 [![Mastodon Follow](https://img.shields.io/mastodon/follow/109370961877277568?domain=hostux.social&style=social)](https://hostux.social/@Tatsh)
 [![Patreon](https://img.shields.io/badge/Patreon-Tatsh2-F96854?logo=patreon)](https://www.patreon.com/Tatsh2)
+
+<!-- WISWA-GENERATED-README:STOP -->
 
 macOS users: please see [macprefs](https://github.com/Tatsh/macprefs) for an equivalent tool.
 

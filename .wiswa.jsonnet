@@ -1,6 +1,7 @@
 local utils = import 'utils.libjsonnet';
 
 {
+  uses_user_defaults: true,
   project_type: 'c',
   security_policy_supported_versions: { '0.4.x': ':white_check_mark:' },
   project_name: 'winprefs',
@@ -11,9 +12,6 @@ local utils = import 'utils.libjsonnet';
   want_main: false,
   want_codeql: false,
   want_tests: false,
-  copilot+: {
-    intro: 'winprefs is a tool to export registry data to various programming languages.',
-  },
   cz+: {
     commitizen+: {
       remove_path_prefixes+: ['native'],

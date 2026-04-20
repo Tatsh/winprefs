@@ -1,3 +1,4 @@
+Ångström
 apos
 asan
 autosort
@@ -11,6 +12,7 @@ commitizen
 commonprogramdata
 conv
 convs
+cooldown
 coveragerc
 coverallsapp
 cpack
@@ -24,7 +26,6 @@ dbuild
 dcmake
 denable
 docstrings
-dorny
 dotnettools
 doxyfile
 dunicode
@@ -35,6 +36,7 @@ ekeyrejected
 endforeach
 endfunction
 errno
+esac
 esbenp
 fileflags
 fileflagsmask
@@ -57,6 +59,7 @@ humbletim
 ifdef
 interprocedural
 iwyu
+jinja
 jsonnet
 jsonschema
 libcmocka
@@ -87,6 +90,7 @@ municode
 mwindows
 mypy
 nologo
+npmjs
 nsis
 nullptr
 nxcompat
@@ -98,10 +102,12 @@ pcwch
 pcwstr
 phkey
 productversion
+pylock
 reflow
 regen
 regsam
 regsetkeyvaluew
+ripgreprc
 schemafile
 shellcheck
 shellformat
@@ -146,6 +152,7 @@ winget
 winprefs
 winprefsw
 wiswa
+wiswa's
 wmain
 wmissing
 wparentheses
@@ -159,4 +166,3 @@ wunreachable
 wunused
 xunit
 yarnrc
-ångström
