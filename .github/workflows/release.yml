@@ -5,7 +5,9 @@ jobs:
     steps:
       - uses: 'actions/checkout@v6.0.2'
       - env:
-          HEAD_BRANCH: '${{ github.event.workflow_run.head_branch }}'
+          GH_TOKEN: '${{ github.token }}'
+          HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
+          REPO: '${{ github.repository }}'
           TRIGGER_CONCLUSION: '${{ github.event.workflow_run.conclusion }}'
         id: 'guard'
         name: 'Check trigger conditions'
@@ -15,21 +17,26 @@ jobs:
             echo 'proceed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          if [[ -z "$HEAD_BRANCH" || "$HEAD_BRANCH" != v* ]]; then
-            echo "Head branch '${HEAD_BRANCH}' is not a release tag, nothing to do."
+          tag=$(gh api "repos/${REPO}/git/matching-refs/tags/v" \
+            --jq ".[] | select(.object.sha == \"${HEAD_SHA}\") | .ref" \
+            | sed 's|^refs/tags/||' | head -1)
+          if [[ -z "$tag" ]]; then
+            echo "No v* tag points at ${HEAD_SHA}, nothing to do."
             echo 'proceed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          echo "Found release tag ${tag} for SHA ${HEAD_SHA}."
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
           echo 'proceed=true' >> "$GITHUB_OUTPUT"
       - env:
           GH_TOKEN: '${{ github.token }}'
-          HEAD_BRANCH: '${{ github.event.workflow_run.head_branch }}'
           HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
+          TAG: '${{ steps.guard.outputs.tag }}'
         id: 'check'
         if: "steps.guard.outputs.proceed == 'true'"
         name: 'Check all required workflows succeeded'
         run: |
-          tag="$HEAD_BRANCH"
+          tag="$TAG"
           sha="$HEAD_SHA"
           all_success=true
           for workflow in Build Prettier Spelling Tests clang-format markdownlint; do
