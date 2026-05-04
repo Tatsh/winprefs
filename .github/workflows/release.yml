@@ -17,9 +17,21 @@ jobs:
             echo 'proceed=false' >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          tag=$(gh api "repos/${REPO}/git/matching-refs/tags/v" \
-            --jq ".[] | select(.object.sha == \"${HEAD_SHA}\") | .ref" \
-            | sed 's|^refs/tags/||' | head -1)
+          tag=''
+          while IFS=$'\t' read -r ref obj_type obj_sha; do
+            [[ -z "$ref" ]] && continue
+            if [[ "$obj_type" == 'commit' ]]; then
+              target_sha="$obj_sha"
+            else
+              target_sha=$(gh api "repos/${REPO}/git/tags/${obj_sha}" \
+                --jq '.object.sha' 2>/dev/null || echo '')
+            fi
+            if [[ "$target_sha" == "$HEAD_SHA" ]]; then
+              tag="${ref#refs/tags/}"
+              break
+            fi
+          done < <(gh api "repos/${REPO}/git/matching-refs/tags/v" \
+            --jq '.[] | [.ref, .object.type, .object.sha] | @tsv')
           if [[ -z "$tag" ]]; then
             echo "No v* tag points at ${HEAD_SHA}, nothing to do."
             echo 'proceed=false' >> "$GITHUB_OUTPUT"
