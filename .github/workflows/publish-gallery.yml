@@ -1,10 +1,7 @@
 ---
 jobs:
   check:
-    if: >-
-      ${{ github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      startsWith(github.event.workflow_run.head_branch, 'v') }}
+    if: "${{ github.event.workflow_run.conclusion == 'success' }}"
     outputs:
       has_nuget_api_key: '${{ steps.check_secret.outputs.has_nuget_api_key }}'
     runs-on: 'ubuntu-latest'
