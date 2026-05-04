@@ -39,14 +39,6 @@ jobs:
         run: >-
           cpack -C ${{matrix.build-type}}
           --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
-      - name: Encode build type into package filenames
-        run: |
-          Get-ChildItem -LiteralPath "${{github.workspace}}" -File |
-            Where-Object { $_.Name -like 'winprefs-*' -and ($_.Extension -in '.exe', '.zip') } |
-            ForEach-Object {
-              $target = $_.BaseName + '-${{matrix.build-type}}' + $_.Extension
-              Rename-Item -LiteralPath $_.FullName -NewName $target
-            }
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
@@ -130,14 +122,6 @@ jobs:
           cpack -C ${{matrix.build-type}}
           --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
         shell: msys2 {0}
-      - name: Encode build type into package filenames
-        shell: msys2 {0}
-        run: |
-          cd "${{steps.fixed_workspace.outputs.out}}"
-          shopt -s nullglob
-          for f in winprefs-*.exe winprefs-*.zip; do
-            mv -- "$f" "${f%.*}-${{matrix.build-type}}.${f##*.}"
-          done
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
