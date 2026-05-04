@@ -5,7 +5,7 @@ local utils = import 'utils.libjsonnet';
   project_type: 'c',
   security_policy_supported_versions: { '0.4.x': ':white_check_mark:' },
   project_name: 'winprefs',
-  version: '0.4.0',
+  version: '0.4.1',
   description: 'Tool to export registry paths to script and code formats (reg add, PowerShell, C, C#).',
   keywords: ['backup', 'batch', 'c', 'csharp', 'customisation', 'customization', 'desktop', 'powershell', 'registry', 'win32', 'windows'],
   clang_format_args: 'native/*.c native/*.h native/tests/*.c native/tests/*.h',

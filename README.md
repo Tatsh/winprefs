@@ -8,7 +8,7 @@
 [![C](https://img.shields.io/badge/C-00599C?logo=c)](<https://en.wikipedia.org/wiki/C_(programming_language)>)
 [![GitHub tag (with filter)](https://img.shields.io/github/v/tag/Tatsh/winprefs)](https://github.com/Tatsh/winprefs/tags)
 [![License](https://img.shields.io/github/license/Tatsh/winprefs)](https://github.com/Tatsh/winprefs/blob/master/LICENSE.txt)
-[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.4.0/master)](https://github.com/Tatsh/winprefs/compare/v0.4.0...master)
+[![GitHub commits since latest release (by SemVer including pre-releases)](https://img.shields.io/github/commits-since/Tatsh/winprefs/v0.4.1/master)](https://github.com/Tatsh/winprefs/compare/v0.4.1...master)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-blue?logo=dependabot)](https://github.com/dependabot)
 [![GitHub Pages](https://github.com/Tatsh/winprefs/actions/workflows/pages.yml/badge.svg)](https://tatsh.github.io/winprefs/)
 [![Stargazers](https://img.shields.io/github/stars/Tatsh/winprefs?logo=github&style=flat)](https://github.com/Tatsh/winprefs/stargazers)
