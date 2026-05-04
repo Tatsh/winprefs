@@ -95,6 +95,7 @@ mypy
 nologo
 npmjs
 nsis
+nullglob
 nullptr
 nxcompat
 olaf
@@ -118,6 +119,7 @@ schemafile
 shellcheck
 shellformat
 shlwapi
+shopt
 snapcraft
 snwprintf
 softprops

@@ -1,7 +1,7 @@
 ---
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.arch.runner }}
     steps:
       - id: fixed_workspace
         name: Fix path
@@ -17,8 +17,10 @@ jobs:
         run: >-
           cmake -B ${{github.workspace}}/build
           --install-prefix ${{github.workspace}}/build/prefix
+          -A ${{matrix.arch.cmake_platform}}
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DCPACK_SYSTEM_NAME=${{matrix.arch.cpack_system}}
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
       - name: Install
@@ -37,11 +39,19 @@ jobs:
         run: >-
           cpack -C ${{matrix.build-type}}
           --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
+      - name: Encode build type into package filenames
+        run: |
+          Get-ChildItem -LiteralPath "${{github.workspace}}" -File |
+            Where-Object { $_.Name -like 'winprefs-*' -and ($_.Extension -in '.exe', '.zip') } |
+            ForEach-Object {
+              $target = $_.BaseName + '-${{matrix.build-type}}' + $_.Extension
+              Rename-Item -LiteralPath $_.FullName -NewName $target
+            }
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
-          name: winprefs-${{ matrix.build-type }}-windows
+          name: winprefs-${{ matrix.build-type }}-${{ matrix.arch.name }}
           path: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
@@ -51,7 +61,7 @@ jobs:
           subject-path: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
-      - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
+      - if: ${{ github.ref_type == 'tag' }}
         name: Upload package
         uses: softprops/action-gh-release@v3
         with:
@@ -63,6 +73,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        arch:
+          - cmake_platform: x64
+            cpack_system: win64
+            name: x64
+            runner: windows-latest
+          - cmake_platform: ARM64
+            cpack_system: winarm64
+            name: arm64
+            runner: windows-11-arm
         build-type: [Debug, Release]
   build-msys:
     runs-on: ${{ matrix.sys.runner }}
@@ -111,6 +130,14 @@ jobs:
           cpack -C ${{matrix.build-type}}
           --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
         shell: msys2 {0}
+      - name: Encode build type into package filenames
+        shell: msys2 {0}
+        run: |
+          cd "${{steps.fixed_workspace.outputs.out}}"
+          shopt -s nullglob
+          for f in winprefs-*.exe winprefs-*.zip; do
+            mv -- "$f" "${f%.*}-${{matrix.build-type}}.${f##*.}"
+          done
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
@@ -139,6 +166,11 @@ jobs:
       matrix:
         build-type: [Debug, Release]
         sys:
+          - cpack_system: win32
+            env: i686
+            name: mingw32
+            release: true
+            runner: windows-latest
           - cpack_system: win64
             env: x86_64
             name: mingw64
@@ -147,12 +179,12 @@ jobs:
           - cpack_system: win64
             env: ucrt-x86_64
             name: ucrt64
-            release: true
+            release: false
             runner: windows-latest
           - cpack_system: winarm64
             env: clang-aarch64
             name: clangarm64
-            release: true
+            release: false
             runner: windows-11-arm
   build-cross:
     runs-on: ubuntu-latest
