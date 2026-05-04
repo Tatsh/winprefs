@@ -1,8 +1,31 @@
 ---
 jobs:
+  check:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      startsWith(github.event.workflow_run.head_branch, 'v') }}
+    outputs:
+      has_nuget_api_key: '${{ steps.check_secret.outputs.has_nuget_api_key }}'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - env:
+          NUGET_API_KEY: '${{ secrets.NUGET_API_KEY }}'
+        id: 'check_secret'
+        name: 'Check NUGET_API_KEY is set'
+        run: |
+          if [[ -n "$NUGET_API_KEY" ]]; then
+            echo 'has_nuget_api_key=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'has_nuget_api_key=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::NUGET_API_KEY secret is empty; the publish job will be skipped.'
+          fi
   publish:
     env:
-      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      NUGET_API_KEY: '${{ secrets.NUGET_API_KEY }}'
+    if: "needs.check.outputs.has_nuget_api_key == 'true'"
+    needs:
+      - 'check'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
@@ -24,8 +47,12 @@ jobs:
       - name: Publish to PowerShell Gallery
         run: Publish-Module -Name .\WinPrefs -NuGetApiKey $env:NUGET_API_KEY
         shell: pwsh
-name: Publish to PowerShell Gallery
+name: 'Publish to PowerShell Gallery'
 'on':
-  push:
-    tags:
-      - v*
+  workflow_run:
+    workflows:
+      - 'Release'
+    types:
+      - 'completed'
+permissions:
+  contents: 'read'

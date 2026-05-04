@@ -11,10 +11,13 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+      - name: Install NSIS
+        run: choco install nsis -y --no-progress
       - name: Configure
         run: >-
-          cmake -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -B ${{github.workspace}}/build
+          cmake -B ${{github.workspace}}/build
           --install-prefix ${{github.workspace}}/build/prefix
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose --config ${{matrix.build-type}}
@@ -30,17 +33,15 @@ jobs:
         run: |
           cd "${env:APPDATA}/prefs-export"
           git --no-pager log
-      - name: Install NSIS
-        run: choco install nsis -y
       - name: Package
         run: >-
-          cpack -C ${{matrix.build-type}} --config ${{github.workspace}}/build/CPackConfig.cmake
-          --verbose
+          cpack -C ${{matrix.build-type}}
+          --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
-          name: 'winprefs-official-${{ matrix.build-type }}'
+          name: winprefs-${{ matrix.build-type }}-windows
           path: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
@@ -50,10 +51,12 @@ jobs:
           subject-path: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
-      - if: ${{ matrix.build-type == 'Release' && github.ref_type == 'tag' }}
+      - if: ${{ github.ref_type == 'tag' && matrix.build-type == 'Release' }}
         name: Upload package
         uses: softprops/action-gh-release@v3
         with:
+          draft: true
+          fail_on_unmatched_files: true
           files: |
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.exe
             ${{steps.fixed_workspace.outputs.out}}/winprefs-*.zip
@@ -61,7 +64,97 @@ jobs:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-  build_cross:
+  build-msys:
+    runs-on: ${{ matrix.sys.runner }}
+    steps:
+      - id: fixed_workspace
+        name: Fix path
+        run: >-
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - if: matrix.sys.name == 'clangarm64'
+        name: Install NSIS via Chocolatey
+        run: |
+          choco install nsis -y --no-progress
+          'C:\Program Files (x86)\NSIS' | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_PATH
+      - uses: msys2/setup-msys2@v2
+        with:
+          install: >-
+            make
+          msystem: ${{matrix.sys.name}}
+          pacboy: >-
+            cmake:p
+            ninja:p
+            ${{ matrix.sys.name == 'clangarm64' && ' ' || 'nsis:p' }}
+            toolchain:p
+          update: true
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Configure
+        run: >-
+          cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
+          --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DCPACK_SYSTEM_NAME=${{matrix.sys.cpack_system}}
+        shell: msys2 {0}
+      - name: Build
+        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
+        shell: msys2 {0}
+      - name: Install
+        run: >-
+          cmake --install ${{steps.fixed_workspace.outputs.out}}/build
+          --config ${{matrix.build-type}} --verbose
+        shell: msys2 {0}
+      - name: Package
+        run: >-
+          cpack -C ${{matrix.build-type}}
+          --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
+        shell: msys2 {0}
+      - name: 'Upload Artifacts'
+        uses: 'actions/upload-artifact@v7'
+        with:
+          if-no-files-found: error
+          name: winprefs-${{ matrix.build-type }}-${{ matrix.sys.name }}
+          path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
+      - name: Attest
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
+      - if: ${{ github.ref_type == 'tag' && matrix.sys.release }}
+        name: Upload package
+        uses: softprops/action-gh-release@v3
+        with:
+          draft: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{github.workspace}}/winprefs-*.exe
+            ${{github.workspace}}/winprefs-*.zip
+    strategy:
+      fail-fast: false
+      matrix:
+        build-type: [Debug, Release]
+        sys:
+          - cpack_system: win64
+            env: x86_64
+            name: mingw64
+            release: false
+            runner: windows-latest
+          - cpack_system: win64
+            env: ucrt-x86_64
+            name: ucrt64
+            release: true
+            runner: windows-latest
+          - cpack_system: winarm64
+            env: clang-aarch64
+            name: clangarm64
+            release: true
+            runner: windows-11-arm
+  build-cross:
     runs-on: ubuntu-latest
     steps:
       - name: Set up MinGW
@@ -75,19 +168,21 @@ jobs:
         run: >-
           cmake -B ${{github.workspace}}/build
           -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
-          -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
-          -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON
+          -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc
+          -DCMAKE_SYSTEM_NAME=Windows
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{matrix.build-type}} --verbose
       - name: Package
         run: >-
-          cpack -G ZIP -C ${{matrix.build-type}} --config
-          ${{github.workspace}}/build/CPackConfig.cmake --verbose
+          cpack -G ZIP -C ${{matrix.build-type}}
+          --config ${{github.workspace}}/build/CPackConfig.cmake --verbose
       - name: 'Upload Artifacts'
         uses: 'actions/upload-artifact@v7'
         with:
           if-no-files-found: error
-          name: 'winprefs-cross-${{ matrix.build-type }}'
+          name: winprefs-${{ matrix.build-type }}-cross
           path: |
             ${{github.workspace}}/winprefs-*.exe
             ${{github.workspace}}/winprefs-*.zip
@@ -101,119 +196,14 @@ jobs:
       fail-fast: false
       matrix:
         build-type: [Debug, Release]
-  build_msys:
-    runs-on: windows-latest
-    steps:
-      - id: fixed_workspace
-        name: Fix path
-        run: >-
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
-          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-      - uses: msys2/setup-msys2@v2
-        with:
-          install: >-
-            make
-          msystem: ${{matrix.sys.name}}
-          pacboy: >-
-            cmake:p
-            ninja:p
-            toolchain:p
-          update: true
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-      - name: Configure
-        run: >-
-          cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
-          --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
-        shell: msys2 {0}
-      - name: Build
-        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose
-        shell: msys2 {0}
-      - name: Install
-        run: >-
-          cmake --install ${{steps.fixed_workspace.outputs.out}}/build
-          --config ${{matrix.build-type}} --verbose
-        shell: msys2 {0}
-      - name: Install NSIS
-        run: choco install nsis -y
-      - name: Package
-        run: >-
-          cpack -C ${{matrix.build-type}}
-          --config ${{steps.fixed_workspace.outputs.out}}/build/CPackConfig.cmake --verbose
-        shell: msys2 {0}
-      - name: Configure Git
-        run: |
-          git config --global user.email "you@example.com"
-          git config --global user.name "Your Name"
-      - name: Crash test
-        run: ${{github.workspace}}/build/prefix/bin/winprefs.exe -c -d
-      - name: Show Git log of export
-        run: |
-          cd "${env:APPDATA}/prefs-export"
-          git --no-pager log
-      - name: 'Upload Artifacts'
-        uses: 'actions/upload-artifact@v7'
-        with:
-          if-no-files-found: error
-          name: 'winprefs-msys-${{matrix.sys.name}}-${{ matrix.build-type }}'
-          path: |
-            ${{github.workspace}}/winprefs-*.exe
-            ${{github.workspace}}/winprefs-*.zip
-      - name: Attest
-        uses: actions/attest-build-provenance@v4
-        with:
-          subject-path: |
-            ${{github.workspace}}/winprefs-*.exe
-            ${{github.workspace}}/winprefs-*.zip
-    strategy:
-      fail-fast: false
-      matrix:
-        build-type: [Debug, Release]
-        sys:
-          - env: clang-x86_64
-            name: clang64
-          - env: i686
-            name: mingw32
-          - env: x86_64
-            name: mingw64
-          - env: ucrt-x86_64
-            name: ucrt64
 name: Build
 'on':
-  pull_request:
-    branches:
-      - master
-    paths:
-      - '**/*.c'
-      - '**/*.cmake'
-      - '**/*.cpp'
-      - '**/*.cs'
-      - '**/*.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/cmake.yml'
-      - 'CMakePresets.json'
-      - 'CMakeSettings.json'
-      - 'vcpkg-configuration.json'
-      - 'vcpkg.json'
   push:
-    branches:
-      - master
-    paths:
-      - '**/*.c'
-      - '**/*.cmake'
-      - '**/*.cpp'
-      - '**/*.cs'
-      - '**/*.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/cmake.yml'
-      - 'CMakePresets.json'
-      - 'CMakeSettings.json'
-      - 'vcpkg-configuration.json'
-      - 'vcpkg.json'
+    branches: [master]
     tags:
       - 'v*.*.*'
+  pull_request:
+    branches: [master]
 permissions:
   attestations: write
   contents: write

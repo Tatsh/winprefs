@@ -1,11 +1,15 @@
+---
 jobs:
   managed:
+    permissions:
+      contents: write
     runs-on: windows-latest
     steps:
       - id: fixed_workspace
         name: Fix path
-        run: |
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        run: >-
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
@@ -17,7 +21,8 @@ jobs:
         run: >-
           cmake -B ${{steps.fixed_workspace.outputs.out}}/build
           --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_CSharp_TESTS=ON
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DBUILD_CSharp_TESTS=ON
         shell: vsdevenv x64 powershell {0}
       - name: Build
         run: >-
@@ -39,12 +44,15 @@ jobs:
       matrix:
         build-type: [Debug, Release]
   native:
+    permissions:
+      contents: write
     runs-on: windows-latest
     steps:
       - id: fixed_workspace
         name: Fix path
-        run: |
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        run: >-
+          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: msys2/setup-msys2@v2
         with:
           install: >-
@@ -65,14 +73,19 @@ jobs:
         run: >-
           cmake -G Ninja -B ${{steps.fixed_workspace.outputs.out}}/build
           --install-prefix ${{steps.fixed_workspace.outputs.out}}/build/prefix
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}} -DBUILD_TESTS=ON
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DBUILD_TESTS=ON
           -DENABLE_COVERAGE=ON
         shell: msys2 {0}
       - name: Build
-        run: cmake --build ${{steps.fixed_workspace.outputs.out}}/build --verbose --config ${{matrix.build-type}}
+        run: >-
+          cmake --build ${{steps.fixed_workspace.outputs.out}}/build
+          --verbose --config ${{matrix.build-type}}
         shell: msys2 {0}
       - name: Run tests
-        run: ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests --verbose -C ${{matrix.build-type}}
+        run: >-
+          ctest --test-dir ${{steps.fixed_workspace.outputs.out}}/build/native/tests
+          --verbose -C ${{matrix.build-type}}
         shell: msys2 {0}
       - name: Generate coverage information
         run: >-
@@ -97,8 +110,11 @@ jobs:
         run: sudo apt-get update -y && sudo apt-get install -y libcmocka-dev
       - name: Configure
         run: >-
-          cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
-          -DBUILD_TESTS=ON -DENABLE_ASAN=ON -DENABLE_UBSAN=ON
+          cmake -B ${{github.workspace}}/build
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DBUILD_TESTS=ON
+          -DENABLE_ASAN=ON
+          -DENABLE_UBSAN=ON
       - name: Build
         run: cmake --build ${{github.workspace}}/build --verbose
       - name: Run tests
@@ -112,28 +128,8 @@ name: Tests
   pull_request:
     branches:
       - master
-    paths:
-      - '**/*.c'
-      - '**/*.cmake'
-      - '**/*.cpp'
-      - '**/*.cs'
-      - '**/*.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/tests.yml'
-      - 'CMakePresets.json'
-      - 'vcpkg.json'
   push:
     branches:
       - master
-    paths:
-      - '**/*.c'
-      - '**/*.cmake'
-      - '**/*.cpp'
-      - '**/*.cs'
-      - '**/*.h'
-      - '**/CMakeLists.txt'
-      - '.github/workflows/tests.yml'
-      - 'CMakePresets.json'
-      - 'vcpkg.json'
 permissions:
   contents: 'read'
