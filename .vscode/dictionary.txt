@@ -1,12 +1,13 @@
-Ångström
 apos
 asan
+autoinstall
 autosort
 behavior
 bsky
 buildsystems
 cdecl
 choco
+clangarm
 cmocka
 commitizen
 commonprogramdata
@@ -24,6 +25,7 @@ dashcam
 datarootdir
 dbuild
 dcmake
+dcpack
 denable
 docstrings
 dotnettools
@@ -101,6 +103,9 @@ pacboy
 pcwch
 pcwstr
 phkey
+pkgbuild
+pkgrel
+pkgver
 productversion
 pylock
 reflow
@@ -125,6 +130,7 @@ tatsh
 teardown
 tensin
 tlbid
+tostring
 typelib
 ubsan
 ucrt
@@ -147,6 +153,7 @@ wempty
 werror
 wfullpath
 wgetcwd
+winarm
 winegcc
 winget
 winprefs
@@ -166,3 +173,4 @@ wunreachable
 wunused
 xunit
 yarnrc
+Ångström
