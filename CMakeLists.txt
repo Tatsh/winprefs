@@ -27,8 +27,14 @@ option(ENABLE_ASAN "Enable address sanitiser." OFF)
 option(ENABLE_COVERAGE "Link tests with gcov." OFF)
 option(ENABLE_UBSAN "Enable undefined behaviour sanitiser." OFF)
 option(ENABLE_VLD "Debug only: enable Visual Leak Detector." OFF)
-set(TARGET_VERSION
-    $<IF:$<CXX_COMPILER_ID:MSVC>,0x600,0x501>
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+  set(_winprefs_default_target_version 0x600)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+  set(_winprefs_default_target_version 0x500)
+else()
+  set(_winprefs_default_target_version 0x501)
+endif()
+set(TARGET_VERSION ${_winprefs_default_target_version}
     CACHE STRING "Version of Windows to target in 0x format.")
 
 if(BUILD_TESTS)

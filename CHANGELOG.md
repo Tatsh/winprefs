@@ -11,11 +11,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.4.1] - 2026-05-04
 
+### Added
+
+- Pre-built native binaries for ARM64 (Windows on ARM) and 32-bit i686, in addition to the existing
+  64-bit x86 build.
+
 ### Changed
 
 - NSIS installer no longer requires administrator privileges; it installs per-user under
   `%LOCALAPPDATA%` and the version is no longer included in the install path.
 - NSIS installer embeds version metadata so the file's properties reflect the release.
+- 32-bit native builds (MinGW) now target Windows 2000 and newer (`_WIN32_WINNT=0x500`) by default,
+  matching the README's compatibility claim.
 
 ### Fixed
 
