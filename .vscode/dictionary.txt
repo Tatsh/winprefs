@@ -69,6 +69,7 @@ libera
 libjsonnet
 libsonnet
 lmcstr
+localappdata
 lpcb
 lpcch
 lpcvoid
