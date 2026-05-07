@@ -21,6 +21,14 @@ local utils = import 'utils.libjsonnet';
       ],
     },
   },
+  dependabot+: {
+    updates+: [{
+      cooldown: { 'default-days': 7 },
+      directory: '/',
+      'package-ecosystem': 'dotnet-sdk',
+      schedule: { interval: 'weekly' },
+    }],
+  },
   shared_ignore+: ['/src/obj/'],
   gitignore+: ['*.ps1', '*.psd1', '/.vs/'],
   prettierignore+: ['*.cs'],
