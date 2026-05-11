@@ -9,7 +9,9 @@
   "documentation": "https://winprefs.readthedocs.org",
   "homepage": "https://tatsh.github.io/winprefs/",
   "license": "MIT",
-  "maintainers": ["Andrew Udvare <audvare@gmail.com>"],
+  "maintainers": [
+    "Andrew Udvare <audvare@gmail.com>"
+  ],
   "name": "winprefs",
   "version": "0.4.1"
 }

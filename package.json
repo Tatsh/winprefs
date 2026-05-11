@@ -1,4 +1,9 @@
 {
+  "_wiswa": {
+    "commandLine": "wiswa",
+    "lastRun": "2026-05-11T03:13:06Z",
+    "version": "02b0e83"
+  },
   "contributors": ["Andrew Udvare <audvare@gmail.com>"],
   "cspell": {
     "cache": {
@@ -119,7 +124,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:Tatsh/winprefs.git"
+    "url": "git+https://github.com/Tatsh/winprefs.git"
   },
   "scripts": {
     "build": "cmake --preset=default -DBUILD_DOCS=ON && cmake --build build",

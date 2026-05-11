@@ -1,7 +1,7 @@
+Ångström
 apos
 asan
 autoinstall
-autosort
 behavior
 bsky
 buildsystems
@@ -29,7 +29,6 @@ dcpack
 denable
 docstrings
 dotnettools
-doxyfile
 dunicode
 dwith
 dynamicbase
@@ -95,7 +94,6 @@ mypy
 nologo
 npmjs
 nsis
-nullglob
 nullptr
 nxcompat
 olaf
@@ -108,6 +106,7 @@ phkey
 pkgbuild
 pkgrel
 pkgver
+preapproved
 productversion
 pylock
 reflow
@@ -119,7 +118,6 @@ schemafile
 shellcheck
 shellformat
 shlwapi
-shopt
 snapcraft
 snwprintf
 softprops
@@ -177,4 +175,3 @@ wunreachable
 wunused
 xunit
 yarnrc
-Ångström
