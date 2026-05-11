@@ -92,7 +92,6 @@ municode
 mwindows
 mypy
 nologo
-npmjs
 nsis
 nullptr
 nxcompat
@@ -109,6 +108,7 @@ pkgver
 preapproved
 productversion
 pylock
+pyproject
 reflow
 regen
 regsam
@@ -138,6 +138,8 @@ ubsan
 ucrt
 ucrtbase
 udvare
+undraft
+undrafted
 userprofile
 vedantmgoyal
 vendored
@@ -164,6 +166,7 @@ wiswa
 wiswa's
 wmain
 wmissing
+worktree
 wparentheses
 wpointer
 wshadow

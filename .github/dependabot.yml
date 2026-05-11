@@ -24,10 +24,4 @@ updates:
     package-ecosystem: 'vcpkg'
     schedule:
       interval: 'weekly'
-  - cooldown:
-      default-days: 7
-    directory: '/'
-    package-ecosystem: 'dotnet-sdk'
-    schedule:
-      interval: 'weekly'
 version: 2
