@@ -44,15 +44,17 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     list(APPEND test_linker_flags "-Wl,--wrap,${func}")
   endforeach()
   set(test_c_defs TESTING=1 _WIN32_WINNT=0x600)
+  # This must be -iquote and not an include directory, otherwise system headers such as sys/stat.h
+  # resolve their <io.h> to this project's io.h.
   set(test_c_flags
       $<$<CONFIG:Debug>:${GCC_CLANG_DEBUG_C_FLAGS}>
       ${GCC_CLANG_SHARED_C_FLAGS}
+      "SHELL:-iquote ${CMAKE_SOURCE_DIR}/native"
       -Wno-error=unused-function
       -Wno-error=unused-parameter
       -Wno-unused-function
       -Wno-unused-parameter
       $<$<BOOL:${ENABLE_COVERAGE}>:--coverage>)
-  set(test_include_dirs ${CMAKE_SOURCE_DIR}/native)
   set(test_pch ../pch.h)
 
   add_library(
@@ -86,7 +88,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     wrappers.h)
   target_compile_definitions(tests PRIVATE ${test_c_defs})
   target_compile_options(tests PRIVATE ${test_c_flags} $<$<BOOL:${ENABLE_ASAN}>:-fsanitize=address>)
-  target_include_directories(tests PRIVATE ${test_include_dirs})
   target_link_options(tests PRIVATE ${test_linker_flags})
   target_precompile_headers(tests PRIVATE ${test_pch})
 
@@ -109,7 +110,6 @@ if(CMAKE_C_COMPILER_ID MATCHES "Clang|GNU")
     add_ubsan(test-${category})
     target_compile_definitions(test-${category} PRIVATE ${test_c_defs})
     target_compile_options(test-${category} PRIVATE ${test_c_flags})
-    target_include_directories(test-${category} PRIVATE ${test_include_dirs})
     target_link_libraries(test-${category}
                           PRIVATE tests $<IF:$<TARGET_EXISTS:cmocka::cmocka>,cmocka::cmocka,cmocka>)
     target_link_options(
