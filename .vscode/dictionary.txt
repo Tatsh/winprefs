@@ -13,7 +13,6 @@ commitizen
 commonprogramdata
 conv
 convs
-cooldown
 coveragerc
 coverallsapp
 cpack
@@ -36,7 +35,6 @@ egor
 ekeyrejected
 endforeach
 endfunction
-errno
 esac
 esbenp
 fileflags
@@ -50,6 +48,7 @@ gcov
 ggdb
 gmock
 graphviz
+handoff
 hkcc
 hkcr
 hkcu
@@ -108,6 +107,7 @@ pkgrel
 pkgver
 preapproved
 productversion
+pyinstaller
 pylock
 pyproject
 reflow
@@ -123,13 +123,13 @@ snapcraft
 snwprintf
 softprops
 startf
+statusline
 stdbool
 strequal
 tagfile
 taskschd
 taskscheduler
 tatsh
-teardown
 tensin
 tlbid
 tolower
@@ -179,3 +179,4 @@ wunreachable
 wunused
 xunit
 yarnrc
+zizmor
