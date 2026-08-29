@@ -8,8 +8,9 @@
 
 static int ARG_LONG_func(wchar_t **argv0, char const *name) {
     wchar_t *argIt = *argv0;
-    while (*argIt == *name && *argIt)
+    while (*argIt == *name && *argIt) {
         argIt++, name++;
+    }
     if (*argIt == *name || (*argIt == '=' && !*name)) {
         *argv0 = argIt;
         return 1;
@@ -73,6 +74,7 @@ int main(int argc, char **argv) {
     char const *input = "default", *output = "default";
     int readstdin = 0;
 
+    // clang-format off
     ARG_BEGIN {
         if (0) {
         case 'a':
@@ -127,6 +129,7 @@ int main(int argc, char **argv) {
             }
     }
     ARG_END;
+    // clang-format on
 
     printf("a = %s\n", a ? "true" : "false");
     printf("b = %s\n", b ? "true" : "false");
@@ -138,8 +141,9 @@ int main(int argc, char **argv) {
 
     printf("\nargc: %d", argc);
     puts("\nargv:");
-    while (*argv)
+    while (*argv) {
         printf("  %s\n", *argv++);
+    }
 
     return 0;
 }
@@ -157,8 +161,9 @@ int main(int argc, char **argv) {
 #define MAX_ARGC 50000
 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
-    if (size < 2)
+    if (size < 2) {
         return -1;
+    }
 
     char *buf = malloc(size + 2);
     memcpy(buf, data, size);

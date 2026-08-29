@@ -62,6 +62,7 @@ int wmain(int argc, wchar_t *argv[]) {
     wchar_t *output_file = nullptr;
     bool output_dir_specified = false;
     bool read_settings = true;
+    // clang-format off
     ARG_BEGIN {
         if (ARG_LONG("deploy-key"))
         case 'K': {
@@ -132,6 +133,7 @@ int wmain(int argc, wchar_t *argv[]) {
             }
     }
     ARG_END;
+    // clang-format on
     wchar_t *reg_path = *argv;
     enum OUTPUT_FORMAT output_format_e =
         (!format || !_wcsicmp(L"reg", format)) ? OUTPUT_FORMAT_REG :
