@@ -16,7 +16,7 @@ jobs:
           persist-credentials: false
       - uses: humbletim/vsdevenv-shell@503210b7b39a7405e534ea93c36a733b93f01087
       - name: Install dotnet-coverage
-        run: dotnet tool install --global dotnet-coverage
+        run: dotnet tool install --global dotnet-coverage --version 18.10.0
         shell: vsdevenv x64 powershell {0}
       - env:
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
