@@ -120,7 +120,10 @@ typedef void *PSID;
 #define SUCCEEDED(x) x == 0
 #define SW_HIDE 0
 #define WAIT_OBJECT_0 0
+// clang-format 18.1.3 (the CI runner) and newer releases format this braced list differently.
+// clang-format off
 #define SECURITY_NT_AUTHORITY {0, 0, 0, 0, 0, 5}
+// clang-format on
 #define SECURITY_BUILTIN_DOMAIN_RID 0x00000020
 #define DOMAIN_ALIAS_RID_ADMINS 0x00000220
 
