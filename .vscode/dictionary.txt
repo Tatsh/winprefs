@@ -10,6 +10,7 @@ clangarm
 cmocka
 commitizen
 commonprogramdata
+concrt
 conv
 convs
 coveragerc
@@ -85,7 +86,10 @@ mdfile
 mktemp
 msbuild
 msvc
+msvcp
+msvcprtd
 msvcrt
+msvcrtd
 msystem
 municode
 mwindows
@@ -138,10 +142,14 @@ typelib
 ubsan
 ucrt
 ucrtbase
+ucrtbased
 udvare
 undraft
 undrafted
 userprofile
+vccorlib
+vcomp
+vcruntime
 vedantmgoyal
 vendored
 venv

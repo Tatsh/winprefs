@@ -43,6 +43,34 @@ jobs:
           Remove-Item -Recurse -Path WinPrefs\ref -ErrorAction SilentlyContinue
           Remove-Item -Recurse -Path WinPrefs\runtimes -ErrorAction SilentlyContinue
         shell: pwsh
+      - name: Check for debug runtime linkage
+        run: |
+          $markers = @(
+            'VCRUNTIME140D',
+            'MSVCP140D',
+            'VCOMP140D',
+            'CONCRT140D',
+            'VCCORLIB140D',
+            'ucrtbased',
+            'MSVCRTD',
+            'MSVCPRTD'
+          )
+          $failed = $false
+          $files = Get-ChildItem "build/prefix/WinPrefs" -File -Recurse -Include *.dll, *.exe
+          foreach ($file in $files) {
+            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            $text = [System.Text.Encoding]::ASCII.GetString($bytes)
+            foreach ($marker in $markers) {
+              if ($text.Contains($marker)) {
+                Write-Host "::error::$($file.Name) references debug runtime $marker."
+                $failed = $true
+              }
+            }
+          }
+          if ($failed) {
+            exit 1
+          }
+        shell: pwsh
       - name: Publish to PowerShell Gallery
         run: Publish-Module -Name .\WinPrefs -NuGetApiKey $env:NUGET_API_KEY
         shell: pwsh
