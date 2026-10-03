@@ -4,11 +4,37 @@ jobs:
     if: "${{ github.event.workflow_run.conclusion == 'success' }}"
     outputs:
       has_nuget_api_key: '${{ steps.check_secret.outputs.has_nuget_api_key }}'
+      tag: '${{ steps.release.outputs.tag }}'
     runs-on: 'ubuntu-latest'
     steps:
       - env:
+          GH_TOKEN: '${{ github.token }}'
+          HEAD_SHA: '${{ github.event.workflow_run.head_sha }}'
+          REPO: '${{ github.repository }}'
+        id: 'release'
+        name: 'Find the published release for this commit'
+        run: |
+          tag=''
+          while IFS= read -r candidate; do
+            [[ -z "$candidate" ]] && continue
+            sha=$(gh api "repos/${REPO}/commits/${candidate}" \
+              -H 'Accept: application/vnd.github.sha' 2>/dev/null || echo '')
+            if [[ "$sha" == "$HEAD_SHA" ]]; then
+              tag="$candidate"
+              break
+            fi
+          done < <(gh release list --repo "$REPO" --exclude-drafts --limit 20 \
+            --json tagName --jq '.[].tagName | select(test("^v"))')
+          if [[ -z "$tag" ]]; then
+            echo "No published v* release points at ${HEAD_SHA}, nothing to publish."
+          else
+            echo "Found published release ${tag} for ${HEAD_SHA}."
+          fi
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+      - env:
           NUGET_API_KEY: '${{ secrets.NUGET_API_KEY }}'
         id: 'check_secret'
+        if: "steps.release.outputs.tag != ''"
         name: 'Check NUGET_API_KEY is set'
         run: |
           if [[ -n "$NUGET_API_KEY" ]]; then
@@ -20,7 +46,7 @@ jobs:
   publish:
     env:
       NUGET_API_KEY: '${{ secrets.NUGET_API_KEY }}'
-    if: "needs.check.outputs.has_nuget_api_key == 'true'"
+    if: "needs.check.outputs.tag != '' && needs.check.outputs.has_nuget_api_key == 'true'"
     needs:
       - 'check'
     runs-on: windows-latest
@@ -28,6 +54,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          ref: '${{ needs.check.outputs.tag }}'
       - name: Build module
         run: |
           Remove-Item -Force -Recurse build -ErrorAction SilentlyContinue
