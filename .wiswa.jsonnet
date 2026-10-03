@@ -134,4 +134,13 @@ local utils = import 'utils.libjsonnet';
       platform: 'linux|mingw',
     }],
   },
+  github+: {
+    zizmor+: {
+      rules+: {
+        'dangerous-triggers'+: {
+          ignore: std.sort(super.ignore + ['publish-gallery.yml']),
+        },
+      },
+    },
+  },
 }

@@ -3,6 +3,7 @@
 *.log
 *.ps1
 *.psd1
+*.tsbuildinfo
 *~
 .*.swp
 .*_cache/

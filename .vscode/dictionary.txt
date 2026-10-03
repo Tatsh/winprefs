@@ -1,4 +1,3 @@
-Ångström
 apos
 asan
 autoinstall
@@ -92,8 +91,10 @@ municode
 mwindows
 mypy
 nologo
+noone
 nsis
 nullptr
+numpydoc
 nxcompat
 olaf
 omnisharp
@@ -121,7 +122,6 @@ shellformat
 shlwapi
 snapcraft
 snwprintf
-softprops
 startf
 statusline
 stdbool
@@ -167,7 +167,6 @@ wiswa
 wiswa's
 wmain
 wmissing
-worktree
 wparentheses
 wpointer
 wshadow
@@ -180,3 +179,4 @@ wunused
 xunit
 yarnrc
 zizmor
+Ångström
