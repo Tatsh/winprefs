@@ -109,6 +109,7 @@ pacboy
 pcwch
 pcwstr
 phkey
+pipx
 pkgbuild
 pkgrel
 pkgver
