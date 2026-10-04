@@ -123,6 +123,7 @@ regen
 regsam
 regsetkeyvaluew
 ripgreprc
+sbclaude
 schemafile
 shellcheck
 shellformat

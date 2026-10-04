@@ -33,6 +33,7 @@
 /.mcp.json
 /.profile
 /.ripgreprc
+/.sbclaude-venv/
 /.vs/
 /.wiswa-ci/
 /.yarn/install-state.gz
