@@ -12,6 +12,7 @@ local utils = import 'utils.libjsonnet';
   want_main: false,
   want_codeql: false,
   want_tests: false,
+  want_msys2: true,
   cz+: {
     commitizen+: {
       remove_path_prefixes+: ['native'],
@@ -135,6 +136,15 @@ local utils = import 'utils.libjsonnet';
     }],
   },
   github+: {
+    workflows+: {
+      publish_msys2+: {
+        fork: 'Tatsh/MINGW-packages',
+        package_name: 'winprefs',
+      },
+      publish_winget+: {
+        identifier: 'Tatsh.WinPrefs',
+      },
+    },
     zizmor+: {
       rules+: {
         'dangerous-triggers'+: {

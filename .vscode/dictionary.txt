@@ -85,11 +85,13 @@ mconsole
 mdfile
 mktemp
 msbuild
+msix
 msvc
 msvcp
 msvcprtd
 msvcrt
 msvcrtd
+msys
 msystem
 municode
 mwindows

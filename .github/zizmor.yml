@@ -8,5 +8,6 @@ rules:
   dangerous-triggers:
     ignore:
       - 'publish-gallery.yml'
+      - 'publish-msys2.yml'
       - 'publish-winget.yml'
       - 'release.yml'
