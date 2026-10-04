@@ -1,6 +1,10 @@
 ---
+concurrency:
+  cancel-in-progress: true
+  group: '${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}'
 jobs:
   managed:
+    name: Managed tests
     permissions:
       contents: write
     runs-on: windows-latest
@@ -8,7 +12,7 @@ jobs:
       - id: fixed_workspace
         name: Fix path
         run: >-
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          echo out=$("$env:GITHUB_WORKSPACE" -Replace "\\","/") | Out-File
           -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -19,29 +23,32 @@ jobs:
         run: dotnet tool install --global dotnet-coverage --version 18.10.0
         shell: vsdevenv x64 powershell {0}
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Configure
         run: >-
           cmake -B "$env:WORKSPACE/build"
           --install-prefix "$env:WORKSPACE/build/prefix"
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          "-DCMAKE_BUILD_TYPE=$env:BUILD_TYPE"
           -DBUILD_CSharp_TESTS=ON
         shell: vsdevenv x64 powershell {0}
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Build
         run: >-
           msbuild "$env:WORKSPACE/build/ALL_BUILD.vcxproj" /restore
-          /p:Configuration=${{matrix.build-type}} /p:platform=x64 /v:n
+          "/p:Configuration=$env:BUILD_TYPE" /p:platform=x64 /v:n
         shell: vsdevenv x64 powershell {0}
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Run tests
         run: >-
           dotnet-coverage collect --nologo -o cobertura.xml --output-format cobertura
           --include-files "src/*.cs" ctest --test-dir
           "$env:WORKSPACE/build/tests" --output-on-failure
-          -C ${{matrix.build-type}}
+          -C "$env:BUILD_TYPE"
         shell: vsdevenv x64 powershell {0}
       - if: matrix.build-type == 'Debug'
         name: Coveralls
@@ -51,6 +58,7 @@ jobs:
       matrix:
         build-type: [Debug, Release]
   native:
+    name: Native tests
     permissions:
       contents: write
     runs-on: windows-latest
@@ -58,7 +66,7 @@ jobs:
       - id: fixed_workspace
         name: Fix path
         run: >-
-          echo out=$("${{github.workspace}}" -Replace "\\","/") | Out-File
+          echo out=$("$env:GITHUB_WORKSPACE" -Replace "\\","/") | Out-File
           -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - uses: msys2/setup-msys2@66cd2cce69caa17b53920067426061ca1de3a884
         with:
@@ -78,28 +86,31 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Configure
         run: >-
           cmake -G Ninja -B "$WORKSPACE/build"
           --install-prefix "$WORKSPACE/build/prefix"
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
           -DBUILD_TESTS=ON
           -DENABLE_COVERAGE=ON
         shell: msys2 {0}
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Build
         run: >-
           cmake --build "$WORKSPACE/build"
-          --verbose --config ${{matrix.build-type}}
+          --verbose --config "$BUILD_TYPE"
         shell: msys2 {0}
       - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
         name: Run tests
         run: >-
           ctest --test-dir "$WORKSPACE/build/native/tests"
-          --verbose -C ${{matrix.build-type}}
+          --verbose -C "$BUILD_TYPE"
         shell: msys2 {0}
       - env:
           WORKSPACE: ${{ steps.fixed_workspace.outputs.out }}
@@ -117,6 +128,7 @@ jobs:
       matrix:
         build-type: [Debug, Release]
   asan-test:
+    name: Sanitizer tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -125,17 +137,19 @@ jobs:
           persist-credentials: false
       - name: Install tools
         run: sudo apt-get update -y && sudo apt-get install -y libcmocka-dev
-      - name: Configure
+      - env:
+          BUILD_TYPE: ${{ matrix.build-type }}
+        name: Configure
         run: >-
-          cmake -B ${{github.workspace}}/build
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          cmake -B "$GITHUB_WORKSPACE/build"
+          -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
           -DBUILD_TESTS=ON
           -DENABLE_ASAN=ON
           -DENABLE_UBSAN=ON
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --verbose
+        run: cmake --build "$GITHUB_WORKSPACE/build" --verbose
       - name: Run tests
-        run: ctest --test-dir ${{github.workspace}}/build/native/tests --verbose
+        run: ctest --test-dir "$GITHUB_WORKSPACE/build/native/tests" --verbose
     strategy:
       fail-fast: false
       matrix:

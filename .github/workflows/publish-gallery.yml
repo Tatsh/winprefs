@@ -1,7 +1,12 @@
 ---
+concurrency:
+  cancel-in-progress: false
+  group: '${{ github.workflow }}-${{ github.event.workflow_run.head_sha }}'
+  queue: 'max'
 jobs:
   check:
     if: "${{ github.event.workflow_run.conclusion == 'success' }}"
+    name: 'Find Release'
     outputs:
       has_nuget_api_key: '${{ steps.check_secret.outputs.has_nuget_api_key }}'
       tag: '${{ steps.release.outputs.tag }}'
@@ -47,6 +52,7 @@ jobs:
     env:
       NUGET_API_KEY: '${{ secrets.NUGET_API_KEY }}'
     if: "needs.check.outputs.tag != '' && needs.check.outputs.has_nuget_api_key == 'true'"
+    name: Publish
     needs:
       - 'check'
     runs-on: windows-latest
