@@ -22,12 +22,12 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
   set_target_properties(
     PSWinPrefs
     PROPERTIES DOTNET_SDK "Microsoft.NET.Sdk"
-               DOTNET_TARGET_FRAMEWORK "net9.0"
+               DOTNET_TARGET_FRAMEWORK "net10.0"
                VS_GLOBAL_EnforceCodeStyleInBuild True
                VS_GLOBAL_ImplicitUsings enable
                VS_GLOBAL_Nullable enable
                VS_PACKAGE_REFERENCES
-               "Microsoft.PowerShell.SDK_7.5.0;TaskScheduler_${TASKSCHEDULER_VERSION}")
+               "Microsoft.PowerShell.SDK_7.6.7;TaskScheduler_${TASKSCHEDULER_VERSION}")
   target_compile_options(PSWinPrefs PRIVATE "/unsafe")
   if(BUILD_TESTS)
     target_compile_definitions(PSWinPrefs PRIVATE TESTING=1)

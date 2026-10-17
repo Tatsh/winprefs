@@ -10,7 +10,7 @@ if(CMAKE_C_COMPILER_ID STREQUAL "MSVC" AND CMAKE_C_COMPILER_VERSION VERSION_GREA
     PSWinPrefsTests
     PROPERTIES
       DOTNET_SDK "Microsoft.NET.Sdk"
-      DOTNET_TARGET_FRAMEWORK "net9.0"
+      DOTNET_TARGET_FRAMEWORK "net10.0"
       VS_GLOBAL_DebugType "Full"
       VS_GLOBAL_EnforceCodeStyleInBuild True
       VS_GLOBAL_ImplicitUsings enable

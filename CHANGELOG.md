@@ -9,6 +9,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
 
+### Changed
+
+- PowerShell module now targets .NET 10 and requires PowerShell 7.6 or newer. Building the module
+  requires Visual Studio 2026.
+
+### Fixed
+
+- Updated `Microsoft.PowerShell.SDK` to 7.6.7 to resolve vulnerabilities in
+  `System.Security.Cryptography.Xml` and `System.Security.Cryptography.Pkcs`.
+
 ## [0.4.1] - 2026-05-04
 
 ### Added

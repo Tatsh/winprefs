@@ -231,7 +231,7 @@ On Windows with Visual Studio installed:
 mkdir build
 cd build
 cmake -Wno-dev ..
-cmake -G 'Visual Studio 17 2022' --build . -DCMAKE_BUILD_TYPE=Release
+cmake -G 'Visual Studio 18 2026' --build . -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release
 ```
 
@@ -241,7 +241,7 @@ After building `winprefs.exe` will be in `build\native\Release\winprefs.exe`.
 
 #### MinGW
 
-Note: The PowerShell module (C# code) is only buildable with Visual Studio 2022.
+PowerShell module (C# code) is only buildable with Visual Studio 2026.
 
 ```shell
 mkdir build
