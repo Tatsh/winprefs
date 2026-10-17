@@ -43,6 +43,10 @@ local utils = import 'utils.libjsonnet';
         },
       }],
     },
+    resolutions+: {
+      katex: '^0.18.2',
+      'smol-toml': '^1.9.0',
+    },
   },
   vscode+: {
     c_cpp+: {

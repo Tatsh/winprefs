@@ -63,6 +63,7 @@ iwyu
 jinja
 jsonnet
 jsonschema
+katex
 libcmocka
 libera
 libjsonnet
@@ -128,6 +129,7 @@ schemafile
 shellcheck
 shellformat
 shlwapi
+smol
 snapcraft
 snwprintf
 startf

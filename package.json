@@ -133,6 +133,10 @@
     "type": "git",
     "url": "git+https://github.com/Tatsh/winprefs.git"
   },
+  "resolutions": {
+    "katex": "^0.18.2",
+    "smol-toml": "^1.9.0"
+  },
   "scripts": {
     "build": "cmake --preset=default -DBUILD_DOCS=ON && cmake --build build",
     "check-formatting": "clang-format --dry-run --Werror native/*.c native/*.h native/tests/*.c native/tests/*.h && prettier --check . && markdownlint-cli2 --config package.json --configPointer /markdownlint-cli2",
