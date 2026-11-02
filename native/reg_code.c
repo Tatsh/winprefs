@@ -163,11 +163,11 @@ bool do_write_c_reg_code(writer_t *writer,
     bool ret = true;
     wchar_t *escaped_key, *escaped_d, *escaped_prop, *top_key_s, *out;
     escaped_key = escaped_d = escaped_prop = top_key_s = out = nullptr;
-    wchar_t *first_backslash = wcschr(full_path, L'\\');
+    const wchar_t *first_backslash = wcschr(full_path, L'\\');
     if (!first_backslash) {
         goto fail;
     }
-    wchar_t *subkey = first_backslash + 1;
+    const wchar_t *subkey = first_backslash + 1;
     escaped_key = escape_for_c(subkey, false, 0);
     escaped_d = convert_data_for_c(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
@@ -411,11 +411,11 @@ bool do_write_c_sharp_reg_code(writer_t *writer,
     bool ret = true;
     wchar_t *out, *escaped_key, *escaped_d, *escaped_prop, *top_key_s;
     out = escaped_key = escaped_d = escaped_prop = top_key_s = nullptr;
-    wchar_t *first_backslash = wcschr(full_path, L'\\');
+    const wchar_t *first_backslash = wcschr(full_path, L'\\');
     if (!first_backslash) {
         goto fail;
     }
-    wchar_t *subkey = first_backslash + 1;
+    const wchar_t *subkey = first_backslash + 1;
     escaped_key = escape_for_c(subkey, false, 0);
     escaped_d = convert_data_for_c_sharp(type, value, data_len);
     escaped_prop = escape_for_c(prop, false, 0);
