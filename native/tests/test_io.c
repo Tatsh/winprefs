@@ -3,7 +3,7 @@
 
 void test_write_output_returns_false_when_WideCharToMultiByte_returns_req_size_0(void **state) {
     will_return(__wrap_WideCharToMultiByte, 0);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_false(write_output(nullptr, false, default_writer));
@@ -14,7 +14,7 @@ void test_write_output_returns_false_when_WideCharToMultiByte_returns_req_size_0
 void test_write_output_returns_true_when_WideCharToMultiByte_returns_0(void **state) {
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WideCharToMultiByte, 0);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_output(nullptr, false, default_writer));
@@ -23,12 +23,12 @@ void test_write_output_returns_true_when_WideCharToMultiByte_returns_0(void **st
 }
 
 void test_write_output_adds_cr(void **state) {
-    expect_value(__wrap_WriteFile, nNumberOfBytesToWrite, 11);
+    expect_uint_value(__wrap_WriteFile, nNumberOfBytesToWrite, 11);
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WideCharToMultiByte, 10);
     will_return(__wrap_WriteFile, 11);
     will_return(__wrap_WriteFile, true);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_output(nullptr, true, default_writer));
@@ -37,7 +37,7 @@ void test_write_output_adds_cr(void **state) {
 }
 
 void test_write_key_filtered_recursive_does_not_exceed_max_depth_inclusive(void **state) {
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(
@@ -48,7 +48,7 @@ void test_write_key_filtered_recursive_does_not_exceed_max_depth_inclusive(void 
 }
 
 void test_write_key_filtered_recursive_does_not_exceed_length_limitations(void **state) {
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(
@@ -74,7 +74,7 @@ void test_write_key_filtered_has_filters(void **state) {
     expect_string(__wrap_PathMatchSpec, pszFile, L"HKCR\\Windows\\Shell\\MuiCache");
     expect_string(__wrap_PathMatchSpec, pszSpec, L"HKCR\\Windows\\Shell\\MuiCache");
     will_return(__wrap_PathMatchSpec, true);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     const size_t wl = sizeof(wchar_t);
@@ -98,7 +98,7 @@ void test_write_key_filtered_has_filters(void **state) {
 
 void test_write_key_filtered_RegOpenKeyEx_fail(void **state) {
     will_return(__wrap_RegOpenKeyEx, -1);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(nullptr,
@@ -118,7 +118,7 @@ void test_write_key_filtered_RegQueryInfoKey_fail(void **state) {
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_false(write_key_filtered_recursive(nullptr,
@@ -139,7 +139,7 @@ void test_write_key_filtered_RegQueryInfoKey_0_subkeys_returns_true(void **state
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, ERROR_SUCCESS);
     will_return(__wrap_RegCloseKey, 0);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(nullptr,
@@ -163,7 +163,7 @@ void test_write_key_filtered_RegEnumKeyEx_fail_returns_true(void **state) {
     will_return(__wrap_RegEnumKeyEx, 0);
     will_return(__wrap_RegEnumKeyEx, -1);
     will_return(__wrap_RegCloseKey, 0);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(write_key_filtered_recursive(nullptr,
@@ -190,7 +190,7 @@ void test_write_key_filtered_recursion_fail(void **state) {
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, 0);
     will_return(__wrap_RegQueryInfoKey, -1);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_false(write_key_filtered_recursive(nullptr,
@@ -206,7 +206,7 @@ void test_write_key_filtered_recursion_fail(void **state) {
 }
 
 void test_do_writes_n_values_0_returns_true(void **state) {
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(do_writes(nullptr, 0, nullptr, OUTPUT_FORMAT_REG, default_writer));
@@ -220,7 +220,7 @@ void test_do_writes_nullptr_args(void **state) {
 }
 
 void test_do_writes_unknown_format_arg(void **state) {
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_UNKNOWN, default_writer));
@@ -229,12 +229,12 @@ void test_do_writes_unknown_format_arg(void **state) {
 }
 
 void test_do_writes_callbacks_fail(void **state) {
-    will_return_always(__wrap_RegEnumValue, ERROR_SUCCESS);
+    will_return_uint_always(__wrap_RegEnumValue, ERROR_SUCCESS);
     will_return(__wrap_do_write_reg_command, false);
     will_return(__wrap_do_write_c_reg_code, false);
     will_return(__wrap_do_write_c_sharp_reg_code, false);
     will_return(__wrap_do_write_powershell_reg_code, false);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_false(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_C, default_writer));
@@ -246,9 +246,9 @@ void test_do_writes_callbacks_fail(void **state) {
 }
 
 void test_do_writes(void **state) {
-    will_return_always(__wrap_RegEnumValue, ERROR_SUCCESS);
+    will_return_uint_always(__wrap_RegEnumValue, ERROR_SUCCESS);
     will_return(__wrap_do_write_c_reg_code, true);
-    will_return_always(__wrap_GetStdHandle, (HANDLE)0);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     writer_t *default_writer = get_default_writer();
     default_writer->setup(default_writer, true, nullptr);
     assert_true(do_writes(nullptr, 1, L"full path", OUTPUT_FORMAT_C, default_writer));

@@ -83,7 +83,7 @@ static void test_main_max_depth_conversion(void **state) {
     will_return(__wrap_PathAppend, prefs_export_path);
     will_return(__wrap_PathAppend, true);
 
-    expect_value(__wrap_save_preferences, max_depth, 50);
+    expect_int_value(__wrap_save_preferences, max_depth, 50);
     expect_any(__wrap_save_preferences, commit);
     expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
@@ -131,8 +131,8 @@ static void test_main_commit_arg(void **state) {
     will_return(__wrap_PathAppend, true);
 
     expect_any(__wrap_save_preferences, max_depth);
-    expect_value(__wrap_save_preferences, commit, true);
-    expect_value(__wrap_save_preferences, read_settings, true);
+    expect_uint_value(__wrap_save_preferences, commit, true);
+    expect_uint_value(__wrap_save_preferences, read_settings, true);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);
@@ -162,7 +162,7 @@ static void test_main_commit_arg(void **state) {
 
 static void test_main_output_dir_arg(void **state) {
     expect_any(__wrap_save_preferences, max_depth);
-    expect_value(__wrap_save_preferences, commit, false);
+    expect_uint_value(__wrap_save_preferences, commit, false);
     expect_any(__wrap_save_preferences, read_settings);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
@@ -354,7 +354,7 @@ static void test_main_format_arg_c_sharp(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     long unsigned int i;
     wchar_t **buf = calloc(4, sizeof(wchar_t *));
@@ -372,7 +372,7 @@ static void test_main_format_arg_c_sharp(void **state) {
         will_return(__wrap_PathAppend, prefs_export_path);
         will_return(__wrap_PathAppend, true);
 
-        expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C_SHARP);
+        expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C_SHARP);
         wmemset(buf[2], L'\0', 7);
         wmemcpy(buf[2], C_SHARP_FORMAT_NAMES[i], wcslen(C_SHARP_FORMAT_NAMES[i]));
         int ret = wmain(3, buf);
@@ -418,11 +418,11 @@ static const wchar_t *possible_short_paths[] = {
     L"HKCR", L"HKCC", L"HKCU", L"HKDD", L"HKLM", L"HKU"};
 
 static void test_main_format_arg_full_reg_path(void **state) {
-    will_return_always(__wrap_RegOpenKeyEx, 9999999);
+    will_return_uint_always(__wrap_RegOpenKeyEx, 9999999);
 
-    expect_value_count(__wrap_export_single_value, format, OUTPUT_FORMAT_REG, -1);
-    will_return_count(__wrap_export_single_value, true, 3);
-    will_return_count(__wrap_export_single_value, false, 3);
+    expect_uint_value_count(__wrap_export_single_value, format, OUTPUT_FORMAT_REG, SIZE_MAX);
+    will_return_uint_count(__wrap_export_single_value, true, 3);
+    will_return_uint_count(__wrap_export_single_value, false, 3);
 
     size_t full_reg_path_len = wcslen(FULL_REG_PATH_SUFFIX);
     wchar_t **buf = calloc(3, sizeof(wchar_t *));
@@ -434,7 +434,7 @@ static void test_main_format_arg_full_reg_path(void **state) {
 
     long unsigned int i;
     for (i = 0; i < ARRAY_SIZE(possible_hkey); i++) {
-        expect_value(__wrap_export_single_value, top_key, possible_hkey[i]);
+        expect_uint_value(__wrap_export_single_value, top_key, (uintptr_t)possible_hkey[i]);
         wmemset(buf[1], L'\0', full_reg_path_len + 6);
         _snwprintf(buf[1],
                    full_reg_path_len + 5,
@@ -472,7 +472,7 @@ static void test_main_format_arg_reg(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     wchar_t **buf = calloc(4, sizeof(wchar_t *));
     buf[0] = calloc(8, sizeof(wchar_t));
@@ -484,7 +484,7 @@ static void test_main_format_arg_reg(void **state) {
     wmemset(buf[1], L'\0', 3);
     wmemcpy(buf[1], L"-F", 2);
 
-    expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
+    expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
     wmemset(buf[2], L'\0', 10);
     wmemcpy(buf[2], L"reg", 3);
     int ret = wmain(3, buf);
@@ -519,7 +519,7 @@ static void test_main_format_arg_default(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     wchar_t **buf = calloc(4, sizeof(wchar_t *));
     buf[0] = calloc(8, sizeof(wchar_t));
@@ -527,7 +527,7 @@ static void test_main_format_arg_default(void **state) {
     wmemset(buf[0], L'\0', 8);
     wmemcpy(buf[0], L"winprefs", 10);
 
-    expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
+    expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
     int ret = wmain(1, buf);
     assert_return_code(ret, EXIT_SUCCESS);
 
@@ -558,7 +558,7 @@ static void test_main_save_prefs_failed(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, false);
+    will_return_uint_always(__wrap_save_preferences, false);
 
     will_return(__wrap_GetLastError, 0);
     will_return(__wrap_FormatMessage, 10);
@@ -569,7 +569,7 @@ static void test_main_save_prefs_failed(void **state) {
     wmemset(buf[0], L'\0', 8);
     wmemcpy(buf[0], L"winprefs", 10);
 
-    expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
+    expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_REG);
     int ret = wmain(1, buf);
     assert_return_code(ret, EXIT_FAILURE);
 
@@ -598,7 +598,7 @@ static void test_main_format_arg_powershell(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     long unsigned int i;
     wchar_t **buf = calloc(4, sizeof(wchar_t *));
@@ -616,7 +616,7 @@ static void test_main_format_arg_powershell(void **state) {
         will_return(__wrap_PathAppend, prefs_export_path);
         will_return(__wrap_PathAppend, true);
 
-        expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_POWERSHELL);
+        expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_POWERSHELL);
         wmemset(buf[2], L'\0', 11);
         wmemcpy(buf[2], POWERSHELL_FORMAT_NAMES[i], wcslen(POWERSHELL_FORMAT_NAMES[i]));
         int ret = wmain(3, buf);
@@ -650,7 +650,7 @@ static void test_main_format_arg_c(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     long unsigned int i;
     wchar_t **buf = calloc(4, sizeof(wchar_t *));
@@ -668,7 +668,7 @@ static void test_main_format_arg_c(void **state) {
         will_return(__wrap_PathAppend, prefs_export_path);
         will_return(__wrap_PathAppend, true);
 
-        expect_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C);
+        expect_uint_value(__wrap_save_preferences, format, OUTPUT_FORMAT_C);
         wmemset(buf[2], L'\0', 7);
         wmemcpy(buf[2], C_FORMAT_NAMES[i], wcslen(C_FORMAT_NAMES[i]));
         int ret = wmain(3, buf);
@@ -693,7 +693,7 @@ void test_main_top_key_only(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     wchar_t **buf = calloc(5, sizeof(wchar_t *));
     buf[0] = calloc(9, sizeof(wchar_t));
@@ -730,7 +730,7 @@ void test_main_top_key_only_2(void **state) {
     expect_any_always(__wrap_save_preferences, output_dir);
     expect_any_always(__wrap_save_preferences, output_file);
     expect_any_always(__wrap_save_preferences, specified_path);
-    will_return_always(__wrap_save_preferences, true);
+    will_return_uint_always(__wrap_save_preferences, true);
 
     wchar_t **buf = calloc(5, sizeof(wchar_t *));
     buf[0] = calloc(9, sizeof(wchar_t));
@@ -760,7 +760,7 @@ void test_main_top_key_only_2(void **state) {
 void test_main_no_settings_arg(void **state) {
     expect_any(__wrap_save_preferences, max_depth);
     expect_any_always(__wrap_save_preferences, commit);
-    expect_value(__wrap_save_preferences, read_settings, false);
+    expect_uint_value(__wrap_save_preferences, read_settings, false);
     expect_any(__wrap_save_preferences, format);
     expect_any(__wrap_save_preferences, deploy_key);
     expect_any(__wrap_save_preferences, hk);

@@ -8,7 +8,7 @@ void test_get_git_branch_CreatePipe_fails(void **state) {
 void test_get_git_branch_CreateProcess_fails(void **state) {
     will_return(__wrap_CreatePipe, true);
     will_return(__wrap_CreateProcess, false);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_CloseHandle, true);
     assert_null(get_git_branch(nullptr, 0, nullptr, 0));
 }
 
@@ -22,7 +22,7 @@ void test_get_git_branch(void **state) {
 
     will_return(__wrap_CreatePipe, true);
     will_return(__wrap_CreateProcess, true);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_WaitForSingleObject, WAIT_OBJECT_0);
     will_return(__wrap_PeekNamedPipe, 8);
     will_return(__wrap_PeekNamedPipe, true);
@@ -31,10 +31,10 @@ void test_get_git_branch(void **state) {
     will_return(__wrap_ReadFile, true);
     will_return(__wrap_PeekNamedPipe, 0);
     will_return(__wrap_PeekNamedPipe, true);
-    expect_value(__wrap_MultiByteToWideChar, cchWideChar, 0);
+    expect_int_value(__wrap_MultiByteToWideChar, cchWideChar, 0);
     will_return(__wrap_MultiByteToWideChar, 0);
     will_return(__wrap_MultiByteToWideChar, 6);
-    expect_value(__wrap_MultiByteToWideChar, cchWideChar, 6);
+    expect_int_value(__wrap_MultiByteToWideChar, cchWideChar, 6);
     will_return(__wrap_MultiByteToWideChar, w_master);
     will_return(__wrap_MultiByteToWideChar, 6);
 

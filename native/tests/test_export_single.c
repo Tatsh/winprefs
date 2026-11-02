@@ -14,9 +14,9 @@ void test_export_single_value_invalid_format(void **state) {
 }
 
 void test_export_single_value_formats(void **state) {
-    will_return_always(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
-    will_return_always(__wrap_RegQueryValueEx, ERROR_SUCCESS);
-    will_return_always(__wrap_GetStdHandle, 0);
+    will_return_uint_always(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
+    will_return_uint_always(__wrap_RegQueryValueEx, ERROR_SUCCESS);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     will_return(__wrap_do_write_reg_command, true);
     will_return(__wrap_do_write_c_reg_code, true);
     will_return(__wrap_do_write_c_sharp_reg_code, true);
@@ -30,9 +30,9 @@ void test_export_single_value_formats(void **state) {
 }
 
 void test_export_single_value_formats_fail(void **state) {
-    will_return_always(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
-    will_return_always(__wrap_RegQueryValueEx, ERROR_SUCCESS);
-    will_return_always(__wrap_GetStdHandle, 0);
+    will_return_uint_always(__wrap_RegOpenKeyEx, ERROR_SUCCESS);
+    will_return_uint_always(__wrap_RegQueryValueEx, ERROR_SUCCESS);
+    will_return_ptr_always(__wrap_GetStdHandle, (HANDLE)0);
     will_return(__wrap_do_write_reg_command, false);
     will_return(__wrap_do_write_c_reg_code, false);
     will_return(__wrap_do_write_c_sharp_reg_code, false);

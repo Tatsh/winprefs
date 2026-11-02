@@ -9,8 +9,8 @@ void test_git_commit_no_dot_git_wgetcwd_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, INVALID_FILE_ATTRIBUTES);
     will_return(__wrap__wgetcwd, 0);
     assert_false(git_commit(L"output-dir", nullptr));
@@ -20,8 +20,8 @@ void test_git_commit_no_dot_git_wchdir_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, INVALID_FILE_ATTRIBUTES);
     will_return(__wrap__wgetcwd, L"");
     will_return(__wrap__wchdir, 1);
@@ -32,8 +32,8 @@ void test_git_commit_no_dot_git_wchdir_fail_2(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, INVALID_FILE_ATTRIBUTES);
     will_return(__wrap__wgetcwd, L"");
     will_return(__wrap__wchdir, 0);
@@ -48,8 +48,8 @@ void test_git_commit_no_dot_git_CreateProcess_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, INVALID_FILE_ATTRIBUTES);
     will_return(__wrap__wgetcwd, L"");
     will_return(__wrap__wchdir, 0);
@@ -61,8 +61,8 @@ void test_git_commit_no_dot_git_GetExitCodeProcess_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, INVALID_FILE_ATTRIBUTES);
     will_return(__wrap__wgetcwd, L"");
     will_return(__wrap__wchdir, 0);
@@ -76,8 +76,8 @@ void test_git_commit_add_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, false);
     assert_false(git_commit(L"output-dir", nullptr));
@@ -87,8 +87,8 @@ void test_git_commit_GetTimeFormat_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
@@ -112,13 +112,13 @@ void test_git_commit_GetDateFormat_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_GetTimeFormat, 10);
+    will_return_uint_always(__wrap_GetTimeFormat, 10);
     will_return(__wrap_GetDateFormat, 0);
     assert_false(git_commit(L"output-dir", nullptr));
 
@@ -138,8 +138,8 @@ void test_git_commit_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
@@ -156,8 +156,8 @@ void test_git_commit_deploy_key_wfullpath_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
@@ -178,8 +178,8 @@ void test_git_commit_deploy_key_config_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
@@ -201,8 +201,8 @@ void test_git_commit_deploy_key_push_fail(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
@@ -231,8 +231,8 @@ void test_git_commit_deploy_key(void **state) {
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);
     will_return(__wrap_GetExitCodeProcess, true);
-    will_return_always(__wrap_WaitForSingleObject, 0);
-    will_return_always(__wrap_CloseHandle, true);
+    will_return_uint_always(__wrap_WaitForSingleObject, 0);
+    will_return_uint_always(__wrap_CloseHandle, true);
     will_return(__wrap_GetFileAttributes, FILE_ATTRIBUTE_DIRECTORY);
     will_return(__wrap_CreateProcess, true);
     will_return(__wrap_GetExitCodeProcess, 0);

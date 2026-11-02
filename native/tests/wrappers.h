@@ -1,6 +1,18 @@
 #ifndef TESTS_WRAPPERS_H
 #define TESTS_WRAPPERS_H
 
+#ifndef check_expected_int
+#define check_expected_int(parameter) check_expected(parameter)
+#define check_expected_uint(parameter) check_expected(parameter)
+#define expect_int_value(function, parameter, value) expect_value(function, parameter, value)
+#define expect_uint_value(function, parameter, value) expect_value(function, parameter, value)
+#define expect_uint_value_count(function, parameter, value, count)                                 \
+    expect_value_count(function, parameter, value, (int)(count))
+#define will_return_uint_always(function, value) will_return_always(function, value)
+#define will_return_ptr_always(function, value) will_return_always(function, value)
+#define will_return_uint_count(function, value, count) will_return_count(function, value, count)
+#endif
+
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array[0]))
 
 #define UINT64 uint64_t

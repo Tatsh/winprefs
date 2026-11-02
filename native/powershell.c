@@ -152,7 +152,7 @@ static wchar_t *add_colon_if_required(const wchar_t *path) {
         goto fail;
     } // LCOV_EXCL_STOP
     wmemset(full_path_ps, L'\0', full_path_len);
-    wchar_t *first_backslash = wcschr(path, '\\');
+    const wchar_t *first_backslash = wcschr(path, '\\');
     if (!first_backslash) {
         goto fail;
     }

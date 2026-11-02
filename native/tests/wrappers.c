@@ -10,10 +10,10 @@ bool __wrap_save_preferences(bool commit,
                              HKEY hk,
                              const wchar_t *specified_path,
                              enum OUTPUT_FORMAT format) {
-    check_expected(commit);
-    check_expected(read_settings);
-    check_expected(format);
-    check_expected(max_depth);
+    check_expected_uint(commit);
+    check_expected_uint(read_settings);
+    check_expected_uint(format);
+    check_expected_int(max_depth);
     check_expected_ptr(deploy_key);
     check_expected_ptr(hk);
     check_expected_ptr(output_dir);
@@ -23,7 +23,7 @@ bool __wrap_save_preferences(bool commit,
 }
 
 bool __wrap_export_single_value(HKEY top_key, const wchar_t *reg_path, enum OUTPUT_FORMAT format) {
-    check_expected(format);
+    check_expected_uint(format);
     check_expected_ptr(reg_path);
     check_expected_ptr(top_key);
     return mock_type(bool);
@@ -101,7 +101,7 @@ bool __wrap_WriteFile(HANDLE hFile,
                       DWORD nNumberOfBytesToWrite,
                       LPDWORD lpNumberOfBytesWritten,
                       LPOVERLAPPED lpOverlapped) {
-    check_expected(nNumberOfBytesToWrite);
+    check_expected_uint(nNumberOfBytesToWrite);
     *lpNumberOfBytesWritten = mock_type(DWORD);
     return mock_type(bool);
 }
@@ -116,7 +116,7 @@ int __wrap_MultiByteToWideChar(UINT CodePage,
                                int cbMultiByte,
                                LPWSTR lpWideCharStr,
                                int cchWideChar) {
-    check_expected(cchWideChar);
+    check_expected_int(cchWideChar);
     wchar_t *wc_ret = mock_ptr_type(wchar_t *);
     if (lpWideCharStr && wc_ret) {
         wmemcpy(lpWideCharStr, wc_ret, (size_t)cchWideChar);
@@ -311,7 +311,7 @@ int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...) {
 }
 
 bool __wrap_write_output(wchar_t *out, bool use_crlf, writer_t *writer) {
-    check_expected(out);
+    check_expected_ptr(out);
     return mock_type(bool);
 }
 
