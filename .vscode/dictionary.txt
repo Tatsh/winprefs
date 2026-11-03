@@ -117,6 +117,7 @@ pathlib
 pcwch
 pcwstr
 phkey
+pipefail
 pipx
 pkgbuild
 pkgrel
@@ -180,6 +181,7 @@ werror
 wfullpath
 wgetcwd
 winarm
+windres
 winegcc
 winget
 winprefs

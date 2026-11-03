@@ -168,7 +168,11 @@ local utils = import 'utils.libjsonnet';
   github+: { workflows+: {
     scan_build+: {
       checkout_options: { 'fetch-depth': 0 },
-      configure_command: 'cmake -S . -B build-scan -DCMAKE_BUILD_TYPE=Debug -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER_TARGET=x86_64-w64-windows-gnu',
+      configure_command: |||-
+        cmake -S . -B build-scan -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER_TARGET=x86_64-w64-windows-gnu \
+          -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
+      |||,
       documentation_steps: [
         {
           name: 'Install dependencies',
