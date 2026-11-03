@@ -1,3 +1,4 @@
+analyzer
 apos
 asan
 autoinstall
@@ -33,6 +34,7 @@ dwith
 dynamicbase
 egor
 ekeyrejected
+elif
 endforeach
 endfunction
 esac
@@ -59,13 +61,16 @@ humbletim
 ifdef
 interprocedural
 iquote
+iterdir
 iwyu
 jinja
 jsonnet
 jsonschema
 katex
+ldflags
 libcmocka
 libera
+libgcc
 libjsonnet
 libsonnet
 lmcstr
@@ -97,6 +102,7 @@ msystem
 municode
 mwindows
 mypy
+nojekyll
 nologo
 noone
 nsis
@@ -107,6 +113,7 @@ olaf
 omnisharp
 oneline
 pacboy
+pathlib
 pcwch
 pcwstr
 phkey
