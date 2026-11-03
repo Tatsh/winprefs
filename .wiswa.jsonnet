@@ -10,7 +10,7 @@ local utils = import 'utils.libjsonnet';
   keywords: ['backup', 'batch', 'c', 'csharp', 'customisation', 'customization', 'desktop', 'powershell', 'registry', 'win32', 'windows'],
   clang_format_args: 'native/*.c native/*.h native/tests/*.c native/tests/*.h',
   want_main: false,
-  want_codeql: false,
+  want_codeql: true,
   want_tests: false,
   want_msys2: true,
   cz+: {
@@ -140,6 +140,11 @@ local utils = import 'utils.libjsonnet';
     }],
   },
   github+: {
+    codeql+: {
+      languages: ['actions'],
+      runs_on: 'ubuntu-latest',
+      workflow_file: 'codeql-actions.yml',
+    },
     workflows+: {
       publish_msys2+: {
         fork: 'Tatsh/MINGW-packages',
