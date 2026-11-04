@@ -20,26 +20,40 @@ jobs:
         run: pipx install cmake
       - name: Locate MinGW runtime libraries
         run: echo "LDFLAGS=-L$(dirname "$(x86_64-w64-mingw32-gcc -print-libgcc-file-name)")" >> "$GITHUB_ENV"
+      - name: Prepare scoped compiler wrappers
+        run: |
+          mkdir -p .wiswa-ci
+          install -m 755 .github/scripts/static-analysis.py .wiswa-ci/scan-build-cc
+          install -m 755 .github/scripts/static-analysis.py .wiswa-ci/scan-build-cxx
       - name: Install Clang analyzer
         run: |
           sudo apt-get update
           sudo apt-get install -y clang clang-tools
       - env:
-          SCAN_BUILD_CONFIGURE_COMMAND: |-
+          SCAN_BUILD_CONFIGURE_COMMAND: |
+            export STATIC_ANALYSIS_CC="$CC" STATIC_ANALYSIS_CXX="$CXX"
+            export STATIC_ANALYSIS_REAL_CC=clang STATIC_ANALYSIS_REAL_CXX=clang++
+            export CC="$GITHUB_WORKSPACE/.wiswa-ci/scan-build-cc"
+            export CXX="$GITHUB_WORKSPACE/.wiswa-ci/scan-build-cxx"
             cmake -S . -B build-scan -DCMAKE_BUILD_TYPE=Debug \
               -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER_TARGET=x86_64-w64-windows-gnu \
               -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres
         name: Configure with compiler interception
         run: |-
           mkdir -p scan-build-report
-          scan-build --use-cc=clang --use-c++=clang++ -o "$RUNNER_TEMP/scan-configure" bash -eo pipefail -c "$SCAN_BUILD_CONFIGURE_COMMAND" 2>&1 | tee scan-build-report/build.log
+          scan-build --use-cc=clang --use-c++=clang++ --exclude "$(python3 .github/scripts/static-analysis.py --exclude)" -o "$RUNNER_TEMP/scan-configure" bash -eo pipefail -c "$SCAN_BUILD_CONFIGURE_COMMAND" 2>&1 | tee scan-build-report/build.log
       - env:
-          SCAN_BUILD_BUILD_COMMAND: cmake --build build-scan --clean-first --parallel 2
+          SCAN_BUILD_BUILD_COMMAND: |
+            export STATIC_ANALYSIS_CC="$CC" STATIC_ANALYSIS_CXX="$CXX"
+            export STATIC_ANALYSIS_REAL_CC=clang STATIC_ANALYSIS_REAL_CXX=clang++
+            export CC="$GITHUB_WORKSPACE/.wiswa-ci/scan-build-cc"
+            export CXX="$GITHUB_WORKSPACE/.wiswa-ci/scan-build-cxx"
+            cmake --build build-scan --clean-first --parallel 2
         id: analysis
         name: Analyze a clean build
         run: |
           mkdir -p scan-build-report
-          scan-build --use-cc=clang --use-c++=clang++ -plist-html --keep-empty -v \
+          scan-build --use-cc=clang --use-c++=clang++ --exclude "$(python3 .github/scripts/static-analysis.py --exclude)" -plist-html --keep-empty -v \
             -o scan-build-report/results bash -eo pipefail -c "$SCAN_BUILD_BUILD_COMMAND" \
             2>&1 | tee -a scan-build-report/build.log
       - env:

@@ -127,12 +127,14 @@ productversion
 pyinstaller
 pylock
 pyproject
+rdparty
 reflow
 regen
 regsam
 regsetkeyvaluew
 ripgreprc
 rmtree
+sarif
 sbclaude
 schemafile
 shellcheck

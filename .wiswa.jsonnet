@@ -212,3 +212,4 @@ local utils = import 'utils.libjsonnet';
     },
   } },
 }
++ { static_analysis_paths: ['native', 'src', 'tests'] }
