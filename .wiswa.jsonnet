@@ -208,7 +208,6 @@ local utils = import 'utils.libjsonnet';
           run: 'echo "LDFLAGS=-L$(dirname "$(x86_64-w64-mingw32-gcc -print-libgcc-file-name)")" >> "$GITHUB_ENV"',
         },
       ],
-      workflow_file: 'pages.yml',
     },
   } },
 }
