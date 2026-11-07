@@ -100,6 +100,7 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
         size_t total_size = escaped_len + 1;
         wchar_t *out = calloc(total_size, WL);
         if (!out) { // LCOV_EXCL_START
+            free(escaped);
             return nullptr;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', total_size);
@@ -119,6 +120,7 @@ static wchar_t *convert_data_for_c(DWORD reg_type, const char *data, size_t data
             int req_size = _snwprintf(nullptr, 0, L"%ls\\0", escaped) + 1;
             wchar_t *out = calloc((size_t)req_size, WL);
             if (!out) { // LCOV_EXCL_START
+                free(escaped);
                 return nullptr;
             } // LCOV_EXCL_STOP
             _snwprintf(out, (size_t)req_size, L"%ls\\0", escaped);

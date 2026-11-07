@@ -54,13 +54,12 @@ int wmain(int argc, wchar_t *argv[]) {
     bool commit = false;
     bool debug = false;
     int max_depth = 20;
-    char *as_char = nullptr;
     wchar_t *argv0 = argv[0];
     wchar_t *deploy_key = nullptr;
     wchar_t *format = nullptr;
     wchar_t *output_dir = nullptr;
     wchar_t *output_file = nullptr;
-    bool output_dir_specified = false;
+    wchar_t *default_output_dir = nullptr;
     bool read_settings = true;
     // clang-format off
     ARG_BEGIN {
@@ -81,7 +80,6 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         else if (ARG_LONG("output-dir")) case 'o': {
             output_dir = ARG_VAL();
-            output_dir_specified = true;
         }
         else if (ARG_LONG("format")) case 'F': {
             format = ARG_VAL();
@@ -89,7 +87,7 @@ int wmain(int argc, wchar_t *argv[]) {
         else if (ARG_LONG("max-depth")) case 'm': {
             wchar_t *val = ARG_VAL();
             size_t w_len = wcslen(val);
-            as_char = malloc(w_len + 1);
+            char *as_char = malloc(w_len + 1);
             if (!as_char) { // LCOV_EXCL_START
                 fprintf(stderr, "Memory error.\n");
                 goto fail;
@@ -97,6 +95,7 @@ int wmain(int argc, wchar_t *argv[]) {
             memset(as_char, 0, w_len + 1);
             wcstombs(as_char, val, w_len);
             max_depth = atoi(as_char);
+            free(as_char);
         }
         else if (ARG_LONG("no-settings")) case 'S': {
             read_settings = false;
@@ -174,7 +173,7 @@ int wmain(int argc, wchar_t *argv[]) {
         }
     }
     if (!output_dir) {
-        output_dir = calloc(MAX_PATH, WL);
+        output_dir = default_output_dir = calloc(MAX_PATH, WL);
         if (!output_dir) { // LCOV_EXCL_START
             fprintf(stderr, "Failed to allocate memory.\n");
             return EXIT_FAILURE;
@@ -220,10 +219,7 @@ int wmain(int argc, wchar_t *argv[]) {
 fail:
     ret = EXIT_FAILURE;
 cleanup:
-    free(as_char);
-    if (!output_dir_specified) {
-        free(output_dir);
-    }
+    free(default_output_dir);
     print_leaks();
     return ret;
 }

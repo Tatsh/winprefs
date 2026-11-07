@@ -66,7 +66,7 @@ static wchar_t *convert_data_for_powershell(DWORD reg_type, const char *data, si
         size_t s_size = new_len + 10;
         out = calloc(s_size, WL);
         if (!out) { // LCOV_EXCL_START
-            return nullptr;
+            goto fail;
         } // LCOV_EXCL_STOP
         wmemset(out, L'\0', s_size);
         _snwprintf(out, s_size, L"(byte[]](%ls))", bin);
