@@ -2,7 +2,6 @@ using System.Management.Automation;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
-using System.Text.RegularExpressions;
 using Microsoft.Win32.TaskScheduler;
 
 [assembly: InternalsVisibleTo("PSWinPrefsTests")]
@@ -10,7 +9,7 @@ namespace WinPrefs {
     [Alias("winprefs-install-job")]
     [Cmdlet("Register", "SavePreferencesScheduledTask")]
     [SupportedOSPlatform("windows")]
-    public partial class RegisterSavePreferencesScheduledTask : PSCmdlet {
+    public class RegisterSavePreferencesScheduledTask : PSCmdlet {
         [Alias("m")]
         [Parameter(HelpMessage = "Depth limit.")]
         public int MaxDepth = 20;
@@ -74,7 +73,7 @@ namespace WinPrefs {
             td.Settings.StartWhenAvailable = true;
             td.Actions.Add(new ExecAction(
                 location,
-                WhitespaceRegex().Replace(String.Join(" ", args), " "),
+                String.Join(" ", args.Where(arg => arg.Length > 0)),
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile
             )));
             taskManager.register("tat.sh\\WinPrefs", $"WinPrefs-{theSuffix}", td);
@@ -85,8 +84,5 @@ namespace WinPrefs {
             ProcessRecord();
             EndProcessing();
         }
-
-        [GeneratedRegex(@"\s+")]
-        private static partial Regex WhitespaceRegex();
     }
 }

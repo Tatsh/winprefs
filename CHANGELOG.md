@@ -18,6 +18,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `winprefs.exe` no longer crashes when `-m`/`--max-depth` is passed without a value. It now
   reports an error and exits with a failure status.
+- `Register-SavePreferencesScheduledTask` no longer collapses consecutive spaces inside the deploy
+  key, output directory, output file, and registry path arguments of the scheduled task.
 - Updated `Microsoft.PowerShell.SDK` to 7.6.7 to resolve vulnerabilities in
   `System.Security.Cryptography.Xml` and `System.Security.Cryptography.Pkcs`.
 

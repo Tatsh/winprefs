@@ -39,6 +39,27 @@ namespace WinPrefs.Tests {
                     Times.Once);
         }
 
+        [Fact]
+        public void Invoke_ShouldOmitUnsetArguments() {
+            // Arrange
+            var cmdlet = new RegisterSavePreferencesScheduledTask();
+            TaskDefinition? registered = null;
+            var mockTaskManager = new Mock<IScheduledTaskManager>();
+            mockTaskManager.Setup(tm => tm.register(
+               It.IsAny<string>(), It.IsAny<string>(), It.IsAny<TaskDefinition>()))
+                .Callback<string, string, TaskDefinition>((_, _, td) => registered = td);
+            var mockCopyWinprefsw = new Mock<ICopyWinprefsw>();
+            cmdlet.taskManager = mockTaskManager.Object;
+            cmdlet.copier = mockCopyWinprefsw.Object;
+
+            // Act
+            cmdlet.ProcessInternal();
+
+            // Assert
+            var action = Xunit.Assert.IsType<ExecAction>(registered?.Actions[0]);
+            Xunit.Assert.Equal(@"-m 20 -f ""exec-reg.bat"" -F reg HKCU:\", action.Arguments);
+        }
+
         private static void Thrower(Exception e) {
             throw e;
         }
