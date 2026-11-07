@@ -86,6 +86,10 @@ int wmain(int argc, wchar_t *argv[]) {
         }
         else if (ARG_LONG("max-depth")) case 'm': {
             wchar_t *val = ARG_VAL();
+            if (!val) {
+                fwprintf(stderr, L"%ls: option '--max-depth' requires an argument.\n", argv0);
+                goto fail;
+            }
             size_t w_len = wcslen(val);
             char *as_char = malloc(w_len + 1);
             if (!as_char) { // LCOV_EXCL_START

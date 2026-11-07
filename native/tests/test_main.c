@@ -117,6 +117,21 @@ static void test_main_max_depth_conversion(void **state) {
     free(prefs_export_path);
 }
 
+static void test_main_max_depth_missing_value(void **state) {
+    wchar_t **buf = calloc(3, sizeof(wchar_t *));
+    buf[0] = calloc(9, sizeof(wchar_t));
+    buf[1] = calloc(3, sizeof(wchar_t));
+    buf[2] = nullptr;
+    wmemcpy(buf[0], L"winprefs", 8);
+    wmemcpy(buf[1], L"-m", 2);
+    int ret = wmain(2, buf);
+    free(buf[0]);
+    free(buf[1]);
+    free(buf);
+
+    assert_int_equal(EXIT_FAILURE, ret);
+}
+
 static void test_main_commit_arg(void **state) {
     wchar_t *app_data_folder = calloc(30, sizeof(wchar_t));
     wmemset(app_data_folder, L'\0', 30);
@@ -808,6 +823,7 @@ const struct CMUnitTest main_tests[] = {
     cmocka_unit_test(test_main_help),
     cmocka_unit_test(test_main_invalid_option),
     cmocka_unit_test(test_main_max_depth_conversion),
+    cmocka_unit_test(test_main_max_depth_missing_value),
     cmocka_unit_test(test_main_no_settings_arg),
     cmocka_unit_test(test_main_output_dir_arg),
     cmocka_unit_test(test_main_output_file_arg),
