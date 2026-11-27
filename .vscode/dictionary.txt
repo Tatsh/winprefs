@@ -1,4 +1,3 @@
-analyzer
 apos
 asan
 autoinstall
@@ -14,7 +13,6 @@ commonprogramdata
 concrt
 conv
 convs
-copytree
 coveragerc
 coverallsapp
 cpack
@@ -35,7 +33,6 @@ dwith
 dynamicbase
 egor
 ekeyrejected
-elif
 endforeach
 endfunction
 esac
@@ -67,10 +64,8 @@ jinja
 jsonnet
 jsonschema
 katex
-ldflags
 libcmocka
 libera
-libgcc
 libjsonnet
 libsonnet
 lmcstr
@@ -113,11 +108,9 @@ olaf
 omnisharp
 oneline
 pacboy
-pathlib
 pcwch
 pcwstr
 phkey
-pipefail
 pipx
 pkgbuild
 pkgrel
@@ -133,14 +126,12 @@ regen
 regsam
 regsetkeyvaluew
 ripgreprc
-rmtree
 sarif
 sbclaude
 schemafile
 shellcheck
 shellformat
 shlwapi
-shutil
 smol
 snapcraft
 snwprintf
@@ -185,7 +176,6 @@ werror
 wfullpath
 wgetcwd
 winarm
-windres
 winegcc
 winget
 winprefs
